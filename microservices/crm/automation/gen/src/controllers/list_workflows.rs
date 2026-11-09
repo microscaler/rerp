@@ -19,13 +19,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-06-08T16:00:00Z",
     //       "description": "",
     //       "entry_step_id": "f1189b89-3e27-5826-bc93-e33f7450d394",
+    //       "goal_rate": 0.23,
     //       "id": "22e49987-c27c-538a-9688-56d9ca17a7ec",
     //       "is_active": true,
     //       "last_run": "2026-11-05T15:58:00Z",
+    //       "messages_sent": 31402,
     //       "name": "Welcome series (7 days)",
     //       "reentry": "ONCE",
     //       "sequence": 1,
     //       "status": "ACTIVE",
+    //       "step_count": 9,
+    //       "stop_on_conversion_id": "30eefab7-ff42-50cf-85bd-3a974b1ce548",
+    //       "stop_on_unsubscribe": true,
     //       "trigger_type": "SUBSCRIBED_TO_LIST",
     //       "triggers": [
     //         {
@@ -49,13 +54,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-06-18T16:00:00Z",
     //       "description": "",
     //       "entry_step_id": "686016a9-b02e-5415-8f48-28549c0ca454",
+    //       "goal_rate": 0.11,
     //       "id": "1114e157-f1ec-5dda-9063-79abf0255ee3",
     //       "is_active": true,
     //       "last_run": "2026-11-05T15:38:00Z",
+    //       "messages_sent": 7110,
     //       "name": "Abandoned signup",
     //       "reentry": "ONCE",
     //       "sequence": 1,
     //       "status": "ACTIVE",
+    //       "step_count": 7,
+    //       "stop_on_conversion_id": "ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b",
+    //       "stop_on_unsubscribe": true,
     //       "trigger_type": "TAG_ADDED",
     //       "triggers": [
     //         {
@@ -73,13 +83,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-06-28T16:00:00Z",
     //       "description": "",
     //       "entry_step_id": "d8cdcb6a-61a1-563f-81fd-329e0ae430fd",
+    //       "goal_rate": 0.06,
     //       "id": "b36c0bc7-7dae-56b4-af7f-9c1ef4673496",
     //       "is_active": true,
     //       "last_run": "2026-11-05T15:18:00Z",
+    //       "messages_sent": 4120,
     //       "name": "Re-engage · 90 days quiet",
     //       "reentry": "MULTIPLE",
     //       "sequence": 1,
     //       "status": "ACTIVE",
+    //       "step_count": 5,
+    //       "stop_on_conversion_id": "ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b",
+    //       "stop_on_unsubscribe": true,
     //       "trigger_type": "TIME_BASED",
     //       "triggers": [
     //         {
@@ -105,13 +120,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-06-08T16:00:00Z",
       "description": "",
       "entry_step_id": "f1189b89-3e27-5826-bc93-e33f7450d394",
+      "goal_rate": 0.23,
       "id": "22e49987-c27c-538a-9688-56d9ca17a7ec",
       "is_active": true,
       "last_run": "2026-11-05T15:58:00Z",
+      "messages_sent": 31402,
       "name": "Welcome series (7 days)",
       "reentry": "ONCE",
       "sequence": 1,
       "status": "ACTIVE",
+      "step_count": 9,
+      "stop_on_conversion_id": "30eefab7-ff42-50cf-85bd-3a974b1ce548",
+      "stop_on_unsubscribe": true,
       "trigger_type": "SUBSCRIBED_TO_LIST",
       "triggers": [
         {
@@ -135,13 +155,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-06-18T16:00:00Z",
       "description": "",
       "entry_step_id": "686016a9-b02e-5415-8f48-28549c0ca454",
+      "goal_rate": 0.11,
       "id": "1114e157-f1ec-5dda-9063-79abf0255ee3",
       "is_active": true,
       "last_run": "2026-11-05T15:38:00Z",
+      "messages_sent": 7110,
       "name": "Abandoned signup",
       "reentry": "ONCE",
       "sequence": 1,
       "status": "ACTIVE",
+      "step_count": 7,
+      "stop_on_conversion_id": "ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b",
+      "stop_on_unsubscribe": true,
       "trigger_type": "TAG_ADDED",
       "triggers": [
         {
@@ -159,13 +184,18 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-06-28T16:00:00Z",
       "description": "",
       "entry_step_id": "d8cdcb6a-61a1-563f-81fd-329e0ae430fd",
+      "goal_rate": 0.06,
       "id": "b36c0bc7-7dae-56b4-af7f-9c1ef4673496",
       "is_active": true,
       "last_run": "2026-11-05T15:18:00Z",
+      "messages_sent": 4120,
       "name": "Re-engage · 90 days quiet",
       "reentry": "MULTIPLE",
       "sequence": 1,
       "status": "ACTIVE",
+      "step_count": 5,
+      "stop_on_conversion_id": "ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b",
+      "stop_on_unsubscribe": true,
       "trigger_type": "TIME_BASED",
       "triggers": [
         {
@@ -191,6 +221,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":1204,"completed_enrolments":8311,"created_at":"2026-06-08T16:00:00Z","description":"","entry_step_id":"f1189b89-3e27-5826-bc93-e33f7450d394","id":"22e49987-c27c-538a-9688-56d9ca17a7ec","is_active":true,"last_run":"2026-11-05T15:58:00Z","name":"Welcome series (7 days)","reentry":"ONCE","sequence":1,"status":"ACTIVE","trigger_type":"SUBSCRIBED_TO_LIST","triggers":[{"config":{"label":"Newsletter"},"type":"SUBSCRIBED_TO_LIST"},{"config":{"label":"Website footer"},"type":"FORM_SUBMITTED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default(), serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":318,"completed_enrolments":2940,"created_at":"2026-06-18T16:00:00Z","description":"","entry_step_id":"686016a9-b02e-5415-8f48-28549c0ca454","id":"1114e157-f1ec-5dda-9063-79abf0255ee3","is_active":true,"last_run":"2026-11-05T15:38:00Z","name":"Abandoned signup","reentry":"ONCE","sequence":1,"status":"ACTIVE","trigger_type":"TAG_ADDED","triggers":[{"config":{"label":"trial"},"type":"TAG_ADDED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default(), serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":2077,"completed_enrolments":4120,"created_at":"2026-06-28T16:00:00Z","description":"","entry_step_id":"d8cdcb6a-61a1-563f-81fd-329e0ae430fd","id":"b36c0bc7-7dae-56b4-af7f-9c1ef4673496","is_active":true,"last_run":"2026-11-05T15:18:00Z","name":"Re-engage · 90 days quiet","reentry":"MULTIPLE","sequence":1,"status":"ACTIVE","trigger_type":"TIME_BASED","triggers":[{"config":{"label":"daily · segment Churn risk"},"type":"TIME_BASED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default()],limit: 25,page: 1,total: 6,
+        items: vec![serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":1204,"completed_enrolments":8311,"created_at":"2026-06-08T16:00:00Z","description":"","entry_step_id":"f1189b89-3e27-5826-bc93-e33f7450d394","goal_rate":0.23,"id":"22e49987-c27c-538a-9688-56d9ca17a7ec","is_active":true,"last_run":"2026-11-05T15:58:00Z","messages_sent":31402,"name":"Welcome series (7 days)","reentry":"ONCE","sequence":1,"status":"ACTIVE","step_count":9,"stop_on_conversion_id":"30eefab7-ff42-50cf-85bd-3a974b1ce548","stop_on_unsubscribe":true,"trigger_type":"SUBSCRIBED_TO_LIST","triggers":[{"config":{"label":"Newsletter"},"type":"SUBSCRIBED_TO_LIST"},{"config":{"label":"Website footer"},"type":"FORM_SUBMITTED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default(), serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":318,"completed_enrolments":2940,"created_at":"2026-06-18T16:00:00Z","description":"","entry_step_id":"686016a9-b02e-5415-8f48-28549c0ca454","goal_rate":0.11,"id":"1114e157-f1ec-5dda-9063-79abf0255ee3","is_active":true,"last_run":"2026-11-05T15:38:00Z","messages_sent":7110,"name":"Abandoned signup","reentry":"ONCE","sequence":1,"status":"ACTIVE","step_count":7,"stop_on_conversion_id":"ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b","stop_on_unsubscribe":true,"trigger_type":"TAG_ADDED","triggers":[{"config":{"label":"trial"},"type":"TAG_ADDED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default(), serde_json::from_value::<Workflow>(serde_json::json!({"active_enrolments":2077,"completed_enrolments":4120,"created_at":"2026-06-28T16:00:00Z","description":"","entry_step_id":"d8cdcb6a-61a1-563f-81fd-329e0ae430fd","goal_rate":0.06,"id":"b36c0bc7-7dae-56b4-af7f-9c1ef4673496","is_active":true,"last_run":"2026-11-05T15:18:00Z","messages_sent":4120,"name":"Re-engage · 90 days quiet","reentry":"MULTIPLE","sequence":1,"status":"ACTIVE","step_count":5,"stop_on_conversion_id":"ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b","stop_on_unsubscribe":true,"trigger_type":"TIME_BASED","triggers":[{"config":{"label":"daily · segment Churn risk"},"type":"TIME_BASED"}],"updated_at":"2026-11-02T16:00:00Z"})).unwrap_or_default()],limit: 25,page: 1,total: 6,
     })
 }

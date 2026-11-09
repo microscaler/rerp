@@ -21,8 +21,28 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open")]
+    pub open: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open_value")]
+    pub open_value: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "pipeline_id")]
+    pub pipeline_id: Option<String>,
+
     #[serde(rename = "stages")]
     pub stages: Vec<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "stalled")]
+    pub stalled: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "stalled_value")]
+    pub stalled_value: Option<i64>,
 
     #[serde(rename = "total_opportunities")]
     pub total_opportunities: i32,
@@ -32,6 +52,18 @@ pub struct Response {
 
     #[serde(rename = "total_weighted_revenue")]
     pub total_weighted_revenue: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "weighted_value")]
+    pub weighted_value: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "won_this_month")]
+    pub won_this_month: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "won_value_this_month")]
+    pub won_value_this_month: Option<i64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

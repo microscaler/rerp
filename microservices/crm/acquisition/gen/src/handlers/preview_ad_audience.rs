@@ -87,8 +87,16 @@ pub struct Response {
     pub excluded: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "holdout")]
+    pub holdout: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "identifier_coverage")]
     pub identifier_coverage: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "platform_minimum")]
+    pub platform_minimum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "source_count")]

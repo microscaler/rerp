@@ -26,7 +26,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         }
     //       ]
     //     }
-    //   ]
+    //   ],
+    //   "week_label": "Week label"
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -47,7 +48,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         }
       ]
     }
-  ]
+  ],
+  "week_label": "Week label"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -58,6 +60,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        days: vec![serde_json::from_str::<serde_json::Value>(r#"{"date":"2026-11-25","posts":[{"body":"Body","created_at":"2026-11-05T16:00:00Z","id":"3eb009b7-a99d-5a4c-956a-99e11d8dbb76","status":"DRAFT","targets":[{"account_id":"b06c6126-3814-5778-9fd5-6fd9f1ad37bf"}]}]}"#).unwrap_or(serde_json::Value::Null)],
+        days: vec![serde_json::from_str::<serde_json::Value>(r#"{"date":"2026-11-25","posts":[{"body":"Body","created_at":"2026-11-05T16:00:00Z","id":"3eb009b7-a99d-5a4c-956a-99e11d8dbb76","status":"DRAFT","targets":[{"account_id":"b06c6126-3814-5778-9fd5-6fd9f1ad37bf"}]}]}"#).unwrap_or(serde_json::Value::Null)],week_label: Some("Week label".to_string()),
     })
 }

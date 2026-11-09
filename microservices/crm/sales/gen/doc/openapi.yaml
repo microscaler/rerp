@@ -144,6 +144,7 @@ paths:
                   url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                   token: 55e9e0da0f6b5bac785a4e086d4672cd
                   created_at: '2026-11-03T16:00:00Z'
+                  user_id: alex
                 - id: e094760a-c9e6-5722-a46b-a81f93262000
                   name: Everything
                   scope: ALL
@@ -153,6 +154,7 @@ paths:
                   url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/a91c2f0e7b8d4c6a9e1f3b5d7c9e04f1.ics
                   token: a91c2f0e7b8d4c6a9e1f3b5d7c9e04f1
                   created_at: '2026-09-26T16:00:00Z'
+                  user_id: alex
                 total: 2
                 page: 1
                 limit: 25
@@ -214,6 +216,7 @@ paths:
                 url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                 token: 55e9e0da0f6b5bac785a4e086d4672cd
                 created_at: '2026-11-03T16:00:00Z'
+                user_id: alex
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -267,6 +270,7 @@ paths:
                 url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                 token: 55e9e0da0f6b5bac785a4e086d4672cd
                 created_at: '2026-11-03T16:00:00Z'
+                user_id: alex
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -333,6 +337,7 @@ paths:
                 url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                 token: 55e9e0da0f6b5bac785a4e086d4672cd
                 created_at: '2026-11-03T16:00:00Z'
+                user_id: alex
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -398,6 +403,7 @@ paths:
                 url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                 token: 55e9e0da0f6b5bac785a4e086d4672cd
                 created_at: '2026-11-03T16:00:00Z'
+                user_id: alex
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -485,6 +491,7 @@ paths:
                 url: https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics
                 token: 55e9e0da0f6b5bac785a4e086d4672cd
                 created_at: '2026-11-03T16:00:00Z'
+                user_id: alex
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1612,16 +1619,19 @@ paths:
                   summary: Email received from Priya Natarajan
                   actor: mailbox
                   at: '2026-11-05T11:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
                 - id: 56f9f35a-b3ae-561e-a01d-fc17a886c66f
                   kind: CREATED
                   summary: Note added
                   actor: Alex Morgan
                   at: '2026-11-04T14:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
                 - id: 49dfa063-a2e2-5b6b-8052-24d0928bc8d4
                   kind: EMAIL_SENT
                   summary: 1:1 email sent · Proposal for 120 seats
                   actor: Alex Morgan
                   at: '2026-11-04T11:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
                 total: 6
                 page: 1
                 limit: 20
@@ -1673,6 +1683,7 @@ paths:
               role_id: bf97547e-6bcb-5904-afb7-41336a460ebf
               role: Role
               primary: false
+              is_primary: true
       responses:
         '201':
           description: Created
@@ -1681,6 +1692,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/Deal'
               example:
+                contact_id: 93f1db66-d1af-580b-b546-6a13f1774d12
+                name: Marcus Reid
+                email: marcus.reid@adventureworks.example
+                role: Champion
+                is_primary: false
                 id: 1b23e5c3-0ff4-5d6d-a54b-e72da751ce26
                 title: Northwind · 48 → 120 seats
                 pipeline_id: 32dd9c82-6ef8-54b5-816b-7f32b5de5050
@@ -1726,14 +1742,17 @@ paths:
                   name: Priya Natarajan
                   email: priya.natarajan@northwindtraders.example
                   role: Decision maker
+                  is_primary: true
                 - contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
                   name: Tom Okafor
                   email: tom.okafor@fabrikam.example
                   role: Champion
+                  is_primary: false
                 - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
                   name: Lena Fischer
                   email: lena.fischer@contoso.example
                   role: Procurement
+                  is_primary: false
                 total: 2
                 page: 1
                 limit: 25
@@ -1835,6 +1854,11 @@ paths:
                 created_by: Created by
                 created_at: '2026-11-05T16:00:00Z'
                 updated_at: '2026-11-05T16:00:00Z'
+                contact_id: cab01328-10bf-5c9a-9c3a-5c2c57018288
+                name: Northwind Traders
+                email: Email
+                role: Role
+                is_primary: true
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1941,6 +1965,11 @@ paths:
                   to:
                   - To
                   subject: 'Re: Proposal for 120 seats'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                  kind: MAILBOX
+                  sent_at: '2026-11-05T11:00:00Z'
+                  opens: 0
+                  clicks: 0
                   direction: OUT
                   at: '2026-11-05T16:00:00Z'
                 - id: deec010c-855c-539b-8d81-1431924ccb88
@@ -1948,6 +1977,11 @@ paths:
                   to:
                   - To
                   subject: Proposal for 120 seats
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                  kind: ONE_TO_ONE
+                  sent_at: '2026-11-05T05:00:00Z'
+                  opens: 2
+                  clicks: 1
                   direction: OUT
                   at: '2026-11-05T16:00:00Z'
                 - id: 1c2c13d1-7fe2-5067-bfa7-0039c31d4603
@@ -1955,6 +1989,11 @@ paths:
                   to:
                   - To
                   subject: October product update
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                  kind: CAMPAIGN
+                  sent_at: '2026-10-28T16:00:00Z'
+                  opens: 1
+                  clicks: 0
                   direction: OUT
                   at: '2026-11-05T16:00:00Z'
                 total: 3
@@ -2089,12 +2128,18 @@ paths:
                   url: https://crm.acme.example/files/dfile1
                   uploaded_by: Alex Morgan
                   created_at: '2026-11-04T11:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                  file_name: Northwind-proposal-v2.pdf
+                  size_bytes: 319488
                   filename: Filename
                   size: 3
                 - id: 9c808bcb-a18d-53f5-9805-02247a239a42
                   url: https://crm.acme.example/files/dfile2
                   uploaded_by: Alex Morgan
                   created_at: '2026-11-04T13:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                  file_name: SAML-setup-guide.pdf
+                  size_bytes: 1153433
                   filename: Filename
                   size: 3
                 total: 2
@@ -2145,6 +2190,9 @@ paths:
                 id: 93fa29a9-2114-561b-bc28-f28f2a42613a
                 uploaded_by: Me
                 created_at: '2026-11-05T16:00:00Z'
+                deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
+                file_name: upload.pdf
+                size_bytes: 0
                 filename: Filename
                 size: 3
         '401':
@@ -2263,10 +2311,12 @@ paths:
                   text: Priya confirmed budget approved for 120 seats; SSO is the blocker. Sent SAML docs.
                   author: Alex Morgan
                   created_at: '2026-11-04T14:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
                 - id: 938887ff-e5fb-5b68-b294-071e744f7951
                   text: Deal created from form "Contact sales" (seats = 120).
                   author: Automation · Hot lead handoff
                   created_at: '2026-11-02T09:00:00Z'
+                  deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
                 total: 2
                 page: 1
                 limit: 20
@@ -2325,6 +2375,7 @@ paths:
                 text: ''
                 author: Me
                 created_at: '2026-11-05T16:00:00Z'
+                deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2386,6 +2437,7 @@ paths:
                 pinned: false
                 created_at: '2026-11-05T16:00:00Z'
                 updated_at: '2026-11-05T16:00:00Z'
+                deal_id: 22fefcba-8554-529b-a78d-271dec0488c7
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2511,6 +2563,11 @@ paths:
                 created_by: Created by
                 created_at: '2026-11-05T16:00:00Z'
                 updated_at: '2026-11-05T16:00:00Z'
+                contact_id: cab01328-10bf-5c9a-9c3a-5c2c57018288
+                name: Northwind Traders
+                email: Email
+                role: Role
+                is_primary: true
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2602,6 +2659,11 @@ paths:
                 created_by: Created by
                 created_at: '2026-11-05T16:00:00Z'
                 updated_at: '2026-11-05T16:00:00Z'
+                contact_id: cab01328-10bf-5c9a-9c3a-5c2c57018288
+                name: Northwind Traders
+                email: Email
+                role: Role
+                is_primary: true
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2767,6 +2829,11 @@ paths:
                   write_date: '2026-11-02T16:00:00Z'
                   stage_name: Proposal
                   stage_probability: 50
+                  form: Form
+                  attribution:
+                    channel: customer expansion
+                    landing_path: /pricing
+                    first_touch_at: '2026-10-13T16:00:00Z'
                 - id: 48d65ced-2142-5626-af8e-c006f3c081b0
                   name: Fabrikam · trial → team
                   type: LEAD
@@ -2789,6 +2856,11 @@ paths:
                   write_date: '2026-11-03T16:00:00Z'
                   stage_name: New
                   stage_probability: 10
+                  form: contact
+                  attribution:
+                    channel: form
+                    landing_path: /pricing
+                    first_touch_at: '2026-10-14T16:00:00Z'
                 - id: 9c1e9e9d-0f28-58fc-bef5-2374e4abf12c
                   name: Contoso · Business plan
                   type: LEAD
@@ -2811,6 +2883,11 @@ paths:
                   write_date: '2026-10-28T16:00:00Z'
                   stage_name: Proposal
                   stage_probability: 50
+                  form: contact
+                  attribution:
+                    channel: form
+                    landing_path: /pricing
+                    first_touch_at: '2026-10-08T16:00:00Z'
                 total: 12
                 page: 1
                 limit: 25
@@ -2904,6 +2981,11 @@ paths:
                 write_date: '2026-11-02T16:00:00Z'
                 stage_name: Proposal
                 stage_probability: 50
+                form: Form
+                attribution:
+                  channel: customer expansion
+                  landing_path: /pricing
+                  first_touch_at: '2026-10-13T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3042,6 +3124,11 @@ paths:
                 write_date: '2026-11-02T16:00:00Z'
                 stage_name: Proposal
                 stage_probability: 50
+                form: Form
+                attribution:
+                  channel: customer expansion
+                  landing_path: /pricing
+                  first_touch_at: '2026-10-13T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -3140,6 +3227,11 @@ paths:
                 write_date: '2026-11-02T16:00:00Z'
                 stage_name: Proposal
                 stage_probability: 50
+                form: Form
+                attribution:
+                  channel: customer expansion
+                  landing_path: /pricing
+                  first_touch_at: '2026-10-13T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -3437,6 +3529,8 @@ paths:
                 stage_probability: 3
                 stage_color: 3
                 is_rotting: true
+                form: Form
+                attribution: {}
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -3512,6 +3606,8 @@ paths:
                   open_deals: 38
                   open_value: '412300.00'
                   created_at: '2026-03-30T16:00:00Z'
+                  closed_deals: 7
+                  fiscal_year_start: JAN
                 - id: 7bb3c22d-2ff5-5dd8-8252-93551ce02c7c
                   name: Partners
                   currency: EUR
@@ -3520,6 +3616,8 @@ paths:
                   open_deals: 6
                   open_value: '48000.00'
                   created_at: '2026-03-30T16:00:00Z'
+                  closed_deals: 2
+                  fiscal_year_start: JAN
                 - id: 0b83cac7-7b15-5d24-b8bd-bb5960b6bec6
                   name: Renewals
                   currency: EUR
@@ -3528,6 +3626,8 @@ paths:
                   open_deals: 11
                   open_value: '96500.00'
                   created_at: '2026-03-30T16:00:00Z'
+                  closed_deals: 2
+                  fiscal_year_start: JAN
                 total: 3
                 page: 1
                 limit: 25
@@ -3590,6 +3690,8 @@ paths:
                 open_deals: 38
                 open_value: '412300.00'
                 created_at: '2026-03-30T16:00:00Z'
+                closed_deals: 7
+                fiscal_year_start: JAN
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3635,14 +3737,28 @@ paths:
                   stage_name: New
                   count: 9
                   weighted_revenue: '4100.00'
+                  revenue: 41000
+                  probability: 10
                 - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
                   stage_name: Qualified
                   count: 8
                   weighted_revenue: '24100.00'
+                  revenue: 96400
+                  probability: 25
                 - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
                   stage_name: Proposal
                   count: 7
                   weighted_revenue: '59250.00'
+                  revenue: 118500
+                  probability: 50
+                pipeline_id: d9a2022e-96ff-53a3-a94d-2b169424fd31
+                open: 38
+                open_value: 412300
+                weighted_value: 188900
+                won_this_month: 7
+                won_value_this_month: 55200
+                stalled: 6
+                stalled_value: 58200
                 total_opportunities: 3
                 total_revenue: '1250.00'
                 total_weighted_revenue: '1250.00'
@@ -3694,6 +3810,8 @@ paths:
                 open_deals: 38
                 open_value: '412300.00'
                 created_at: '2026-03-30T16:00:00Z'
+                closed_deals: 7
+                fiscal_year_start: JAN
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3761,6 +3879,8 @@ paths:
                 open_deals: 38
                 open_value: '412300.00'
                 created_at: '2026-03-30T16:00:00Z'
+                closed_deals: 7
+                fiscal_year_start: JAN
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3826,6 +3946,8 @@ paths:
                 open_deals: 38
                 open_value: '412300.00'
                 created_at: '2026-03-30T16:00:00Z'
+                closed_deals: 7
+                fiscal_year_start: JAN
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4340,6 +4462,8 @@ paths:
 
                     %SIGNATURE%'
                   updated_at: '2026-11-04T16:00:00Z'
+                  title: Trial follow-up
+                  use_count: 41
                   name: Northwind Traders
                 - id: eac7c2fa-4409-5886-b674-5a0d0ed8ddb6
                   category_id: 113ca5aa-e3f2-576a-b6b5-79dbb715308e
@@ -4353,6 +4477,8 @@ paths:
 
                     %SIGNATURE%'
                   updated_at: '2026-10-27T16:00:00Z'
+                  title: Proposal cover note
+                  use_count: 18
                   name: Northwind Traders
                 - id: 5bad7783-ebef-5909-8e69-53319d7f4cfd
                   category_id: cab98488-f673-5409-9af6-81de2f44a796
@@ -4363,6 +4489,8 @@ paths:
 
                     %SIGNATURE%'
                   updated_at: '2026-10-16T16:00:00Z'
+                  title: Meeting confirmation
+                  use_count: 66
                   name: Northwind Traders
                 total: 4
                 page: 1
@@ -4424,6 +4552,8 @@ paths:
 
                   %SIGNATURE%'
                 updated_at: '2026-11-04T16:00:00Z'
+                title: Trial follow-up
+                use_count: 41
                 name: Northwind Traders
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -4480,6 +4610,8 @@ paths:
 
                   %SIGNATURE%'
                 updated_at: '2026-11-04T16:00:00Z'
+                title: Trial follow-up
+                use_count: 41
                 name: Northwind Traders
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -4546,6 +4678,8 @@ paths:
 
                   %SIGNATURE%'
                 updated_at: '2026-11-04T16:00:00Z'
+                title: Trial follow-up
+                use_count: 41
                 name: Northwind Traders
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -4611,6 +4745,8 @@ paths:
 
                   %SIGNATURE%'
                 updated_at: '2026-11-04T16:00:00Z'
+                title: Trial follow-up
+                use_count: 41
                 name: Northwind Traders
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -4791,6 +4927,7 @@ paths:
                   - title
                   - next_task
                   - owner
+                  sort_by: NEXT_TASK
                 - id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
                   name: Qualified
                   sequence: 2
@@ -4807,6 +4944,7 @@ paths:
                   - title
                   - next_task
                   - owner
+                  sort_by: NEXT_TASK
                 - id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
                   name: Proposal
                   sequence: 3
@@ -4823,6 +4961,7 @@ paths:
                   - title
                   - next_task
                   - owner
+                  sort_by: NEXT_TASK
                 total: 16
                 page: 1
                 limit: 25
@@ -4893,6 +5032,7 @@ paths:
                 - title
                 - next_task
                 - owner
+                sort_by: NEXT_TASK
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
@@ -4954,6 +5094,7 @@ paths:
                 - title
                 - next_task
                 - owner
+                sort_by: NEXT_TASK
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -5029,6 +5170,7 @@ paths:
                 - title
                 - next_task
                 - owner
+                sort_by: NEXT_TASK
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -5118,6 +5260,7 @@ paths:
                 - title
                 - next_task
                 - owner
+                sort_by: NEXT_TASK
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -5201,12 +5344,17 @@ paths:
                 - id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
                   label: Reached
                   sentiment: POSITIVE
+                  task_type_ids: []
                 - id: ca29541d-dde8-5a9e-818d-b0717df850c9
                   label: Replied
                   sentiment: POSITIVE
+                  task_type_ids:
+                  - 099104fc-dcee-57bf-b906-d2b826beb51d
                 - id: 822890d5-c8b4-5558-a84c-60e98767732f
                   label: Held
                   sentiment: POSITIVE
+                  task_type_ids:
+                  - 645bfe17-69c3-558e-82cd-9594c3609fa2
                 total: 12
                 page: 1
                 limit: 25
@@ -5255,6 +5403,7 @@ paths:
                 id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
                 label: Reached
                 sentiment: POSITIVE
+                task_type_ids: []
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -5299,6 +5448,7 @@ paths:
                 id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
                 label: Reached
                 sentiment: POSITIVE
+                task_type_ids: []
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -5352,6 +5502,7 @@ paths:
                 id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
                 label: Reached
                 sentiment: POSITIVE
+                task_type_ids: []
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -5403,6 +5554,7 @@ paths:
                 id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
                 label: Reached
                 sentiment: POSITIVE
+                task_type_ids: []
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -5469,6 +5621,9 @@ paths:
                 $ref: '#/components/schemas/TaskSettings'
               example:
                 require_outcomes: true
+                default_reminder_minutes: 15
+                allow_unlinked_tasks: false
+                updated_at: '2026-11-03T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -5509,6 +5664,9 @@ paths:
               default_due_offset_minutes: 3
               default_reminders:
               - unit: AT_DUE
+              default_reminder_minutes: 3
+              allow_unlinked_tasks: false
+              updated_at: '2026-11-05T16:00:00Z'
       responses:
         '200':
           description: OK
@@ -5518,6 +5676,9 @@ paths:
                 $ref: '#/components/schemas/TaskSettings'
               example:
                 require_outcomes: true
+                default_reminder_minutes: 15
+                allow_unlinked_tasks: false
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -6004,7 +6165,7 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: assignee_id
+      - name: owner_id
         in: query
         schema:
           type: string
@@ -6061,6 +6222,7 @@ paths:
                 items:
                 - id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                   title: Call about SSO requirements
+                  note: Priya wants SSO before expanding seats
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   contact_name: Priya Natarajan
                   deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6068,6 +6230,7 @@ paths:
                   type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                   type: Call
                   status: OPEN
+                  owner_id: alex
                   owner_name: Alex Morgan
                   due_at: '2026-11-05T16:00:00Z'
                   overdue: true
@@ -6075,10 +6238,12 @@ paths:
                   completed_at: '2026-11-05T16:00:00Z'
                   created_by: alex
                   created_at: '2026-10-31T16:00:00Z'
+                  duration_minutes: 15
                   related_kind: CONTACT
                   related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
                 - id: 9b417a13-8ac2-50ed-84aa-3048a5f953f7
                   title: Send pricing proposal
+                  note: Business plan, 25 seats, annual
                   contact_id: 6db34cb3-bbbf-5e3f-9502-4efd0ee61e8e
                   contact_name: Sofia Álvarez
                   deal_id: f8691375-235e-50ea-b9f2-8fc4121d6435
@@ -6086,6 +6251,7 @@ paths:
                   type_id: 099104fc-dcee-57bf-b906-d2b826beb51d
                   type: Email
                   status: OPEN
+                  owner_id: alex
                   owner_name: Alex Morgan
                   due_at: '2026-11-05T16:00:00Z'
                   overdue: true
@@ -6093,10 +6259,12 @@ paths:
                   completed_at: '2026-11-05T16:00:00Z'
                   created_by: automation:hot-lead
                   created_at: '2026-10-30T16:00:00Z'
+                  duration_minutes: 0
                   related_kind: CONTACT
                   related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
                 - id: a747276f-e470-5c47-9a27-1129890e7282
                   title: Demo
+                  note: Migration from spreadsheets
                   contact_id: b7ad6bb7-2c27-526b-8340-a18d60fb176b
                   contact_name: Oliver Brown
                   deal_id: c50637e3-5f8b-5d72-bb89-8fe81b9eb36f
@@ -6104,6 +6272,7 @@ paths:
                   type_id: 645bfe17-69c3-558e-82cd-9594c3609fa2
                   type: Meeting
                   status: OPEN
+                  owner_id: sam
                   owner_name: Sam Lee
                   due_at: '2026-11-06T16:00:00Z'
                   overdue: false
@@ -6111,6 +6280,7 @@ paths:
                   completed_at: '2026-11-05T16:00:00Z'
                   created_by: sam
                   created_at: '2026-10-29T16:00:00Z'
+                  duration_minutes: 45
                   related_kind: CONTACT
                   related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
                 total: 8
@@ -6136,7 +6306,7 @@ paths:
       - sales
       - read-only
       description: 'List tasks. Paged (`page`, `limit` ≤ 100). Filters: `search`, `status`, `related_kind`, `related_id`,
-        `contact_id`, `deal_id`, `type_id`, `assignee_id`, `outcome_id`, `sentiment`, `due_from`, `due_to`, `overdue`, `sort`,
+        `contact_id`, `deal_id`, `type_id`, `owner_id`, `outcome_id`, `sentiment`, `due_from`, `due_to`, `overdue`, `sort`,
         `dir`.'
     post:
       operationId: create_task
@@ -6151,11 +6321,11 @@ paths:
               $ref: '#/components/schemas/CreateTaskRequest'
             example:
               title: Northwind · 48 → 120 seats
-              description: Example
+              note: Note
               related_kind: CONTACT
               related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
               type_id: 68706bed-f594-5ba8-a999-023935a20260
-              assignee_id: ext_f345a2153b
+              owner_id: alex
               due_at: '2026-11-05T16:00:00Z'
               reminders:
               - unit: AT_DUE
@@ -6174,6 +6344,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6181,6 +6352,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6188,6 +6360,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -6333,7 +6506,7 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: assignee_id
+      - name: owner_id
         in: query
         schema:
           type: string
@@ -6418,7 +6591,7 @@ paths:
       - sales
       - read-only
       description: 'The task overview report: totals, series over time, breakdowns by status/type/outcome/sentiment, outcomes
-        by rep. Query: `related_kind`, `type_id`, `outcome_id`, `assignee_id`, `group_id`, `created_from`, `created_to`, `due_from`,
+        by rep. Query: `related_kind`, `type_id`, `outcome_id`, `owner_id`, `group_id`, `created_from`, `created_to`, `due_from`,
         `due_to`, `completed_from`, `completed_to`.'
   /tasks/{id}:
     get:
@@ -6444,6 +6617,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6451,6 +6625,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6458,6 +6633,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -6501,11 +6677,11 @@ paths:
               $ref: '#/components/schemas/CreateTaskRequest'
             example:
               title: Northwind · 48 → 120 seats
-              description: Example
+              note: Note
               related_kind: CONTACT
               related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
               type_id: 68706bed-f594-5ba8-a999-023935a20260
-              assignee_id: ext_f345a2153b
+              owner_id: alex
               due_at: '2026-11-05T16:00:00Z'
               reminders:
               - unit: AT_DUE
@@ -6524,6 +6700,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6531,6 +6708,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6538,6 +6716,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -6580,9 +6759,9 @@ paths:
               $ref: '#/components/schemas/UpdateTaskRequest'
             example:
               title: Northwind · 48 → 120 seats
-              description: Example
+              note: Note
               type_id: 68706bed-f594-5ba8-a999-023935a20260
-              assignee_id: ext_f345a2153b
+              owner_id: alex
               due_at: '2026-11-05T16:00:00Z'
               reminders:
               - unit: AT_DUE
@@ -6601,6 +6780,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6608,6 +6788,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6615,6 +6796,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -6708,6 +6890,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6715,6 +6898,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6722,6 +6906,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -6767,6 +6952,7 @@ paths:
               example:
                 id: 89a25b3e-8a9c-514a-b373-cd9ef34c7cbc
                 title: Call about SSO requirements
+                note: Priya wants SSO before expanding seats
                 contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                 contact_name: Priya Natarajan
                 deal_id: 63a6661f-5860-50ed-8697-f28d29a3917f
@@ -6774,6 +6960,7 @@ paths:
                 type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
                 type: Call
                 status: OPEN
+                owner_id: alex
                 owner_name: Alex Morgan
                 due_at: '2026-11-05T16:00:00Z'
                 overdue: true
@@ -6781,6 +6968,7 @@ paths:
                 completed_at: '2026-11-05T16:00:00Z'
                 created_by: alex
                 created_at: '2026-10-31T16:00:00Z'
+                duration_minutes: 15
                 related_kind: CONTACT
                 related_id: 57d59745-33ec-5dc8-9adc-cc139255687c
         '401':
@@ -7321,6 +7509,10 @@ components:
         at:
           type: string
           format: date-time
+        deal_id:
+          type: string
+          format: uuid
+          readOnly: true
     AddTeamMemberRequest:
       type: object
       required:
@@ -7397,6 +7589,17 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
+        deal_id:
+          type: string
+          format: uuid
+          readOnly: true
+        file_name:
+          type: string
+          readOnly: true
+        size_bytes:
+          type: integer
+          format: int64
           readOnly: true
     AutomationHook:
       type: object
@@ -7503,6 +7706,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        user_id:
+          type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
     CalendarFeedRequest:
       type: object
       required:
@@ -7862,7 +8069,7 @@ components:
         title:
           type: string
           maxLength: 255
-        description:
+        note:
           type: string
         related_kind:
           $ref: '#/components/schemas/RelatedKind'
@@ -7872,7 +8079,7 @@ components:
         type_id:
           type: string
           format: uuid
-        assignee_id:
+        owner_id:
           type: string
           maxLength: 64
           description: Sesame user id (the sub claim of the access token)
@@ -8049,6 +8256,22 @@ components:
           type: string
           format: date-time
           readOnly: true
+        contact_id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          readOnly: true
+        role:
+          type: string
+          readOnly: true
+        is_primary:
+          type: boolean
+          readOnly: true
     DealContact:
       type: object
       required:
@@ -8072,6 +8295,9 @@ components:
         primary:
           type: boolean
           default: false
+        is_primary:
+          type: boolean
+          readOnly: true
     DealContactPage:
       type: object
       required:
@@ -8148,6 +8374,25 @@ components:
         at:
           type: string
           format: date-time
+        deal_id:
+          type: string
+          format: uuid
+          readOnly: true
+        kind:
+          type: string
+          readOnly: true
+        sent_at:
+          type: string
+          format: date-time
+          readOnly: true
+        opens:
+          type: integer
+          format: int64
+          readOnly: true
+        clicks:
+          type: integer
+          format: int64
+          readOnly: true
     DealRole:
       type: object
       required:
@@ -8352,7 +8597,7 @@ components:
           maxLength: 255
         organisation_name:
           type: string
-          maxLength: 255
+          readOnly: true
         website:
           type: string
           format: uri
@@ -8454,7 +8699,6 @@ components:
         organisation_id:
           type: string
           format: uuid
-          description: Parent company/account
         user_id:
           type: string
           maxLength: 64
@@ -8514,6 +8758,11 @@ components:
         is_rotting:
           type: boolean
           readOnly: true
+        form:
+          type: string
+        attribution:
+          type: object
+          additionalProperties: true
       description: A potential customer who has shown interest in our products or services
     MergeLeadsRequest:
       type: object
@@ -8577,6 +8826,10 @@ components:
           type: string
           format: date-time
           readOnly: true
+        deal_id:
+          type: string
+          format: uuid
+          readOnly: true
     NoteRequest:
       type: object
       required:
@@ -8612,6 +8865,10 @@ components:
           type: integer
           format: int64
           readOnly: true
+        task_type_ids:
+          type: array
+          items:
+            type: string
     OutcomeRequest:
       type: object
       required:
@@ -8696,6 +8953,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        closed_deals:
+          type: integer
+          format: int64
+          readOnly: true
+        fiscal_year_start:
+          type: string
     PipelineRequest:
       type: object
       required:
@@ -8884,6 +9147,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        title:
+          type: string
+        use_count:
+          type: integer
+          format: int64
+          readOnly: true
     SavedResponseCategory:
       type: object
       required:
@@ -9025,6 +9294,8 @@ components:
         deal_order:
           type: string
           description: Default sort of cards in the lane, e.g. next_task asc, value desc
+        sort_by:
+          type: string
       description: A pipeline stage representing a step in the sales process
     StageChangeRequest:
       type: object
@@ -9059,7 +9330,7 @@ components:
         title:
           type: string
           maxLength: 255
-        description:
+        note:
           type: string
         related_kind:
           $ref: '#/components/schemas/RelatedKind'
@@ -9088,7 +9359,7 @@ components:
           description: The type's title
         status:
           $ref: '#/components/schemas/TaskStatus'
-        assignee_id:
+        owner_id:
           type: string
           maxLength: 64
           description: Staff user id; absent = unassigned. Sesame user id (the sub claim of the access token)
@@ -9137,6 +9408,9 @@ components:
           type: string
           format: date-time
           readOnly: true
+        duration_minutes:
+          type: integer
+          format: int64
     TaskOverview:
       type: object
       description: The task overview report
@@ -9226,6 +9500,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Reminder'
+        default_reminder_minutes:
+          type: integer
+          format: int64
+          readOnly: true
+        allow_unlinked_tasks:
+          type: boolean
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
     TaskStatus:
       type: string
       enum:
@@ -9622,12 +9907,12 @@ components:
       properties:
         title:
           type: string
-        description:
+        note:
           type: string
         type_id:
           type: string
           format: uuid
-        assignee_id:
+        owner_id:
           type: string
           maxLength: 64
           description: Sesame user id (the sub claim of the access token)
@@ -10018,6 +10303,46 @@ components:
               avg_days_in_stage:
                 type: number
                 format: float
+              revenue:
+                type: integer
+                format: int64
+                readOnly: true
+              probability:
+                type: integer
+                format: int64
+                readOnly: true
+        pipeline_id:
+          type: string
+          format: uuid
+          readOnly: true
+        open:
+          type: integer
+          format: int64
+          readOnly: true
+        open_value:
+          type: integer
+          format: int64
+          readOnly: true
+        weighted_value:
+          type: integer
+          format: int64
+          readOnly: true
+        won_this_month:
+          type: integer
+          format: int64
+          readOnly: true
+        won_value_this_month:
+          type: integer
+          format: int64
+          readOnly: true
+        stalled:
+          type: integer
+          format: int64
+          readOnly: true
+        stalled_value:
+          type: integer
+          format: int64
+          readOnly: true
       description: Paginated list of PipelineSummary records
     SavedResponsePage:
       type: object

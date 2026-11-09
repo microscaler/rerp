@@ -320,6 +320,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -387,6 +394,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -486,6 +500,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -572,6 +593,13 @@ paths:
                 - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
                   email: lena.fischer@contoso.example
                   name: Lena Fischer
+                excluded_duplicates: 238
+                sms:
+                  count: 311
+                  no_sms_consent: 94
+                  replied_stop: 6
+                  no_mobile: 7
+                  unsupported_country: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -637,6 +665,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -711,6 +746,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -785,6 +827,48 @@ paths:
                 social_shares:
                 - {}
                 audience: {}
+                delivery:
+                - label: Delivered
+                  count: 9732
+                - label: Soft bounce
+                  count: 97
+                - label: Hard bounce
+                  count: 38
+                open_rate_vs_list_pts: 2.8
+                deals_won: 3
+                suppressions_added: 41
+                prefetch_opens: 1402
+                forwards: 14
+                replies: 9
+                profile_updates: 27
+                social_shares_by:
+                - name: LinkedIn
+                  count: 5
+                - name: X
+                  count: 1
+                by_location:
+                - name: United Kingdom · London
+                  opens: 1412
+                  clicks: 188
+                  share_pct: 35
+                - name: Germany · Berlin
+                  opens: 804
+                  clicks: 96
+                  share_pct: 20
+                - name: Bulgaria · Sofia
+                  opens: 611
+                  clicks: 71
+                  share_pct: 15
+                clients:
+                - client: Gmail
+                  share_pct: 46
+                  verified_pct: 98
+                - client: Apple Mail
+                  share_pct: 24
+                  verified_pct: 28
+                - client: Outlook
+                  share_pct: 18
+                  verified_pct: 97
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -945,6 +1029,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-25T16:00:00Z'
                 updated_at: '2026-11-05T14:00:00Z'
+                template_name: October product update
+                list_names:
+                - Newsletter
+                open_rate: 0.41
+                click_rate: 0.052
+                unsubscribed: 12
+                subject: What shipped in October, and what is next
         '400':
           description: Validation failed
           content:
@@ -999,6 +1090,8 @@ paths:
                   to: priya.natarajan@northwindtraders.example
                   status: DELIVERED
                   opened_at: '2026-10-28T16:00:00Z'
+                  contact_name: Priya Natarajan
+                  clicked_link: changelog
                   channel: EMAIL
                   created_at: '2026-11-05T16:00:00Z'
                 - id: 294a11f7-a7ec-5743-be57-1a1f486a17b9
@@ -1006,6 +1099,8 @@ paths:
                   to: tom.okafor@fabrikam.example
                   status: DELIVERED
                   opened_at: '2026-10-28T17:00:00Z'
+                  contact_name: Tom Okafor
+                  clicked_link: docs/imports
                   channel: EMAIL
                   created_at: '2026-11-05T16:00:00Z'
                 - id: c84b4b32-0560-5476-99cf-1822e1da82fe
@@ -1013,6 +1108,8 @@ paths:
                   to: lena.fischer@contoso.example
                   status: BOUNCED
                   opened_at: '2026-11-05T16:00:00Z'
+                  contact_name: Lena Fischer
+                  clicked_link: Clicked link
                   channel: EMAIL
                   created_at: '2026-11-05T16:00:00Z'
                 total: 9870
@@ -1051,6 +1148,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/TestSendResult'
               example:
+                queued: 1
                 sent_to:
                 - priya.natarajan@northwindtraders.example
         '401':
@@ -1120,6 +1218,7 @@ paths:
                   opened_at: '2026-10-28T16:00:00Z'
                   clicked_at: '2026-10-28T16:00:00Z'
                   created_at: '2026-10-28T16:00:00Z'
+                  campaign_name: October product update
                 - id: 83e7787e-deb9-5ece-93c5-58284dd9ceb5
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   campaign_id: cd847d34-2090-5e40-afc2-06c94055cc85
@@ -1130,6 +1229,7 @@ paths:
                   opened_at: '2026-10-08T16:00:00Z'
                   clicked_at: '2026-11-05T16:00:00Z'
                   created_at: '2026-10-08T16:00:00Z'
+                  campaign_name: Webinar invite · pricing strategy
                 - id: f4276478-8eee-5e00-ae6b-d72dff226d41
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   campaign_id: dcad966f-24e6-5a17-bb05-807224d4fe09
@@ -1140,6 +1240,7 @@ paths:
                   opened_at: '2026-07-20T16:00:00Z'
                   clicked_at: '2026-11-05T16:00:00Z'
                   created_at: '2026-07-20T16:00:00Z'
+                  campaign_name: September product update
                 total: 3
                 page: 1
                 limit: 20
@@ -1426,6 +1527,7 @@ paths:
                   last_sync_at: '2026-11-05T15:58:00Z'
                   last_error: Last error
                   created_at: '2026-10-01T16:00:00Z'
+                  user_name: Alex Morgan
                 - id: c2fb563e-65c5-5c5a-a0cf-b17ae70bb727
                   user_id: sam
                   address: sam@acme.example
@@ -1443,6 +1545,7 @@ paths:
                   last_sync_at: '2026-11-05T15:54:00Z'
                   last_error: Last error
                   created_at: '2026-09-15T16:00:00Z'
+                  user_name: Sam Lee
                 - id: b9d592b7-1ff3-5f0c-ae30-4f183030d442
                   user_id: alex
                   address: sales@acme.example
@@ -1469,6 +1572,7 @@ paths:
                   last_sync_at: '2026-11-02T16:00:00Z'
                   last_error: 'AUTHENTICATIONFAILED: invalid credentials'
                   created_at: '2026-08-01T16:00:00Z'
+                  user_name: Alex Morgan
                 total: 4
                 page: 1
                 limit: 25
@@ -1545,6 +1649,7 @@ paths:
                 last_sync_at: '2026-11-05T15:58:00Z'
                 last_error: Last error
                 created_at: '2026-10-01T16:00:00Z'
+                user_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1604,6 +1709,7 @@ paths:
                 last_sync_at: '2026-11-05T15:58:00Z'
                 last_error: Last error
                 created_at: '2026-10-01T16:00:00Z'
+                user_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1686,6 +1792,7 @@ paths:
                 last_sync_at: '2026-11-05T15:58:00Z'
                 last_error: Last error
                 created_at: '2026-10-01T16:00:00Z'
+                user_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1806,6 +1913,8 @@ paths:
                   - 63a6661f-5860-50ed-8697-f28d29a3917f
                   opens: 0
                   clicks: 0
+                  contact_name: Priya Natarajan
+                  deal_title: Northwind · 48 → 120 seats
                 - id: 8e29079a-9ff4-5a6e-b030-f098c14b3148
                   mailbox_id: 22788e76-5b04-5e9c-97a4-49cade135ff3
                   direction: OUTBOUND
@@ -1820,6 +1929,8 @@ paths:
                   - 63a6661f-5860-50ed-8697-f28d29a3917f
                   opens: 2
                   clicks: 1
+                  contact_name: Priya Natarajan
+                  deal_title: Northwind · 48 → 120 seats
                 - id: 7882e22e-5ff5-5c69-ac76-7fe91510e0b1
                   mailbox_id: 22788e76-5b04-5e9c-97a4-49cade135ff3
                   direction: INBOUND
@@ -1833,6 +1944,8 @@ paths:
                   deal_ids: []
                   opens: 0
                   clicks: 0
+                  contact_name: Tom Okafor
+                  deal_title: Deal title
                 total: 4
                 page: 1
                 limit: 20
@@ -1976,6 +2089,7 @@ paths:
                 last_sync_at: '2026-11-05T15:58:00Z'
                 last_error: Last error
                 created_at: '2026-10-01T16:00:00Z'
+                user_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2343,6 +2457,14 @@ paths:
                   subscribed_contacts: 3
                   click_to_open_rate: 12.5
                   anonymous_open_rate: 12.5
+                  complaint_rate: 12.5
+                  contact_growth:
+                  - {}
+                  setup:
+                  - {}
+                  contacts_added_30d: 3
+                  open_rate_delta_pts: 12.5
+                  click_rate_delta_pts: 12.5
                 comparison:
                   campaigns_sent: 3
                   messages_sent: 3
@@ -2354,6 +2476,14 @@ paths:
                   subscribed_contacts: 3
                   click_to_open_rate: 12.5
                   anonymous_open_rate: 12.5
+                  complaint_rate: 12.5
+                  contact_growth:
+                  - {}
+                  setup:
+                  - {}
+                  contacts_added_30d: 3
+                  open_rate_delta_pts: 12.5
+                  click_rate_delta_pts: 12.5
                 comparison_basis: NONE
                 campaigns:
                   items:
@@ -2530,6 +2660,30 @@ paths:
                 unsubscribe_rate: 0.003
                 total_contacts: 12480
                 subscribed_contacts: 10912
+                complaint_rate: 0.0002
+                contact_growth:
+                - month: 2025-12
+                  subscribed: 420
+                  unsubscribed: 40
+                - month: 2026-01
+                  subscribed: 480
+                  unsubscribed: 50
+                - month: 2026-02
+                  subscribed: 510
+                  unsubscribed: 40
+                setup:
+                - key: sender
+                  label: Verify sending domain
+                  done: true
+                - key: tracking
+                  label: Install site tracking
+                  done: true
+                - key: form
+                  label: Publish a signup form
+                  done: true
+                contacts_added_30d: 312
+                open_rate_delta_pts: 2.1
+                click_rate_delta_pts: -0.4
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2645,6 +2799,7 @@ paths:
                 postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
                 last_checked_at: '2026-11-05T15:56:00Z'
                 created_at: '2026-04-19T16:00:00Z'
+                used_by: 4 lists · 2 scheduled
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2706,6 +2861,7 @@ paths:
                 postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
                 last_checked_at: '2026-11-05T15:56:00Z'
                 created_at: '2026-04-19T16:00:00Z'
+                used_by: 4 lists · 2 scheduled
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2796,6 +2952,7 @@ paths:
                 postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
                 last_checked_at: '2026-11-05T15:56:00Z'
                 created_at: '2026-04-19T16:00:00Z'
+                used_by: 4 lists · 2 scheduled
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2855,6 +3012,10 @@ paths:
                   type: QUEUED
                   at: '2026-11-05T16:00:00Z'
                 created_at: '2026-11-05T16:00:00Z'
+                campaign_name: Campaign name
+                contact_name: Contact name
+                clicked_link: Clicked link
+                queued: 3
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3453,6 +3614,7 @@ paths:
                     targets:
                     - account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
                     created_at: '2026-11-05T16:00:00Z'
+                week_label: Week label
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3640,6 +3802,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-28T16:00:00Z'
                   updated_at: '2026-10-28T16:00:00Z'
+                  utm_campaign: oct-product-update
                 - id: 9502bdab-c9a3-5d31-a3a0-836d1b2265a9
                   status: PUBLISHED
                   body: How Northwind cut onboarding time by 40% (case study).
@@ -3656,6 +3819,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-28T16:00:00Z'
                   updated_at: '2026-10-28T16:00:00Z'
+                  utm_campaign: oct-product-update
                 - id: 430fbf7a-0185-5395-8414-939caf4d4c78
                   status: PUBLISHED
                   body: 'Pre-market: three charts we are watching this week.'
@@ -3672,6 +3836,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-29T16:00:00Z'
                   updated_at: '2026-10-29T16:00:00Z'
+                  utm_campaign: oct-product-update
                 total: 10
                 page: 1
                 limit: 25
@@ -3738,6 +3903,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3791,6 +3957,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3858,6 +4025,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3945,6 +4113,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4044,6 +4213,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4116,6 +4286,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-28T16:00:00Z'
                 updated_at: '2026-10-28T16:00:00Z'
+                utm_campaign: oct-product-update
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4190,6 +4361,23 @@ paths:
                   is_archived: false
                   created_at: '2026-07-08T16:00:00Z'
                   updated_at: '2026-10-16T16:00:00Z'
+                  priority: NORMAL
+                  language_code: en
+                  versions:
+                  - version: 3
+                    at: '2026-10-19T16:00:00Z'
+                  - version: 2
+                    at: '2026-09-09T16:00:00Z'
+                  - version: 1
+                    at: '2026-07-31T16:00:00Z'
+                  used_by:
+                  - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                    workflow_name: Welcome series (7 days)
+                    step: 1
+                  sent_30d: 1640
+                  open_rate: 0.62
+                  click_rate: 0.14
+                  unsub_30d: 2
                 - id: f248dd12-4837-5fde-aa51-2fba5a0e8227
                   name: 'Welcome · day 2: three things to set up'
                   channel: EMAIL
@@ -4217,6 +4405,21 @@ paths:
                   is_archived: false
                   created_at: '2026-07-13T16:00:00Z'
                   updated_at: '2026-10-17T16:00:00Z'
+                  priority: NORMAL
+                  language_code: en
+                  versions:
+                  - version: 2
+                    at: '2026-10-18T16:00:00Z'
+                  - version: 1
+                    at: '2026-09-08T16:00:00Z'
+                  used_by:
+                  - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                    workflow_name: Welcome series (7 days)
+                    step: 4 (yes branch)
+                  sent_30d: 1004
+                  open_rate: 0.51
+                  click_rate: 0.11
+                  unsub_30d: 1
                 - id: 40072573-6c82-5100-8709-5ed36d8c6794
                   name: Day 2 · resend with new subject
                   channel: EMAIL
@@ -4244,6 +4447,19 @@ paths:
                   is_archived: false
                   created_at: '2026-07-18T16:00:00Z'
                   updated_at: '2026-10-18T16:00:00Z'
+                  priority: NORMAL
+                  language_code: en
+                  versions:
+                  - version: 1
+                    at: '2026-10-17T16:00:00Z'
+                  used_by:
+                  - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                    workflow_name: Welcome series (7 days)
+                    step: 5 (no branch)
+                  sent_30d: 602
+                  open_rate: 0.29
+                  click_rate: 0.06
+                  unsub_30d: 4
                 total: 16
                 page: 1
                 limit: 25
@@ -4319,6 +4535,23 @@ paths:
                 is_archived: false
                 created_at: '2026-07-08T16:00:00Z'
                 updated_at: '2026-10-16T16:00:00Z'
+                priority: NORMAL
+                language_code: en
+                versions:
+                - version: 3
+                  at: '2026-10-19T16:00:00Z'
+                - version: 2
+                  at: '2026-09-09T16:00:00Z'
+                - version: 1
+                  at: '2026-07-31T16:00:00Z'
+                used_by:
+                - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  step: 1
+                sent_30d: 1640
+                open_rate: 0.62
+                click_rate: 0.14
+                unsub_30d: 2
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -4383,6 +4616,23 @@ paths:
                 is_archived: false
                 created_at: '2026-07-08T16:00:00Z'
                 updated_at: '2026-10-16T16:00:00Z'
+                priority: NORMAL
+                language_code: en
+                versions:
+                - version: 3
+                  at: '2026-10-19T16:00:00Z'
+                - version: 2
+                  at: '2026-09-09T16:00:00Z'
+                - version: 1
+                  at: '2026-07-31T16:00:00Z'
+                used_by:
+                - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  step: 1
+                sent_30d: 1640
+                open_rate: 0.62
+                click_rate: 0.14
+                unsub_30d: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4458,6 +4708,23 @@ paths:
                 is_archived: false
                 created_at: '2026-07-08T16:00:00Z'
                 updated_at: '2026-10-16T16:00:00Z'
+                priority: NORMAL
+                language_code: en
+                versions:
+                - version: 3
+                  at: '2026-10-19T16:00:00Z'
+                - version: 2
+                  at: '2026-09-09T16:00:00Z'
+                - version: 1
+                  at: '2026-07-31T16:00:00Z'
+                used_by:
+                - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  step: 1
+                sent_30d: 1640
+                open_rate: 0.62
+                click_rate: 0.14
+                unsub_30d: 2
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -4547,6 +4814,8 @@ paths:
 
                   A week ago you signed up…'
                 unresolved: []
+                from_name: Acme Co
+                from_address: hello@acme.example
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -4594,6 +4863,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Send'
               example:
+                queued: 1
                 id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
                 contact_id: c891a339-996d-56b9-a022-244c570f48c9
                 channel: EMAIL
@@ -4816,6 +5086,10 @@ paths:
                   type: QUEUED
                   at: '2026-11-05T16:00:00Z'
                 created_at: '2026-11-05T16:00:00Z'
+                campaign_name: Campaign name
+                contact_name: Contact name
+                clicked_link: Clicked link
+                queued: 3
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -5008,6 +5282,14 @@ components:
                 type: string
               name:
                 type: string
+        excluded_duplicates:
+          type: integer
+          format: int64
+          readOnly: true
+        sms:
+          type: object
+          additionalProperties: true
+          readOnly: true
     AuditEntry:
       type: object
       required:
@@ -5196,6 +5478,28 @@ components:
         updated_at:
           type: string
           format: date-time
+        template_name:
+          type: string
+          readOnly: true
+        list_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        open_rate:
+          type: number
+          format: double
+          readOnly: true
+        click_rate:
+          type: number
+          format: double
+          readOnly: true
+        unsubscribed:
+          type: integer
+          format: int64
+          readOnly: true
+        subject:
+          type: string
       description: A broadcast to the resolved audience of one or more lists
     CampaignAudience:
       type: object
@@ -5505,6 +5809,58 @@ components:
           type: string
         from:
           type: string
+        delivery:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        open_rate_vs_list_pts:
+          type: number
+          format: double
+          readOnly: true
+        deals_won:
+          type: integer
+          format: int64
+          readOnly: true
+        suppressions_added:
+          type: integer
+          format: int64
+          readOnly: true
+        prefetch_opens:
+          type: integer
+          format: int64
+          readOnly: true
+        forwards:
+          type: integer
+          format: int64
+          readOnly: true
+        replies:
+          type: integer
+          format: int64
+          readOnly: true
+        profile_updates:
+          type: integer
+          format: int64
+          readOnly: true
+        social_shares_by:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        by_location:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        clients:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
     CampaignReportContact:
       type: object
       properties:
@@ -5715,6 +6071,9 @@ components:
         updated_at:
           type: string
           format: date-time
+        user_name:
+          type: string
+          readOnly: true
         authorize_url:
           type: string
           format: uri
@@ -6224,6 +6583,9 @@ components:
         updated_at:
           type: string
           format: date-time
+        user_name:
+          type: string
+          readOnly: true
       required:
       - id
       - user_id
@@ -6289,6 +6651,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/MessageAttachment'
+        contact_name:
+          type: string
+          readOnly: true
+        deal_title:
+          type: string
+          readOnly: true
       required:
       - id
       - mailbox_id
@@ -6451,6 +6819,34 @@ components:
         anonymous_open_rate:
           type: number
           format: double
+        complaint_rate:
+          type: number
+          format: double
+          readOnly: true
+        contact_growth:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        setup:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        contacts_added_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        open_rate_delta_pts:
+          type: number
+          format: double
+          readOnly: true
+        click_rate_delta_pts:
+          type: number
+          format: double
+          readOnly: true
     Platform:
       type: string
       enum:
@@ -6644,6 +7040,12 @@ components:
           items:
             type: string
           description: Merge fields with no value for this contact
+        from_name:
+          type: string
+          readOnly: true
+        from_address:
+          type: string
+          readOnly: true
     ScheduleCampaignRequest:
       type: object
       properties:
@@ -6719,6 +7121,19 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
+        campaign_name:
+          type: string
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        clicked_link:
+          type: string
+          readOnly: true
+        queued:
+          type: integer
+          format: int64
           readOnly: true
       description: One message to one recipient
     SendMailboxMessageRequest:
@@ -6831,6 +7246,9 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
+        used_by:
+          type: string
           readOnly: true
     SenderStatus:
       type: string
@@ -7056,6 +7474,9 @@ components:
                 type: array
                 items:
                   $ref: '#/components/schemas/SocialPost'
+        week_label:
+          type: string
+          readOnly: true
     SocialEngagementSummary:
       type: object
       properties:
@@ -7179,6 +7600,8 @@ components:
         updated_at:
           type: string
           format: date-time
+        utm_campaign:
+          type: string
     Template:
       type: object
       required:
@@ -7244,6 +7667,47 @@ components:
         updated_at:
           type: string
           format: date-time
+        priority:
+          type: string
+        language_code:
+          type: string
+        versions:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        used_by:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        sent_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        open_rate:
+          type: number
+          format: double
+          readOnly: true
+        click_rate:
+          type: number
+          format: double
+          readOnly: true
+        unsub_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        tag:
+          type: string
+        delivered_rate:
+          type: number
+          format: double
+          readOnly: true
+        called_by:
+          type: string
+          readOnly: true
       description: A message template. Campaigns and automation steps reference templates by id.
     TemplateKind:
       type: string
@@ -7279,6 +7743,10 @@ components:
           type: array
           items:
             type: string
+        queued:
+          type: integer
+          format: int64
+          readOnly: true
       required:
       - sent_to
     TrackedLink:

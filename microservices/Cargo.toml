@@ -55,15 +55,25 @@ members = [
     "crm/accounts/impl",
     # CRM services from the 2026-11 decomposition (doc 08, ADR 004): generated crates only, serving the
     # spec's examples until each service gets an impl crate.
+    "crm/runtime",
     "crm/audience/gen",
+    "crm/audience/impl",
     "crm/messaging/gen",
+    "crm/messaging/impl",
     "crm/automation/gen",
+    "crm/automation/impl",
     "crm/sales/gen",
+    "crm/sales/impl",
     "crm/acquisition/gen",
+    "crm/acquisition/impl",
     "crm/insights/gen",
+    "crm/insights/impl",
     "crm/workspace/gen",
+    "crm/workspace/impl",
     "crm/edge/gen",
+    "crm/edge/impl",
     "crm/intake/gen",
+    "crm/intake/impl",
 
     # Centralized migration generation
     "migrator",

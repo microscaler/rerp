@@ -14,6 +14,14 @@ pub struct Request {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_ids")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_names")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "consent_required")]
     pub consent_required: Option<bool>,
 
@@ -59,6 +67,10 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "require_click")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "require_click_param")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "sent_30d")]
@@ -83,6 +95,14 @@ pub struct Response {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_ids")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_names")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "consent_required")]
     pub consent_required: Option<bool>,
 
@@ -128,6 +148,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "require_click")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "require_click_param")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "sent_30d")]

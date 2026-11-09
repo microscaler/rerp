@@ -1,0 +1,439 @@
+service: sales
+database: crm
+schema: sales
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  pipelines:
+    description: Sales pipelines.
+    api: Pipeline
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      currency: varchar(3)
+      visibility: text null check(ALL,GROUPS)
+      group_ids: jsonb null
+      auto_assign: text null check(OFF,ROUND_ROBIN,BY_STAGE)
+      auto_assign_user_ids: jsonb null
+      forecast_mode: text null check(STAGE_PROBABILITY,LEARNED)
+      sequence: integer null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      fiscal_year_start: text null
+    api_only:
+    - open_deals
+    - open_value
+    - closed_deals
+  stages:
+    description: Stages of a pipeline.
+    api: Stage
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      sequence: integer
+      probability: integer
+      is_won: boolean null
+      is_lost: boolean null
+      requirements: text null
+      fold: boolean null
+      color: text null
+      description: text null
+      pipeline_id: uuid fk pipelines(id) cascade
+      rotting_days: integer null
+      card_fields: jsonb null
+      deal_order: text null
+      sort_by: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - lead_count
+    unique:
+    - pipeline_id, sequence
+  leads:
+    description: Website leads and their triage (EPIC-32 board).
+    api: Lead
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(255)
+      lead_type: text check(LEAD,OPPORTUNITY)
+      email_from: varchar(255) null
+      email_normalized: varchar(255) null
+      phone: varchar(64) null
+      contact_name: varchar(255) null
+      website: varchar(255) null
+      description: text null
+      referred_by: varchar(255) null
+      priority: text null check(LOW,NORMAL,HIGH,URGENT)
+      active: boolean
+      stage_id: uuid null fk stages(id) set null
+      tag_ids: jsonb null
+      probability: double precision null
+      date_deadline: date null
+      expected_revenue: numeric(19,4) null
+      organisation_id: uuid null
+      owner_id: varchar(64) null
+      team_id: uuid null fk teams(id) set null
+      won_status: text null check(PENDING,WON,LOST)
+      form: text null
+      attribution: jsonb null
+      contact_id: uuid null
+      intake_submission_id: uuid null
+      lost_reason: text null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - organisation_name
+    - date_open
+    - date_closed
+    - date_last_stage_update
+    - day_open
+    - day_close
+    - prorated_revenue
+    - recurring_revenue_monthly
+    - duplicate_lead_count
+    - create_date
+    - write_date
+    - stage_name
+    - stage_probability
+    - stage_color
+    - is_rotting
+    unique:
+    - intake_submission_id
+    indexes:
+    - stage_id
+    - owner_id
+    - email_normalized
+  deals:
+    description: Deals.
+    api: Deal
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      title: varchar(255)
+      description: text null
+      pipeline_id: uuid fk pipelines(id) restrict
+      stage_id: uuid fk stages(id) restrict
+      stage_entered_at: timestamptz null
+      status: text check(OPEN,WON,LOST)
+      status_changed_at: timestamptz null
+      lost_reason: text null
+      value: numeric(19,4)
+      currency: char(3)
+      owner_id: varchar(64) null
+      organisation_id: uuid null
+      source: text null
+      expected_close_date: date null
+      next_task_at: timestamptz null
+      last_activity_at: timestamptz null
+      custom_fields: jsonb null
+      tag_ids: jsonb null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      created_by: varchar(64) null
+      won_at: timestamptz null
+      lost_at: timestamptz null
+      conversion_id: uuid null
+    api_only:
+    - pipeline_name
+    - stage_name
+    - days_in_stage
+    - probability
+    - weighted_value
+    - owner_name
+    - organisation_name
+    - primary_contact_id
+    - open_task_count
+    - contact_id
+    - name
+    - email
+    - role
+    - is_primary
+    indexes:
+    - pipeline_id, stage_id
+    - owner_id, status
+    - organisation_id
+    - expected_close_date
+  deal_roles:
+    description: Roles a contact can have on a deal.
+    api: DealRole
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      title: varchar(64)
+      description: text null
+      updated_at: timestamptz default now()
+  deal_contacts:
+    description: Contacts on a deal, with their role.
+    api: DealContact
+    columns:
+      workspace_id: uuid
+      deal_id: uuid pk fk deals(id) cascade
+      contact_id: uuid pk
+      role_id: uuid null fk deal_roles(id) set null
+      is_primary: boolean default false
+      added_at: timestamptz default now()
+    indexes:
+    - contact_id
+  deal_notes:
+    description: Notes on a deal.
+    api: Note
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      body: varchar(10000)
+      pinned: boolean null
+      created_at: timestamptz
+      updated_at: timestamptz null
+      deal_id: uuid fk deals(id) cascade
+      created_by: varchar(64) null
+    api_only:
+    - author
+    indexes:
+    - deal_id
+  deal_files:
+    description: Files on a deal (bytes in object storage).
+    api: Attachment
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      file_name: text
+      content_type: text null
+      size_bytes: bigint
+      created_at: timestamptz
+      deal_id: uuid fk deals(id) cascade
+      storage_key: text
+      uploaded_by: varchar(64) null
+      updated_at: timestamptz default now()
+    api_only:
+    - url
+    indexes:
+    - deal_id
+  deal_emails:
+    description: Emails logged on a deal.
+    api: DealEmail
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      direction: text check(OUT,IN)
+      mailbox_id: uuid null
+      from_address: text null
+      to_addresses: jsonb null
+      subject: text
+      snippet: text null
+      body_html: text null
+      contact_id: uuid null
+      saved_response_id: uuid null
+      opened_at: timestamptz null
+      clicked_at: timestamptz null
+      replied_at: timestamptz null
+      thread_id: text null
+      at: timestamptz
+      sent_at: timestamptz null
+      deal_id: uuid fk deals(id) cascade
+      kind: text null
+      opens: integer default 0
+      clicks: integer default 0
+      updated_at: timestamptz default now()
+    indexes:
+    - deal_id, at
+  deal_activity:
+    description: Deal activity feed (append-only).
+    api: ActivityEntry
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      kind: text check(CREATED,STAGE_CHANGED,STATUS_CHANGED,VALUE_CHANGED,OWNER_CHANGED,FIELD_CHANGED,CONTACT_ADDED,CONTACT_REMOVED,NOTE_ADDED,FILE_ADDED,TASK_ADDED,TASK_COMPLETED,EMAIL_SENT,EMAIL_RECEIVED,WORKFLOW_ACTION)
+      summary: text null
+      actor: text null
+      detail: jsonb null
+      at: timestamptz
+      deal_id: uuid fk deals(id) cascade
+    indexes:
+    - deal_id, at desc
+    append_only: true
+  deal_settings:
+    description: Deal settings, one row per workspace.
+    api: DealSettings
+    columns:
+      workspace_id: uuid pk
+      default_currency: char(3) default EUR
+      default_pipeline_id: uuid null fk pipelines(id) set null
+      require_expected_close_from_stage_id: uuid null fk stages(id) set null
+      win_probability: jsonb null
+      updated_at: timestamptz default now()
+    singleton: true
+  task_types:
+    description: Task types.
+    api: TaskType
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      title: varchar(64)
+      default_minutes: integer null
+      sequence: integer null
+      active: boolean
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - outcomes
+    - open_count
+  task_outcomes:
+    description: Task outcomes.
+    api: Outcome
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      label: varchar(64)
+      sentiment: text check(POSITIVE,NEUTRAL,NEGATIVE)
+      updated_at: timestamptz default now()
+    api_only:
+    - used_by_type_ids
+    - count_30d
+  task_type_outcomes:
+    description: Which outcomes a task type offers.
+    columns:
+      workspace_id: uuid
+      task_type_id: uuid pk fk task_types(id) cascade
+      outcome_id: uuid pk fk task_outcomes(id) cascade
+  tasks:
+    description: Tasks on deals, contacts or organisations.
+    api: Task
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      title: varchar(255)
+      note: text null
+      related_kind: text check(CONTACT,DEAL,ACCOUNT)
+      related_id: uuid
+      contact_id: uuid null
+      deal_id: uuid null fk deals(id) cascade
+      type_id: uuid fk task_types(id) restrict
+      status: text check(OPEN,COMPLETED,CANCELLED)
+      owner_id: varchar(64) null
+      due_at: timestamptz null
+      reminders: jsonb null
+      automation: jsonb null
+      outcome_id: uuid null fk task_outcomes(id) set null
+      completed_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      duration_minutes: integer null
+      completed_by: varchar(64) null
+      created_by: varchar(64) null
+    api_only:
+    - contact_name
+    - deal_title
+    - type
+    - owner_name
+    - overdue
+    - outcome
+    - outcome_sentiment
+    indexes:
+    - owner_id, status, due_at
+    - deal_id
+    - contact_id
+  task_settings:
+    description: Task settings, one row per workspace.
+    api: TaskSettings
+    columns:
+      workspace_id: uuid pk
+      require_outcomes: boolean default false
+      default_due_offset_minutes: integer default 1440
+      default_reminder_minutes: integer null
+      allow_unlinked_tasks: boolean default true
+      updated_at: timestamptz default now()
+    singleton: true
+  calendar_feeds:
+    description: iCalendar feeds of tasks (the token is stored hashed).
+    api: CalendarFeed
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      scope: text check(ALL,DEALS,CONTACTS)
+      pipeline_ids: jsonb null
+      assignee_ids: jsonb null
+      include_alerts: boolean null
+      created_at: timestamptz
+      user_id: varchar(64) null
+      token_hash: text unique
+      rotated_at: timestamptz null
+      updated_at: timestamptz default now()
+    api_only:
+    - url
+    - token
+    - created_by
+  saved_response_categories:
+    description: Saved response categories.
+    api: SavedResponseCategory
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(64)
+      updated_at: timestamptz default now()
+    api_only:
+    - response_count
+  saved_responses:
+    description: Saved email responses.
+    api: SavedResponse
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      category_id: uuid null fk saved_response_categories(id) set null
+      subject: varchar(255)
+      body: text
+      last_sent_at: timestamptz null
+      created_at: timestamptz null
+      updated_at: timestamptz null
+      use_count: integer default 0
+    api_only:
+    - category
+    - last_sent_by
+    - send_count
+    - created_by
+  teams:
+    description: Sales teams.
+    api: Team
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      description: text null
+      use_leads: boolean null
+      use_opportunities: boolean null
+      assignment_enabled: boolean
+      assignment_auto_enabled: boolean null
+      assignment_optout: boolean null
+      assignment_domain: varchar(64) null
+      updated_at: timestamptz default now()
+    api_only:
+    - assignment_max
+    - create_date
+    - member_count
+    - active_lead_count
+    - total_revenue
+  team_members:
+    description: Members of a team and their assignment settings.
+    api: TeamMember
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      user_id: varchar(64)
+      team_id: uuid
+      assignment_enabled: boolean
+      assignment_optout: boolean null
+      assignment_domain: varchar(64) null
+      assignment_max: integer
+      quota_monthly: numeric(19,4) null
+      quota_quarterly: numeric(19,4) null
+      quota_yearly: numeric(19,4) null
+      crm_team_id: uuid fk teams(id) cascade
+      updated_at: timestamptz default now()
+    api_only:
+    - lead_day_count
+    - lead_month_count
+    - user_name
+    unique:
+    - team_id, user_id

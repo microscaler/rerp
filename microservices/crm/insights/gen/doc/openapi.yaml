@@ -275,24 +275,46 @@ paths:
                 $ref: '#/components/schemas/ForecastEntryPage'
               example:
                 items:
-                - period: Period
+                - month: 2026-11
+                  open_deals: 14
+                  pipeline_value: 188400
+                  weighted: 96100
+                  won: 55200
+                  target: 200000
+                  period: Period
                   weighted_pipeline: '1250.00'
                   expected_close_revenue: '1250.00'
                   confidence: 12.5
                   actual_close_revenue: '1250.00'
                   variance: '1250.00'
-                - period: Period
+                - month: 2026-12
+                  open_deals: 12
+                  pipeline_value: 141200
+                  weighted: 61800
+                  won: 0
+                  target: 180000
+                  period: Period
                   weighted_pipeline: '1250.00'
                   expected_close_revenue: '1250.00'
                   confidence: 12.5
                   actual_close_revenue: '1250.00'
                   variance: '1250.00'
-                - period: Period
+                - month: 2027-01
+                  open_deals: 9
+                  pipeline_value: 82700
+                  weighted: 24300
+                  won: 0
+                  target: 150000
+                  period: Period
                   weighted_pipeline: '1250.00'
                   expected_close_revenue: '1250.00'
                   confidence: 12.5
                   actual_close_revenue: '1250.00'
                   variance: '1250.00'
+                no_close_date:
+                  count: 3
+                  value: 15000
+                accuracy_last_3_months: 0.88
                 total: 2
                 page: 1
                 limit: 25
@@ -340,6 +362,8 @@ paths:
                 total: 2
                 page: 1
                 limit: 25
+                no_close_date: {}
+                accuracy_last_3_months: 12.5
         '403':
           $ref: '#/components/responses/Forbidden'
         '409':
@@ -399,6 +423,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/FunnelData'
               example:
+                items:
+                - label: Created
+                  count: 122
+                - label: Qualified
+                  count: 84
+                - label: Proposal
+                  count: 51
+                avg_days_to_close: 34
+                win_rate: 0.31
                 stages:
                 - {}
         '403':
@@ -743,6 +776,40 @@ paths:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
               example:
+                items:
+                - owner_id: alex
+                  owner_name: Alex Morgan
+                  open: 16
+                  pipeline_value: 201400
+                  weighted: 98200
+                  won_90d: 12
+                  won_value_90d: 96800
+                  lost_90d: 5
+                  win_rate: 0.71
+                  avg_deal: 8070
+                  tasks_overdue: 2
+                - owner_id: sam
+                  owner_name: Sam Lee
+                  open: 14
+                  pipeline_value: 156900
+                  weighted: 64100
+                  won_90d: 9
+                  won_value_90d: 71200
+                  lost_90d: 8
+                  win_rate: 0.53
+                  avg_deal: 7910
+                  tasks_overdue: 0
+                - owner_id: riya
+                  owner_name: Riya Kapoor
+                  open: 8
+                  pipeline_value: 54000
+                  weighted: 26600
+                  won_90d: 4
+                  won_value_90d: 18400
+                  lost_90d: 3
+                  win_rate: 0.57
+                  avg_deal: 4600
+                  tasks_overdue: 1
                 user_id: alex
                 user_name: User name
                 team_id: 6ae2cdbd-063f-5ea8-bd10-82ddcee5cb31
@@ -1157,6 +1224,7 @@ paths:
                   unique_reply_rate: 0.13
                   bounces: 1
                   bounce_rate: 0.008
+                  sender_name: Alex Morgan
                 total: 1
                 page: 1
                 limit: 20
@@ -1272,18 +1340,21 @@ paths:
                     status: COMPLETED
                     entered_at: '2026-10-28T16:00:00Z'
                     completed_at: '2026-11-04T16:00:00Z'
+                    current_step: null
                   - contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
                     email: tom.okafor@fabrikam.example
                     name: Tom Okafor
                     status: ACTIVE
                     entered_at: '2026-11-02T16:00:00Z'
                     completed_at: '2026-11-05T16:00:00Z'
+                    current_step: Wait 2 days → Day 3 tips
                   - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
                     email: lena.fischer@contoso.example
                     name: Lena Fischer
                     status: EXITED
                     entered_at: '2026-10-29T16:00:00Z'
                     completed_at: '2026-11-05T16:00:00Z'
+                    current_step: null
                   total: 1640
                   page: 1
                   limit: 20
@@ -1347,6 +1418,7 @@ paths:
                   contacts_waiting: 238
                   achieved_rate: 0.23
                   avg_seconds_to_achieve: 207360
+                  condition: Site event trial_activated occurred
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1474,6 +1546,7 @@ paths:
                   open_rate: 0.5
                   click_rate: 0.087
                   revenue: '1200.00'
+                contacts_active: 238
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2740,6 +2813,9 @@ paths:
                   variance: '-5800.00'
                   variance_pct: -9.1
                 generated_at: '2026-11-05T16:00:00Z'
+                no_close_date:
+                  count: 3
+                  value: 15000
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3324,14 +3400,17 @@ paths:
                   family: WEBMAIL
                   opens: 9840
                   share_pct: 40
+                  verified_pct: 98
                 - client: Apple Mail
                   family: DESKTOP
                   opens: 5120
                   share_pct: 21
+                  verified_pct: 29
                 - client: iOS Mail
                   family: MOBILE
                   opens: 3210
                   share_pct: 13
+                  verified_pct: 31
                 by_family:
                 - name: WEBMAIL
                   count: 58
@@ -3883,16 +3962,23 @@ paths:
                   name: Day 7 · Upgrade offer
                   revenue: '18600.00'
                   conversions: 31
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
                 - kind: AUTOMATION_MESSAGE
                   id: e9a85e92-da13-5077-90b2-942ce726419e
                   name: Renewal in 30 days
                   revenue: '14100.00'
                   conversions: 22
+                  workflow_id: 1b370767-8ad9-50d6-9a2f-1417e9310e08
+                  workflow_name: Renewal reminder · 30 days out
                 - kind: AUTOMATION_MESSAGE
                   id: 43187138-0f3a-56f8-94df-a8d0330ffb47
                   name: Day 5 · Customer stories
                   revenue: '4800.00'
                   conversions: 19
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                total_conversions: 142
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4392,6 +4478,8 @@ paths:
                   points: 20
                 - label: Visited /pricing
                   points: 30
+                contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                contact_name: Priya Natarajan
                 entity_id: d7976b34-ac30-5901-8042-56e3d81193ab
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -4677,6 +4765,11 @@ components:
         current_step_id:
           type: string
           format: uuid
+        current_step:
+          type:
+          - string
+          - 'null'
+          readOnly: true
       required:
       - contact_id
       - status
@@ -4740,6 +4833,9 @@ components:
           description: 0-100
         avg_seconds_to_achieve:
           type: integer
+        condition:
+          type: string
+          readOnly: true
       required:
       - step_id
       - name
@@ -4868,6 +4964,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/AutomationMessageRow'
+        contacts_active:
+          type: integer
+          format: int64
+          readOnly: true
       required:
       - workflow_id
       - name
@@ -5107,6 +5207,10 @@ components:
         generated_at:
           type: string
           format: date-time
+        no_close_date:
+          type: object
+          additionalProperties: true
+          readOnly: true
       required:
       - pipeline_id
       - basis
@@ -5371,6 +5475,10 @@ components:
           type: number
           format: float
           description: 0-100
+        verified_pct:
+          type: integer
+          format: int64
+          readOnly: true
       required:
       - client
       - opens
@@ -5522,6 +5630,29 @@ components:
           format: decimal
           pattern: ^-?\d{1,15}(\.\d{1,4})?$
           description: Decimal string in the currency of the record.
+        month:
+          type: string
+          readOnly: true
+        open_deals:
+          type: integer
+          format: int64
+          readOnly: true
+        pipeline_value:
+          type: integer
+          format: int64
+          readOnly: true
+        weighted:
+          type: integer
+          format: int64
+          readOnly: true
+        won:
+          type: integer
+          format: int64
+          readOnly: true
+        target:
+          type: integer
+          format: int64
+          readOnly: true
       required:
       - period
       - weighted_pipeline
@@ -5594,6 +5725,20 @@ components:
               conversion_from_previous:
                 type: number
                 format: float
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
+        avg_days_to_close:
+          type: integer
+          format: int64
+          readOnly: true
+        win_rate:
+          type: number
+          format: double
+          readOnly: true
       required:
       - stages
       description: Sales funnel data showing conversion between stages
@@ -5781,6 +5926,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RevenueSourceRow'
+        total_conversions:
+          type: integer
+          format: int64
+          readOnly: true
       required:
       - currency
       - attribution_window_days
@@ -5799,6 +5948,9 @@ components:
           type: string
         count:
           type: integer
+        delta:
+          type: string
+          readOnly: true
       required:
       - name
       - count
@@ -5879,6 +6031,9 @@ components:
           type: number
           format: float
           description: 0-100
+        sender_name:
+          type: string
+          readOnly: true
       required:
       - workflow_id
       - step_id
@@ -6025,6 +6180,12 @@ components:
         activity_count:
           type: integer
           format: int32
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
       required:
       - user_id
       - user_name
@@ -6136,6 +6297,13 @@ components:
           description: Decimal string in the currency of the record.
         conversions:
           type: integer
+        workflow_id:
+          type: string
+          format: uuid
+          readOnly: true
+        workflow_name:
+          type: string
+          readOnly: true
       required:
       - kind
       - id
@@ -6318,6 +6486,13 @@ components:
             required:
             - label
             - points
+        contact_id:
+          type: string
+          format: uuid
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
       required:
       - score_id
       - entity_id
@@ -6784,6 +6959,30 @@ components:
           type: array
           items:
             type: object
+            properties:
+              name:
+                type: string
+                readOnly: true
+              entered:
+                type: integer
+                format: int64
+                readOnly: true
+              completed:
+                type: integer
+                format: int64
+                readOnly: true
+              won:
+                type: integer
+                format: int64
+                readOnly: true
+              value:
+                type: integer
+                format: int64
+                readOnly: true
+              contacts:
+                type: integer
+                format: int64
+                readOnly: true
       required:
       - widget_id
       - refreshed_at
@@ -7073,6 +7272,14 @@ components:
         limit:
           type: integer
           format: int32
+        no_close_date:
+          type: object
+          additionalProperties: true
+          readOnly: true
+        accuracy_last_3_months:
+          type: number
+          format: double
+          readOnly: true
       required:
       - items
       - total

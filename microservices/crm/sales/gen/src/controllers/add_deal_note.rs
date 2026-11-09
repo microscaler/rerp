@@ -11,6 +11,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // {
     //   "author": "Me",
     //   "created_at": "2026-11-05T16:00:00Z",
+    //   "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
     //   "id": "2e459265-db4e-592e-aa0a-de7b7189dc8e",
     //   "text": ""
     // }
@@ -18,6 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         r#"{
   "author": "Me",
   "created_at": "2026-11-05T16:00:00Z",
+  "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
   "id": "2e459265-db4e-592e-aa0a-de7b7189dc8e",
   "text": ""
 }"#,
@@ -32,6 +34,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         author: Some("Me".to_string()),
         created_at: "2026-11-05T16:00:00Z".to_string(),
+        deal_id: Some("63a6661f-5860-50ed-8697-f28d29a3917f".to_string()),
         id: "2e459265-db4e-592e-aa0a-de7b7189dc8e".to_string(),
         pinned: Some(true),
         text: "".to_string(),

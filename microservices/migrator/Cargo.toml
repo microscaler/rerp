@@ -18,6 +18,7 @@ accounting = [
     "dep:rerp_accounting_financial_reports",
 ]
 documents = ["dep:rerp_documents_render"]
+crm = ["dep:rerp_crm_audience", "dep:rerp_crm_messaging", "dep:rerp_crm_automation", "dep:rerp_crm_sales", "dep:rerp_crm_acquisition", "dep:rerp_crm_insights", "dep:rerp_crm_workspace", "dep:rerp_crm_intake"]
 
 [dependencies]
 chrono = { workspace = true }
@@ -37,3 +38,11 @@ rerp_accounting_budget = { path = "../accounting/budget/impl", optional = true }
 rerp_accounting_edi = { path = "../accounting/edi/impl", optional = true }
 rerp_accounting_financial_reports = { path = "../accounting/financial-reports/impl", optional = true }
 rerp_documents_render = { path = "../documents/render/impl", optional = true }
+rerp_crm_audience = { path = "../crm/audience/impl", optional = true }
+rerp_crm_messaging = { path = "../crm/messaging/impl", optional = true }
+rerp_crm_automation = { path = "../crm/automation/impl", optional = true }
+rerp_crm_sales = { path = "../crm/sales/impl", optional = true }
+rerp_crm_acquisition = { path = "../crm/acquisition/impl", optional = true }
+rerp_crm_insights = { path = "../crm/insights/impl", optional = true }
+rerp_crm_workspace = { path = "../crm/workspace/impl", optional = true }
+rerp_crm_intake = { path = "../crm/intake/impl", optional = true }

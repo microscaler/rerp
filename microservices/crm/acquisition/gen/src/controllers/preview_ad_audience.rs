@@ -19,6 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     "suppressed": 96,
     //     "unsubscribed": 212
     //   },
+    //   "holdout": 527,
     //   "identifier_coverage": {
     //     "EMAIL": 1.0,
     //     "FIRST_NAME": 0.94,
@@ -26,6 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     "PHONE": 0.38,
     //     "POSTCODE": 0.22
     //   },
+    //   "platform_minimum": 100,
     //   "source_count": 5102
     // }
     match serde_json::from_str::<Response>(
@@ -40,6 +42,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "suppressed": 96,
     "unsubscribed": 212
   },
+  "holdout": 527,
   "identifier_coverage": {
     "EMAIL": 1.0,
     "FIRST_NAME": 0.94,
@@ -47,6 +50,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "PHONE": 0.38,
     "POSTCODE": 0.22
   },
+  "platform_minimum": 100,
   "source_count": 5102
 }"#,
     ) {
@@ -68,12 +72,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
             )
             .unwrap_or(serde_json::Value::Null),
         ),
+        holdout: Some(527),
         identifier_coverage: Some(
             serde_json::from_str::<serde_json::Value>(
                 r#"{"EMAIL":1.0,"FIRST_NAME":0.94,"LAST_NAME":0.94,"PHONE":0.38,"POSTCODE":0.22}"#,
             )
             .unwrap_or(serde_json::Value::Null),
         ),
+        platform_minimum: Some(100),
         source_count: Some(5102),
     })
 }

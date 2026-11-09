@@ -2,7 +2,6 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
-use crate::handlers::types::OrganisationOrigin;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -22,129 +21,57 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "active")]
-    pub active: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "active_lead_count")]
-    pub active_lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "annual_revenue")]
-    pub annual_revenue: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "child_ids")]
-    pub child_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "city")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "color")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_size")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "contact_count")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "contact_name")]
-    pub contact_name: Option<String>,
+    #[serde(rename = "converted")]
+    pub converted: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "country_code")]
     pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "country_id")]
-    pub country_id: Option<String>,
+    #[serde(rename = "created_at")]
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "country_name")]
-    pub country_name: Option<String>,
-
-    #[serde(rename = "create_date")]
-    pub create_date: String,
+    #[serde(rename = "customer_account_id")]
+    pub customer_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "email")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "employees")]
-    pub employees: Option<i32>,
+    #[serde(rename = "domain")]
+    pub domain: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "industry_id")]
-    pub industry_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "industry_name")]
-    pub industry_name: Option<String>,
+    #[serde(rename = "industry")]
+    pub industry: Option<String>,
 
     #[serde(rename = "name")]
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "origin")]
-    pub origin: Option<OrganisationOrigin>,
+    #[serde(rename = "open_deal_count")]
+    pub open_deal_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "parent_id")]
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "phone")]
-    pub phone: Option<String>,
+    #[serde(rename = "size")]
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "region")]
-    pub region: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "state_id")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street2")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "tax_id")]
-    pub tax_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "total_revenue")]
-    pub total_revenue: Option<String>,
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "website")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "write_date")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "zip")]
-    pub zip: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

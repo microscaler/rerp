@@ -25,6 +25,10 @@ pub struct Request {
 pub struct Response {
     #[serde(rename = "days")]
     pub days: Vec<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "week_label")]
+    pub week_label: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

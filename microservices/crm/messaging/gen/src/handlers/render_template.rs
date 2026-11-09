@@ -28,6 +28,14 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "from_address")]
+    pub from_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "from_name")]
+    pub from_name: Option<String>,
+
     #[serde(rename = "html")]
     pub html: String,
 

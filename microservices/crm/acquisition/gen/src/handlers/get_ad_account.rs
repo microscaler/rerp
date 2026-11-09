@@ -21,6 +21,10 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "audience_count")]
+    pub audience_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "authorize_url")]
     pub authorize_url: Option<String>,
 
@@ -76,6 +80,10 @@ pub struct Response {
 
     #[serde(rename = "platform")]
     pub platform: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "spend_30d")]
+    pub spend_30d: Option<i64>,
 
     #[serde(rename = "status")]
     pub status: String,

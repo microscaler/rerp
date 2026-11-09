@@ -144,6 +144,8 @@ paths:
                 last_error: Last error
                 connected_by: alex
                 created_at: '2026-07-08T16:00:00Z'
+                audience_count: 4
+                spend_30d: 2140
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -197,6 +199,8 @@ paths:
                 last_error: Last error
                 connected_by: alex
                 created_at: '2026-07-08T16:00:00Z'
+                audience_count: 4
+                spend_30d: 2140
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -260,6 +264,8 @@ paths:
                 last_error: Last error
                 connected_by: alex
                 created_at: '2026-07-08T16:00:00Z'
+                audience_count: 4
+                spend_30d: 2140
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -394,6 +400,8 @@ paths:
                 last_error: Last error
                 connected_by: alex
                 created_at: '2026-07-08T16:00:00Z'
+                audience_count: 4
+                spend_30d: 2140
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -449,6 +457,7 @@ paths:
                     audience_matched: 100
                   status: SHIPPED
                   notes: Audience ≥ ~100 matched
+                  label: Meta
                 - platform: GOOGLE_ADS
                   kind: WALLED_GARDEN_API
                   capabilities:
@@ -462,6 +471,7 @@ paths:
                     audience_matched: 1000
                   status: SHIPPED
                   notes: Customer Match ≥ 1,000 · developer token
+                  label: Google Ads
                 - platform: LINKEDIN
                   kind: WALLED_GARDEN_API
                   capabilities:
@@ -474,6 +484,7 @@ paths:
                   minimums: {}
                   status: SHIPPED
                   notes: No minimum · best B2B match
+                  label: LinkedIn
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -553,6 +564,9 @@ paths:
                   revenue: '21400.00'
                   platform_reported_revenue: '38900.00'
                   unattributed_revenue: '14200.00'
+                  accounts: 5
+                  roas: 5.2
+                  cac: 114
                 rows:
                 - key: 262ac3c8-b3f1-5aff-a843-87613a514a9e
                   label: BF early access · warm-up
@@ -564,6 +578,19 @@ paths:
                   platform_reported_revenue: '9800.00'
                   roas: 1.6
                   cac: '1460.00'
+                  platform: Meta
+                  account_id: ded95315-6c77-51a0-b8ea-66b76fada21a
+                  impressions: 71000
+                  clicks: 214
+                  platform_reported_conversions: 11
+                  revenue_by_position:
+                    first: 1200
+                    assists: 4800
+                    last: 2400
+                  ltv_90d: 760
+                  recommendation: HOLD
+                  recommendation_note: lift after send
+                  recommendation_change_pct: null
                 - key: f3cd6604-1b26-578c-b830-9a23140db612
                   label: Retarget · pricing visitors
                   spend: '620.00'
@@ -574,6 +601,19 @@ paths:
                   platform_reported_revenue: '12100.00'
                   roas: 6.3
                   cac: '124.00'
+                  platform: Meta + Google
+                  account_id: ded95315-6c77-51a0-b8ea-66b76fada21a
+                  impressions: 38000
+                  clicks: 402
+                  platform_reported_conversions: 14
+                  revenue_by_position:
+                    first: 7400
+                    assists: 2100
+                    last: 3900
+                  ltv_90d: 1240
+                  recommendation: SCALE
+                  recommendation_note: +20%
+                  recommendation_change_pct: Recommendation change pct
                 - key: 88429ed5-a8b0-5109-affc-e41b18874962
                   label: Webinar invite · warm-up
                   spend: '600.00'
@@ -584,6 +624,19 @@ paths:
                   platform_reported_revenue: '4200.00'
                   roas: 2.3
                   cac: '300.00'
+                  platform: LinkedIn
+                  account_id: 6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa
+                  impressions: 22000
+                  clicks: 118
+                  platform_reported_conversions: 6
+                  revenue_by_position:
+                    first: 2600
+                    assists: 3100
+                    last: 1400
+                  ltv_90d: 2010
+                  recommendation: HOLD
+                  recommendation_note: ''
+                  recommendation_change_pct: null
                 warm_up_lift:
                   exposed:
                     contacts: 1804
@@ -602,6 +655,12 @@ paths:
                     click_rate: 0.3
                     reply_rate: 0.27
                     unsub_rate: 0
+                  campaign_name: Black Friday early access
+                  measured_after: '2026-11-18T16:00:00Z'
+                  note: Measured after the send; below are the October webinar warm-up's numbers.
+                  cost: 600
+                  cost_per_contact: 0.33
+                  extra_clicks_per_100: 11
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -903,6 +962,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-24T16:00:00Z'
                   updated_at: '2026-11-05T15:48:00Z'
+                  account_name: Acme · Meta EU
                 - id: bbab0796-23f0-59cb-841b-ce85c5b69aae
                   name: Warm-up · Webinar invite (LinkedIn)
                   account_id: 6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa
@@ -946,6 +1006,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-23T16:00:00Z'
                   updated_at: '2026-11-05T15:00:00Z'
+                  account_name: Acme · LinkedIn
                 - id: fa613142-3567-5941-ad4b-02a09f597962
                   name: Retarget · pricing visitors 30 d
                   account_id: ded95315-6c77-51a0-b8ea-66b76fada21a
@@ -985,6 +1046,7 @@ paths:
                   created_by: alex
                   created_at: '2026-10-22T16:00:00Z'
                   updated_at: '2026-11-05T15:48:00Z'
+                  account_name: Acme · Meta EU
                 total: 6
                 page: 1
                 limit: 25
@@ -1112,6 +1174,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-24T16:00:00Z'
                 updated_at: '2026-11-05T15:48:00Z'
+                account_name: Acme · Meta EU
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1204,6 +1267,8 @@ paths:
                 estimated_match_rate: 0.61
                 estimated_matched: 1820
                 below_platform_minimum: false
+                holdout: 527
+                platform_minimum: 100
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1287,6 +1352,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-24T16:00:00Z'
                 updated_at: '2026-11-05T15:48:00Z'
+                account_name: Acme · Meta EU
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1400,6 +1466,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-24T16:00:00Z'
                 updated_at: '2026-11-05T15:48:00Z'
+                account_name: Acme · Meta EU
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1565,6 +1632,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-24T16:00:00Z'
                 updated_at: '2026-11-05T15:48:00Z'
+                account_name: Acme · Meta EU
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1647,6 +1715,7 @@ paths:
                 created_by: alex
                 created_at: '2026-10-24T16:00:00Z'
                 updated_at: '2026-11-05T15:48:00Z'
+                account_name: Acme · Meta EU
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1897,6 +1966,13 @@ paths:
                   created_by: alex
                   created_at: '2026-10-27T16:00:00Z'
                   updated_at: '2026-11-05T15:00:00Z'
+                  warm_up_for_campaign_name: Black Friday · early access
+                  warm_up_send_at: '2026-11-26T16:00:00Z'
+                  holdout_percent: 15
+                  holdout_contacts: 462
+                  pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                    morning of 21 Nov.
+                  recommendation: Hold · lift measured after the send
                 - id: a169735e-6c23-5274-9166-74bdf0eeb9da
                   name: Warm-up · Webinar invite
                   purpose: WARM_UP
@@ -1972,6 +2048,12 @@ paths:
                   created_by: alex
                   created_at: '2026-10-28T16:00:00Z'
                   updated_at: '2026-11-05T14:00:00Z'
+                  warm_up_for_campaign_name: Black Friday · early access
+                  warm_up_send_at: '2026-11-26T16:00:00Z'
+                  holdout_percent: 15
+                  holdout_contacts: 3
+                  pacing_note: Pacing note
+                  recommendation: Recommendation
                 - id: 5563ece1-e63e-554d-aeb6-32168c376cbd
                   name: Retarget · pricing visitors
                   purpose: RETARGET
@@ -2061,6 +2143,12 @@ paths:
                   created_by: alex
                   created_at: '2026-10-29T16:00:00Z'
                   updated_at: '2026-11-05T13:00:00Z'
+                  warm_up_for_campaign_name: Warm up for campaign name
+                  warm_up_send_at: '2026-11-05T16:00:00Z'
+                  holdout_percent: 3
+                  holdout_contacts: 3
+                  pacing_note: Pacing note
+                  recommendation: Scale · +20%
                 total: 5
                 page: 1
                 limit: 25
@@ -2235,6 +2323,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2377,6 +2472,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2540,6 +2642,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2737,6 +2846,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2929,6 +3045,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3074,6 +3197,13 @@ paths:
                 created_by: alex
                 created_at: '2026-10-27T16:00:00Z'
                 updated_at: '2026-11-05T15:00:00Z'
+                warm_up_for_campaign_name: Black Friday · early access
+                warm_up_send_at: '2026-11-26T16:00:00Z'
+                holdout_percent: 15
+                holdout_contacts: 462
+                pacing_note: Pacing even · €180 / day target · ahead by 3% · the send is on day 11, so delivery stops the
+                  morning of 21 Nov.
+                recommendation: Hold · lift measured after the send
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3414,10 +3544,15 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/AdAudienceMember'
+                  total:
+                    type: integer
+                    format: int64
+                    readOnly: true
                 required:
                 - items
               example:
                 items: []
+                total: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3556,6 +3691,11 @@ paths:
               enabled: true
               sent_30d: 3
               failed_30d: 3
+              account_ids:
+              - 64128ebb-1409-5f1a-93cc-64a1733b4b97
+              account_names:
+              - Account names
+              require_click_param: Require click param
       security:
       - bearerAuth: []
       responses:
@@ -3582,6 +3722,15 @@ paths:
                 enabled: true
                 sent_30d: 612
                 failed_30d: 3
+                account_ids:
+                - ded95315-6c77-51a0-b8ea-66b76fada21a
+                - 1dcd203d-8734-5d40-b43b-9bbcdd9758b5
+                - 6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa
+                account_names:
+                - Meta EU
+                - Google Ads
+                - LinkedIn
+                require_click_param: Require click param
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3634,6 +3783,15 @@ paths:
                 enabled: true
                 sent_30d: 612
                 failed_30d: 3
+                account_ids:
+                - ded95315-6c77-51a0-b8ea-66b76fada21a
+                - 1dcd203d-8734-5d40-b43b-9bbcdd9758b5
+                - 6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa
+                account_names:
+                - Meta EU
+                - Google Ads
+                - LinkedIn
+                require_click_param: Require click param
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3680,6 +3838,11 @@ paths:
               enabled: true
               sent_30d: 3
               failed_30d: 3
+              account_ids:
+              - 64128ebb-1409-5f1a-93cc-64a1733b4b97
+              account_names:
+              - Account names
+              require_click_param: Require click param
       security:
       - bearerAuth: []
       responses:
@@ -3706,6 +3869,15 @@ paths:
                 enabled: true
                 sent_30d: 612
                 failed_30d: 3
+                account_ids:
+                - ded95315-6c77-51a0-b8ea-66b76fada21a
+                - 1dcd203d-8734-5d40-b43b-9bbcdd9758b5
+                - 6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa
+                account_names:
+                - Meta EU
+                - Google Ads
+                - LinkedIn
+                require_click_param: Require click param
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3902,9 +4074,19 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/AdConversion'
+                  queued:
+                    type: integer
+                    format: int64
+                    readOnly: true
+                  rules_matched:
+                    type: integer
+                    format: int64
+                    readOnly: true
                 required:
                 - items
               example:
+                queued: 3
+                rules_matched: 1
                 items:
                 - id: e67555dd-33f4-5fee-9da3-a019895219b1
                   status: QUEUED
@@ -4035,6 +4217,10 @@ paths:
                   - {}
                   - {}
                   created_at: '2026-10-30T16:00:00Z'
+                  review:
+                    META: APPROVED
+                    GOOGLE_ADS: APPROVED
+                    LINKEDIN: APPROVED
                 - id: 8767be08-2adf-5232-a68d-eefde450d501
                   kind: IMAGE
                   name: BF square
@@ -4050,6 +4236,9 @@ paths:
                   - {}
                   - {}
                   created_at: '2026-10-31T16:00:00Z'
+                  review:
+                    META: APPROVED
+                    LINKEDIN: PENDING
                 - id: 3998574b-7118-511a-bd3b-fad92e7cddfd
                   kind: VIDEO
                   name: Webinar
@@ -4064,6 +4253,8 @@ paths:
                   platforms:
                   - {}
                   created_at: '2026-11-01T16:00:00Z'
+                  review:
+                    LINKEDIN: APPROVED
                 total: 3
                 page: 1
                 limit: 25
@@ -4132,6 +4323,10 @@ paths:
                 - {}
                 - {}
                 created_at: '2026-10-30T16:00:00Z'
+                review:
+                  META: APPROVED
+                  GOOGLE_ADS: APPROVED
+                  LINKEDIN: APPROVED
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4186,6 +4381,10 @@ paths:
                 - {}
                 - {}
                 created_at: '2026-10-30T16:00:00Z'
+                review:
+                  META: APPROVED
+                  GOOGLE_ADS: APPROVED
+                  LINKEDIN: APPROVED
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4297,6 +4496,7 @@ paths:
               add_click_id: false
               add_contact_token: false
               enabled: true
+              label: Primary
       security:
       - bearerAuth: []
       responses:
@@ -4318,6 +4518,7 @@ paths:
                 add_click_id: true
                 add_contact_token: true
                 enabled: true
+                label: Campaign emails
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4362,6 +4563,7 @@ paths:
               add_click_id: false
               add_contact_token: false
               enabled: true
+              label: Primary
       security:
       - bearerAuth: []
       responses:
@@ -4383,6 +4585,7 @@ paths:
                 add_click_id: true
                 add_contact_token: true
                 enabled: true
+                label: Campaign emails
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -4533,6 +4736,8 @@ paths:
                   server_set: true
                   same_site: Lax
                   localstorage_mirror: true
+                  tracking_domain: t.acme.example
+                  tracking_domain_verified: true
                 click_id_params:
                 - gclid
                 - wbraid
@@ -4559,6 +4764,10 @@ paths:
                   - UK
                   cmp_signal: TCF
                   cookieless_pings: true
+                  last_7d:
+                    full: 0.71
+                    analytics_only: 0.18
+                    cookieless: 0.11
                 link_decoration:
                   enabled: true
                   params:
@@ -4605,6 +4814,8 @@ paths:
                 server_set: false
                 same_site: Lax
                 localstorage_mirror: false
+                tracking_domain: Tracking domain
+                tracking_domain_verified: false
               click_id_params:
               - Click id params
               own_click_id_param: Own click id param
@@ -4623,6 +4834,7 @@ paths:
                 - Strict regions
                 cmp_signal: TCF
                 cookieless_pings: false
+                last_7d: {}
               link_decoration:
                 enabled: true
                 params:
@@ -4647,6 +4859,8 @@ paths:
                   server_set: true
                   same_site: Lax
                   localstorage_mirror: true
+                  tracking_domain: t.acme.example
+                  tracking_domain_verified: true
                 click_id_params:
                 - gclid
                 - wbraid
@@ -4673,6 +4887,10 @@ paths:
                   - UK
                   cmp_signal: TCF
                   cookieless_pings: true
+                  last_7d:
+                    full: 0.71
+                    analytics_only: 0.18
+                    cookieless: 0.11
                 link_decoration:
                   enabled: true
                   params:
@@ -5007,6 +5225,13 @@ paths:
                   contacts: 0
                   converted: 7
                   revenue: '12140.00'
+                funnel:
+                - label: Visitors
+                  count: 84200
+                - label: Identified contacts
+                  count: 6114
+                - label: Leads
+                  count: 3529
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -5530,6 +5755,8 @@ paths:
                   is_active: true
                   capture_fields: {}
                   created_at: '2026-04-19T16:00:00Z'
+                  view_count_30d: 48210
+                  placement: acme.example · every page
                 - id: d614ffd8-570e-5b8f-b84c-75324e12322e
                   name: Launch waitlist
                   description: ''
@@ -5575,6 +5802,8 @@ paths:
                   is_active: true
                   capture_fields: {}
                   created_at: '2026-05-09T16:00:00Z'
+                  view_count_30d: 9420
+                  placement: acme.example/launch
                 - id: 997e0128-1f73-5fb4-b47e-b72197474a68
                   name: Free trial
                   description: ''
@@ -5620,6 +5849,8 @@ paths:
                   is_active: true
                   capture_fields: {}
                   created_at: '2026-05-29T16:00:00Z'
+                  view_count_30d: 6880
+                  placement: app.acme.example/signup
                 total: 6
                 page: 1
                 limit: 25
@@ -5719,6 +5950,8 @@ paths:
                 is_active: true
                 capture_fields: {}
                 created_at: '2026-04-19T16:00:00Z'
+                view_count_30d: 48210
+                placement: acme.example · every page
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -5757,18 +5990,39 @@ paths:
                 - id: 33862d04-0db3-5f10-8b9e-da432aa545ec
                   form_id: 454cdf11-2c7b-505e-8864-df16d18ca8cc
                   contact_id: 5de76105-f8c3-5357-af13-c5ce28753ed0
+                  form_name: Website footer
+                  contact_name: Jonas Weber
+                  email: jonas.weber@proseware.example
+                  at: '2026-11-05T15:40:00Z'
+                  utm_source: linkedin
+                  utm_medium: null
+                  utm_campaign: q4-webinars
                   submitted_at: '2026-11-05T16:00:00Z'
                   values:
                     key: Value
                 - id: 77a87e6a-0d20-5e66-ac8b-b889d993c003
                   form_id: d614ffd8-570e-5b8f-b84c-75324e12322e
                   contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                  form_name: Launch waitlist
+                  contact_name: Lena Fischer
+                  email: lena.fischer@contoso.example
+                  at: '2026-11-02T16:00:00Z'
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: Utm campaign
                   submitted_at: '2026-11-05T16:00:00Z'
                   values:
                     key: Value
                 - id: b14461b9-7786-5357-9035-86f330642d09
                   form_id: 997e0128-1f73-5fb4-b47e-b72197474a68
                   contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  form_name: Free trial
+                  contact_name: Tom Okafor
+                  email: tom.okafor@fabrikam.example
+                  at: '2026-10-28T16:00:00Z'
+                  utm_source: google
+                  utm_medium: null
+                  utm_campaign: Utm campaign
                   submitted_at: '2026-11-05T16:00:00Z'
                   values:
                     key: Value
@@ -5884,6 +6138,8 @@ paths:
                 is_active: true
                 capture_fields: {}
                 created_at: '2026-04-19T16:00:00Z'
+                view_count_30d: 48210
+                placement: acme.example · every page
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -5959,6 +6215,8 @@ paths:
                 is_active: true
                 capture_fields: {}
                 created_at: '2026-04-19T16:00:00Z'
+                view_count_30d: 48210
+                placement: acme.example · every page
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -6038,6 +6296,8 @@ paths:
                 is_active: true
                 capture_fields: {}
                 created_at: '2026-04-19T16:00:00Z'
+                view_count_30d: 48210
+                placement: acme.example · every page
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -6415,6 +6675,7 @@ paths:
                 declared: true
                 count_30d: 2140
                 last_seen_at: '2026-11-05T15:58:00Z'
+                used_by: Welcome series · goal
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -6562,6 +6823,9 @@ paths:
                 tracking_key: pk_site_07c1e
                 last_event_at: '2026-11-05T15:59:48Z'
                 created_at: '2026-05-09T16:00:00Z'
+                events_24h: 18402
+                identified_30d: 3114
+                kind: SCRIPT
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -7138,6 +7402,14 @@ components:
           type: string
           format: date-time
           readOnly: true
+        audience_count:
+          type: integer
+          format: int64
+          readOnly: true
+        spend_30d:
+          type: integer
+          format: int64
+          readOnly: true
     AdAdapter:
       type: object
       required:
@@ -7251,6 +7523,9 @@ components:
           - NOT_PLANNED
         notes:
           type: string
+        label:
+          type: string
+          readOnly: true
     AdAttributionReport:
       type: object
       properties:
@@ -7297,6 +7572,18 @@ components:
               format: decimal
               pattern: ^-?\d{1,15}(\.\d{1,4})?$
               description: Decimal string in the currency of the record.
+            accounts:
+              type: integer
+              format: int64
+              readOnly: true
+            roas:
+              type: number
+              format: double
+              readOnly: true
+            cac:
+              type: integer
+              format: int64
+              readOnly: true
         rows:
           type: array
           items:
@@ -7338,6 +7625,44 @@ components:
                 format: decimal
                 pattern: ^-?\d{1,15}(\.\d{1,4})?$
                 description: Decimal string in the currency of the record.
+              platform:
+                type: string
+                readOnly: true
+              account_id:
+                type: string
+                format: uuid
+                readOnly: true
+              impressions:
+                type: integer
+                format: int64
+                readOnly: true
+              clicks:
+                type: integer
+                format: int64
+                readOnly: true
+              platform_reported_conversions:
+                type: integer
+                format: int64
+                readOnly: true
+              revenue_by_position:
+                type: object
+                additionalProperties: true
+                readOnly: true
+              ltv_90d:
+                type: integer
+                format: int64
+                readOnly: true
+              recommendation:
+                type: string
+                readOnly: true
+              recommendation_note:
+                type: string
+                readOnly: true
+              recommendation_change_pct:
+                type:
+                - string
+                - 'null'
+                readOnly: true
         warm_up_lift:
           type: object
           description: Email outcomes for contacts who were in a WARM_UP audience vs the holdout, when a holdout is configured
@@ -7354,6 +7679,28 @@ components:
               type: object
               additionalProperties:
                 type: number
+            campaign_name:
+              type: string
+              readOnly: true
+            measured_after:
+              type: string
+              format: date-time
+              readOnly: true
+            note:
+              type: string
+              readOnly: true
+            cost:
+              type: integer
+              format: int64
+              readOnly: true
+            cost_per_contact:
+              type: number
+              format: double
+              readOnly: true
+            extra_clicks_per_100:
+              type: integer
+              format: int64
+              readOnly: true
     AdAudience:
       type: object
       required:
@@ -7543,6 +7890,9 @@ components:
           type: string
           format: date-time
           readOnly: true
+        account_name:
+          type: string
+          readOnly: true
     AdAudienceMember:
       type: object
       required:
@@ -7596,6 +7946,9 @@ components:
           - AUDIENCE_DELETED
         error:
           type: string
+        consent_source:
+          type: string
+          readOnly: true
     AdAudiencePreview:
       type: object
       properties:
@@ -7627,6 +7980,14 @@ components:
         below_platform_minimum:
           type: boolean
           description: Platforms refuse to serve audiences under ~100 (Meta) / 1,000 (Google) matched people
+        holdout:
+          type: integer
+          format: int64
+          readOnly: true
+        platform_minimum:
+          type: integer
+          format: int64
+          readOnly: true
     AdAudienceSource:
       type: object
       required:
@@ -7829,6 +8190,24 @@ components:
         updated_at:
           type: string
           format: date-time
+          readOnly: true
+        warm_up_for_campaign_name:
+          type: string
+          readOnly: true
+        warm_up_send_at:
+          type: string
+          format: date-time
+        holdout_percent:
+          type: integer
+          format: int64
+        holdout_contacts:
+          type: integer
+          format: int64
+        pacing_note:
+          type: string
+          readOnly: true
+        recommendation:
+          type: string
           readOnly: true
     AdBuyDelivery:
       type: object
@@ -8317,6 +8696,18 @@ components:
           type: integer
           format: int64
           readOnly: true
+        account_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        account_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        require_click_param:
+          type: string
     AdCreative:
       type: object
       required:
@@ -8390,6 +8781,9 @@ components:
           type: string
           format: date-time
           readOnly: true
+        review:
+          type: object
+          additionalProperties: true
     AdLinkTagRule:
       type: object
       required:
@@ -8430,6 +8824,8 @@ components:
         enabled:
           type: boolean
           default: true
+        label:
+          type: string
     AdLtvReport:
       type: object
       properties:
@@ -8623,6 +9019,12 @@ components:
               type: boolean
               default: true
               description: Mirror the id into localStorage and restore the cookie when it is cleared
+            tracking_domain:
+              type: string
+              readOnly: true
+            tracking_domain_verified:
+              type: boolean
+              readOnly: true
         click_id_params:
           type: array
           items:
@@ -8713,6 +9115,10 @@ components:
             cookieless_pings:
               type: boolean
               description: Send consentless, id-free pings (page, source) for modelled attribution when consent is denied
+            last_7d:
+              type: object
+              additionalProperties: true
+              readOnly: true
         link_decoration:
           type: object
           properties:
@@ -8832,6 +9238,12 @@ components:
                 format: decimal
                 pattern: ^-?\d{1,15}(\.\d{1,4})?$
                 description: Decimal string in the currency of the record.
+        funnel:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          readOnly: true
     CampaignLeadResult:
       type: object
       required:
@@ -9304,6 +9716,9 @@ components:
         last_seen_at:
           type: string
           format: date-time
+        used_by:
+          type: string
+          readOnly: true
     FormAction:
       type: object
       required:
@@ -9489,6 +9904,30 @@ components:
         submitted_at:
           type: string
           format: date-time
+        form_name:
+          type: string
+          readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          readOnly: true
+        at:
+          type: string
+          format: date-time
+          readOnly: true
+        utm_source:
+          type: string
+          readOnly: true
+        utm_medium:
+          type:
+          - string
+          - 'null'
+          readOnly: true
+        utm_campaign:
+          type: string
+          readOnly: true
     FormSubmissionPage:
       type: object
       required:
@@ -9759,6 +10198,16 @@ components:
           type: string
           format: date-time
           readOnly: true
+        events_24h:
+          type: integer
+          format: int64
+          readOnly: true
+        identified_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        kind:
+          type: string
     UTMCampaign:
       type: object
       required:
@@ -10043,6 +10492,12 @@ components:
           type: string
           format: date-time
           readOnly: true
+        view_count_30d:
+          type: integer
+          format: int64
+          readOnly: true
+        placement:
+          type: string
       description: A marketing form definition with its fields
     ErrorResponse:
       type: object
@@ -10227,6 +10682,18 @@ components:
           type: integer
           format: int64
           readOnly: true
+        account_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        account_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        require_click_param:
+          type: string
       description: AdConversionRule (request body; id come from the path or headers)
     AdLinkTagRuleInput:
       type: object
@@ -10265,6 +10732,8 @@ components:
         enabled:
           type: boolean
           default: true
+        label:
+          type: string
       description: AdLinkTagRule (request body; id come from the path or headers)
     CampaignLeadResultPage:
       type: object

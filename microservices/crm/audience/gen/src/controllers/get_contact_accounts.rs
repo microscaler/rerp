@@ -14,7 +14,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // {
     //   "items": [
     //     {
-    //       "create_date": "2026-11-05T16:00:00Z",
+    //       "created_at": "2026-11-05T16:00:00Z",
     //       "id": "44f5daeb-faac-5a53-81fb-ac8b5f267d2c",
     //       "name": "Northwind Traders"
     //     }
@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         r#"{
   "items": [
     {
-      "create_date": "2026-11-05T16:00:00Z",
+      "created_at": "2026-11-05T16:00:00Z",
       "id": "44f5daeb-faac-5a53-81fb-ac8b5f267d2c",
       "name": "Northwind Traders"
     }
@@ -45,6 +45,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<Organisation>(serde_json::json!({"create_date":"2026-11-05T16:00:00Z","id":"44f5daeb-faac-5a53-81fb-ac8b5f267d2c","name":"Northwind Traders"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
+        items: vec![serde_json::from_value::<Organisation>(serde_json::json!({"created_at":"2026-11-05T16:00:00Z","id":"44f5daeb-faac-5a53-81fb-ac8b5f267d2c","name":"Northwind Traders"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

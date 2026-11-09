@@ -14,6 +14,7 @@ use crate::handlers::types::DealStatus;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
+    //   "contact_id": "cab01328-10bf-5c9a-9c3a-5c2c57018288",
     //   "contacts": [
     //     {
     //       "contact_id": "cab01328-10bf-5c9a-9c3a-5c2c57018288"
@@ -25,10 +26,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "custom_fields": {},
     //   "days_in_stage": 3,
     //   "description": "Example",
+    //   "email": "Email",
     //   "expected_close_date": "2026-11-25",
     //   "id": "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26",
+    //   "is_primary": true,
     //   "last_activity_at": "2026-11-05T16:00:00Z",
     //   "lost_reason": "Lost reason",
+    //   "name": "Northwind Traders",
     //   "next_task_at": "2026-11-05T16:00:00Z",
     //   "open_task_count": 3,
     //   "organisation_id": "f81747aa-a909-54a1-bd00-e1888a20c4dc",
@@ -39,6 +43,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "pipeline_name": "Pipeline name",
     //   "primary_contact_id": "8eb8743a-71f2-53a5-a172-92fda4d35c22",
     //   "probability": 3,
+    //   "role": "Role",
     //   "source": "Source",
     //   "stage_entered_at": "2026-11-05T16:00:00Z",
     //   "stage_id": "fd284c39-47ef-593e-aa63-650247d40d35",
@@ -55,6 +60,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // }
     match serde_json::from_str::<Response>(
         r#"{
+  "contact_id": "cab01328-10bf-5c9a-9c3a-5c2c57018288",
   "contacts": [
     {
       "contact_id": "cab01328-10bf-5c9a-9c3a-5c2c57018288"
@@ -66,10 +72,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "custom_fields": {},
   "days_in_stage": 3,
   "description": "Example",
+  "email": "Email",
   "expected_close_date": "2026-11-25",
   "id": "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26",
+  "is_primary": true,
   "last_activity_at": "2026-11-05T16:00:00Z",
   "lost_reason": "Lost reason",
+  "name": "Northwind Traders",
   "next_task_at": "2026-11-05T16:00:00Z",
   "open_task_count": 3,
   "organisation_id": "f81747aa-a909-54a1-bd00-e1888a20c4dc",
@@ -80,6 +89,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "pipeline_name": "Pipeline name",
   "primary_contact_id": "8eb8743a-71f2-53a5-a172-92fda4d35c22",
   "probability": 3,
+  "role": "Role",
   "source": "Source",
   "stage_entered_at": "2026-11-05T16:00:00Z",
   "stage_id": "fd284c39-47ef-593e-aa63-650247d40d35",
@@ -103,6 +113,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
+        contact_id: Some("cab01328-10bf-5c9a-9c3a-5c2c57018288".to_string()),
         contacts: Some(vec![serde_json::from_value::<DealContact>(
             serde_json::json!({"contact_id":"cab01328-10bf-5c9a-9c3a-5c2c57018288"}),
         )
@@ -115,10 +126,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         ),
         days_in_stage: Some(3),
         description: Some("Example".to_string()),
+        email: Some("Email".to_string()),
         expected_close_date: Some("2026-11-25".to_string()),
         id: "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26".to_string(),
+        is_primary: Some(true),
         last_activity_at: Some("2026-11-05T16:00:00Z".to_string()),
         lost_reason: Some("Lost reason".to_string()),
+        name: Some("Northwind Traders".to_string()),
         next_task_at: Some("2026-11-05T16:00:00Z".to_string()),
         open_task_count: Some(3),
         organisation_id: Some("f81747aa-a909-54a1-bd00-e1888a20c4dc".to_string()),
@@ -129,6 +143,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         pipeline_name: Some("Pipeline name".to_string()),
         primary_contact_id: Some("8eb8743a-71f2-53a5-a172-92fda4d35c22".to_string()),
         probability: Some(3),
+        role: Some("Role".to_string()),
         source: Some("Source".to_string()),
         stage_entered_at: Some("2026-11-05T16:00:00Z".to_string()),
         stage_id: "fd284c39-47ef-593e-aa63-650247d40d35".to_string(),

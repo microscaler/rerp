@@ -22,6 +22,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "contact_id": "c891a339-996d-56b9-a022-244c570f48c9",
     //   "created_at": "2026-11-05T16:00:00Z",
     //   "id": "3eb009b7-a99d-5a4c-956a-99e11d8dbb76",
+    //   "queued": 1,
     //   "status": "QUEUED"
     // }
     match serde_json::from_str::<Response>(
@@ -30,6 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "contact_id": "c891a339-996d-56b9-a022-244c570f48c9",
   "created_at": "2026-11-05T16:00:00Z",
   "id": "3eb009b7-a99d-5a4c-956a-99e11d8dbb76",
+  "queued": 1,
   "status": "QUEUED"
 }"#,
     ) {
@@ -42,10 +44,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         campaign_id: Some("example".to_string()),
+        campaign_name: Some("example".to_string()),
         channel: serde_json::from_value::<Channel>(serde_json::Value::String("EMAIL".to_string()))
             .unwrap_or_default(),
         clicked_at: Some("example".to_string()),
+        clicked_link: Some("example".to_string()),
         contact_id: "c891a339-996d-56b9-a022-244c570f48c9".to_string(),
+        contact_name: Some("example".to_string()),
         created_at: "2026-11-05T16:00:00Z".to_string(),
         enrolment_id: Some("example".to_string()),
         error: Some("example".to_string()),
@@ -54,6 +59,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         opened_at: Some("example".to_string()),
         provider: Some(Default::default()),
         provider_message_id: Some("example".to_string()),
+        queued: Some(1),
         status: serde_json::from_value::<SendStatus>(serde_json::Value::String(
             "QUEUED".to_string(),
         ))

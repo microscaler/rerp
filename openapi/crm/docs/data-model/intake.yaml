@@ -1,0 +1,48 @@
+service: intake
+database: crm_intake
+schema: intake
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  submissions:
+    description: Pending and recently decided submissions (quarantine; ADR 004).
+    api: IntakeSubmission
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      form_id: uuid null
+      kind: text check(SUBSCRIPTION,ENQUIRY)
+      status: text check(PENDING,CONFIRMED,ADMITTED,REJECTED,EXPIRED)
+      reject_reason: text null check(HONEYPOT,RATE_LIMIT,INVALID_ADDRESS,DISPOSABLE_DOMAIN,DISCARDED_BY_STAFF)
+      submitted_at: timestamptz default now()
+      confirmation_sent_at: timestamptz null
+      confirmed_at: timestamptz null
+      decided_at: timestamptz null
+      expires_at: timestamptz null
+      email: varchar(255)
+      fields: jsonb
+      list_ids: jsonb null
+      consent_text: text null
+      submitted_ip: varchar(45) null
+      user_agent: text null
+      page_url: text null
+      utm: jsonb null
+      visitor_id: text null
+      token_hash: text null unique
+      confirmed_ip: varchar(45) null
+      confirmation_count: integer default 0
+      source_event_id: uuid unique
+      updated_at: timestamptz default now()
+    api_only:
+    - form_name
+    indexes:
+    - status, expires_at
+    - lower(email)
+    notes: Pending rows expire after 7 days; decided rows are deleted 30 days after the decision. Nothing here ever
+      reaches the CRM store except through intake.admitted.
+  rate_limits:
+    description: Submission counters per address and IP for screening.
+    columns:
+      key: text pk
+      window_start: timestamptz pk
+      count: integer default 0
+    workspace_scoped: false

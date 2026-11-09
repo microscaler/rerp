@@ -39,6 +39,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         at: "2026-11-05T16:00:00Z".to_string(),
         contact_id: "07a7b393-a2b8-5f9d-86c2-37bc92d15398".to_string(),
         data: Some(Default::default()),
+        detail: Some("example".to_string()),
         id: "af512c4f-0beb-50b6-bf61-7a9d8bd417b5".to_string(),
         kind: serde_json::from_value::<ActivityKind>(serde_json::Value::String(
             "MESSAGE_SENT".to_string(),

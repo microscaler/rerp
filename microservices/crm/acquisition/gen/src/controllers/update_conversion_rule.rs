@@ -10,6 +10,16 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
     //   "account_id": "ded95315-6c77-51a0-b8ea-66b76fada21a",
+    //   "account_ids": [
+    //     "ded95315-6c77-51a0-b8ea-66b76fada21a",
+    //     "1dcd203d-8734-5d40-b43b-9bbcdd9758b5",
+    //     "6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa"
+    //   ],
+    //   "account_names": [
+    //     "Meta EU",
+    //     "Google Ads",
+    //     "LinkedIn"
+    //   ],
     //   "consent_required": true,
     //   "currency": "EUR",
     //   "dedupe_key": "DEAL_ID",
@@ -22,6 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "id": "6d83f7aa-792a-54cd-a144-a8810febc825",
     //   "name": "Form submitted · any",
     //   "require_click": false,
+    //   "require_click_param": "Require click param",
     //   "sent_30d": 612,
     //   "value_from": "FIXED",
     //   "window_days": 30
@@ -29,6 +40,16 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     match serde_json::from_str::<Response>(
         r#"{
   "account_id": "ded95315-6c77-51a0-b8ea-66b76fada21a",
+  "account_ids": [
+    "ded95315-6c77-51a0-b8ea-66b76fada21a",
+    "1dcd203d-8734-5d40-b43b-9bbcdd9758b5",
+    "6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa"
+  ],
+  "account_names": [
+    "Meta EU",
+    "Google Ads",
+    "LinkedIn"
+  ],
   "consent_required": true,
   "currency": "EUR",
   "dedupe_key": "DEAL_ID",
@@ -41,6 +62,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "id": "6d83f7aa-792a-54cd-a144-a8810febc825",
   "name": "Form submitted · any",
   "require_click": false,
+  "require_click_param": "Require click param",
   "sent_30d": 612,
   "value_from": "FIXED",
   "window_days": 30
@@ -55,6 +77,16 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         account_id: "ded95315-6c77-51a0-b8ea-66b76fada21a".to_string(),
+        account_ids: Some(vec![
+            "ded95315-6c77-51a0-b8ea-66b76fada21a".to_string(),
+            "1dcd203d-8734-5d40-b43b-9bbcdd9758b5".to_string(),
+            "6dbd6e0c-5762-510c-a3fa-1ad8d54d11fa".to_string(),
+        ]),
+        account_names: Some(vec![
+            "Meta EU".to_string(),
+            "Google Ads".to_string(),
+            "LinkedIn".to_string(),
+        ]),
         consent_required: Some(true),
         currency: Some("EUR".to_string()),
         dedupe_key: Some("DEAL_ID".to_string()),
@@ -69,6 +101,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         id: Some("6d83f7aa-792a-54cd-a144-a8810febc825".to_string()),
         name: Some("Form submitted · any".to_string()),
         require_click: Some(false),
+        require_click_param: Some("Require click param".to_string()),
         sent_30d: Some(612),
         value_from: Some("FIXED".to_string()),
         window_days: Some(30),

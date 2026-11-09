@@ -25,6 +25,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     {},
     //     {}
     //   ],
+    //   "review": {
+    //     "GOOGLE_ADS": "APPROVED",
+    //     "LINKEDIN": "APPROVED",
+    //     "META": "APPROVED"
+    //   },
     //   "width": 1200
     // }
     match serde_json::from_str::<Response>(
@@ -45,6 +50,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {},
     {}
   ],
+  "review": {
+    "GOOGLE_ADS": "APPROVED",
+    "LINKEDIN": "APPROVED",
+    "META": "APPROVED"
+  },
   "width": 1200
 }"#,
     ) {
@@ -73,6 +83,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
             serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null),
             serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null),
         ]),
+        review: Some(
+            serde_json::from_str::<serde_json::Value>(
+                r#"{"GOOGLE_ADS":"APPROVED","LINKEDIN":"APPROVED","META":"APPROVED"}"#,
+            )
+            .unwrap_or(serde_json::Value::Null),
+        ),
         url: Some("example".to_string()),
         width: Some(1200),
     })

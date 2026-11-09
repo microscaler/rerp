@@ -24,6 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "probability": 10,
     //   "rotting_days": 14,
     //   "sequence": 1,
+    //   "sort_by": "NEXT_TASK",
     //   "team_ids": [
     //     "00000000-0000-0000-0000-000000000401"
     //   ]
@@ -45,6 +46,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "probability": 10,
   "rotting_days": 14,
   "sequence": 1,
+  "sort_by": "NEXT_TASK",
   "team_ids": [
     "00000000-0000-0000-0000-000000000401"
   ]
@@ -78,6 +80,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         rotting_days: Some(14),
         rotting_threshold_days: Some(42),
         sequence: 1,
+        sort_by: Some("NEXT_TASK".to_string()),
         team_ids: Some(vec!["00000000-0000-0000-0000-000000000401".to_string()]),
     })
 }

@@ -119,6 +119,10 @@ pub struct Response {
     pub sequence: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sort_by")]
+    pub sort_by: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "team_ids")]
     pub team_ids: Option<Vec<String>>,
 }

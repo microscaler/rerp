@@ -1,0 +1,45 @@
+[package]
+name = "rerp_crm_intake"
+version = "0.1.0"
+edition = "2021"
+build = "build.rs"
+description = "RERP CRM intake: the quarantine (ADR 004) (contract: openapi/crm/intake/openapi.yaml)"
+
+[lib]
+name = "rerp_crm_intake"
+path = "src/lib.rs"
+
+[[bin]]
+name = "intake"
+path = "src/main.rs"
+
+[features]
+default = []
+# jemalloc is opt-in: musl targets cannot link tikv-jemallocator.
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+rerp_crm_intake_gen = { path = "../gen" }
+rerp_crm_runtime = { path = "../../runtime" }
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+may = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+rust_decimal = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }
+
+# Lifeguard ORM: LifeModels in src/models/ (openapi/crm/docs/data-model/intake.yaml)
+lifeguard = { workspace = true }
+lifeguard-derive = { workspace = true }
+lifeguard-migrate = { workspace = true }
+sea-query = { version = "1.0.0-rc.29", features = ["with-json"] }
+# Direct `may_postgres` is required for the `lifeguard_derive` macros.
+may_postgres = { git = "https://github.com/microscaler/may_postgres.git", branch = "master", features = ["with-serde_json-1", "with-chrono-0_4"] }
+
+[build-dependencies]
+lifeguard-migrate = { workspace = true }

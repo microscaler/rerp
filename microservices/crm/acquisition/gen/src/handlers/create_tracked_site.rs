@@ -31,12 +31,24 @@ pub struct Response {
     #[serde(rename = "enabled")]
     pub enabled: Option<bool>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "events_24h")]
+    pub events_24h: Option<i64>,
+
     #[serde(rename = "id")]
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "identified_30d")]
+    pub identified_30d: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "include_all_pages")]
     pub include_all_pages: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "kind")]
+    pub kind: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "last_event_at")]

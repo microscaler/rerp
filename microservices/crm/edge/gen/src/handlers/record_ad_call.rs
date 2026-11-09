@@ -83,8 +83,16 @@ pub struct Response {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "matched_contact_id")]
+    pub matched_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "platform")]
     pub platform: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "touchpoint_id")]
+    pub touchpoint_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "url")]

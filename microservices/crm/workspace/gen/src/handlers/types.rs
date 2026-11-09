@@ -55,6 +55,9 @@ pub struct ApiKey {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_used: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_used_at: Option<String>,
+
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,6 +266,9 @@ pub struct CancelJobResponse {
     pub requested_by: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_by_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub result_expires_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -381,14 +387,12 @@ pub struct CreateCustomFieldRequest {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
-    pub label: String,
+    pub key: String,
 
-    pub name: String,
+    pub label: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -407,6 +411,9 @@ pub struct CreateCustomFieldRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visible: Option<bool>,
@@ -425,16 +432,20 @@ pub struct CreateCustomFieldResponse {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
+
     pub id: String,
+
+    pub key: String,
 
     pub label: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -446,6 +457,9 @@ pub struct CreateCustomFieldResponse {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub searchable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -453,6 +467,9 @@ pub struct CreateCustomFieldResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     pub visible: bool,
 }
@@ -631,7 +648,13 @@ pub struct CreateWebhookResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub events: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failures: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<serde_json::Value>,
@@ -653,6 +676,9 @@ pub struct CreateWebhookResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secret: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub url: String,
 }
@@ -714,16 +740,20 @@ pub struct CustomField {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
+
     pub id: String,
+
+    pub key: String,
 
     pub label: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -735,6 +765,9 @@ pub struct CustomField {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub searchable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -742,6 +775,9 @@ pub struct CustomField {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     pub visible: bool,
 }
@@ -986,16 +1022,20 @@ pub struct GetCustomFieldResponse {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
+
     pub id: String,
+
+    pub key: String,
 
     pub label: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -1007,6 +1047,9 @@ pub struct GetCustomFieldResponse {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub searchable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1014,6 +1057,9 @@ pub struct GetCustomFieldResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     pub visible: bool,
 }
@@ -1094,6 +1140,9 @@ pub struct GetJobResponse {
     pub requested_by: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_by_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub result_expires_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1122,7 +1171,13 @@ pub struct GetWebhookResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub events: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failures: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<serde_json::Value>,
@@ -1144,6 +1199,9 @@ pub struct GetWebhookResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secret: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub url: String,
 }
@@ -1271,6 +1329,9 @@ pub struct Job {
     pub queued_at: String,
 
     pub requested_by: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_by_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result_expires_at: Option<String>,
@@ -1682,9 +1743,6 @@ pub struct PatchCustomFieldRequest {
     pub default_value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub field_type: Option<FieldType>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
     pub label: String,
@@ -1705,6 +1763,10 @@ pub struct PatchCustomFieldRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
 
+    #[serde(rename = "type")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<FieldType>,
+
     pub visible: bool,
 }
 
@@ -1721,16 +1783,20 @@ pub struct PatchCustomFieldResponse {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
+
     pub id: String,
+
+    pub key: String,
 
     pub label: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -1742,6 +1808,9 @@ pub struct PatchCustomFieldResponse {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub searchable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1749,6 +1818,9 @@ pub struct PatchCustomFieldResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     pub visible: bool,
 }
@@ -1802,6 +1874,9 @@ pub struct StartExportResponse {
     pub queued_at: String,
 
     pub requested_by: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub requested_by_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub result_expires_at: Option<String>,
@@ -1860,6 +1935,9 @@ pub struct TeamMember {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub can_send: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub can_send_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
@@ -2019,9 +2097,6 @@ pub struct UpdateCustomFieldRequest {
     pub default_value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub field_type: Option<FieldType>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
     pub label: String,
@@ -2042,6 +2117,10 @@ pub struct UpdateCustomFieldRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
 
+    #[serde(rename = "type")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<FieldType>,
+
     pub visible: bool,
 }
 
@@ -2058,16 +2137,20 @@ pub struct UpdateCustomFieldResponse {
 
     pub entity: String,
 
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hint: Option<String>,
+
     pub id: String,
+
+    pub key: String,
 
     pub label: String,
 
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub options: Option<serde_json::Value>,
@@ -2079,6 +2162,9 @@ pub struct UpdateCustomFieldResponse {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub searchable: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2086,6 +2172,9 @@ pub struct UpdateCustomFieldResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     pub visible: bool,
 }
@@ -2182,7 +2271,13 @@ pub struct UpdateWebhookResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub events: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failures: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<serde_json::Value>,
@@ -2204,6 +2299,9 @@ pub struct UpdateWebhookResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secret: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub url: String,
 }
@@ -2274,7 +2372,13 @@ pub struct Webhook {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub events: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failures: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub headers: Option<serde_json::Value>,
@@ -2296,6 +2400,9 @@ pub struct Webhook {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub secret: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub status: Option<String>,
 
     pub url: String,
 }

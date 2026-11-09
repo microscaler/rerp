@@ -1,0 +1,291 @@
+service: workspace
+database: crm
+schema: workspace
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  workspaces:
+    description: 'Workspaces (brands). Not row-level-secured by workspace: membership decides.'
+    api: Workspace
+    columns:
+      id: uuid pk
+      organisation_id: uuid
+      name: text
+      slug: text null
+      brand_domain: text null
+      default_currency: text null
+      timezone: text null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      archived_at: timestamptz null
+    unique:
+    - organisation_id, slug
+    rls: membership
+  memberships:
+    description: Who belongs to a workspace, with which role.
+    api: Membership
+    columns:
+      workspace_id: uuid pk fk workspaces(id) cascade
+      user_id: varchar(64) pk
+      role: text check(owner,admin,marketer,sales,read-only)
+      added_by: varchar(64) null
+      added_at: timestamptz default now()
+      last_active_at: timestamptz null
+    indexes:
+    - user_id
+    rls: membership
+  invitations:
+    description: Pending invitations by email.
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      email: varchar(255)
+      role: text check(owner,admin,marketer,sales,read-only)
+      invited_by: varchar(64) null
+      token_hash: text unique
+      expires_at: timestamptz
+      accepted_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, lower(email)
+  custom_fields:
+    description: Custom field definitions (values live with the owning entity).
+    api: CustomField
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      entity: varchar(64)
+      key: varchar(128)
+      label: varchar(255)
+      field_type: text check(STRING,INTEGER,FLOAT,BOOLEAN,DATE,DATETIME,EMAIL,PHONE,URL,TEXT,HTML,SELECT,MANY2ONE,MANY2MANY,MONEY,MULTISELECT,TEXTAREA)
+      options: jsonb null
+      required: boolean null
+      visible: boolean
+      searchable: boolean null
+      default_value: text null
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      group_name: varchar(128) null
+      sequence: integer null
+      show_on_card: boolean null
+      hint: text null
+      required_at_stage: text null
+      field_group_id: uuid null fk field_groups(id) set null
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, entity, key
+  field_groups:
+    description: Groups of custom fields.
+    api: FieldGroup
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      entity: text check(contact,organisation,deal,task)
+      name: text
+      sequence: integer null
+      updated_at: timestamptz default now()
+  api_keys:
+    description: API keys (stored hashed).
+    api: ApiKey
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      scopes: jsonb null
+      rate_limit: integer null
+      ip_whitelist: jsonb null
+      is_active: boolean
+      created_at: timestamptz default now()
+      expires_at: timestamptz null
+      last_used_at: timestamptz null
+      key_hash: text unique
+      prefix: varchar(12)
+      created_by: varchar(64) null
+      updated_at: timestamptz default now()
+  webhooks:
+    description: Outgoing webhooks (secret in Secret Manager).
+    api: Webhook
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      url: varchar(512)
+      events: jsonb
+      is_active: boolean
+      headers: jsonb null
+      last_status: text null check(PENDING,SUCCESS,FAILED,RETRYING)
+      created_at: timestamptz default now()
+      secret_ref: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - retry_count
+    - last_triggered
+    - failures
+    - detail
+  webhook_delivery_logs:
+    description: Webhook deliveries.
+    api: WebhookDeliveryLog
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      webhook_id: uuid fk webhooks(id) cascade
+      event: text
+      request_body: jsonb null
+      response_status: integer
+      response_body: text
+      delivered_at: timestamptz
+      attempt: integer default 1
+    api_only:
+    - retry_count
+    indexes:
+    - webhook_id, delivered_at desc
+    append_only: true
+  notification_rules:
+    description: Notification rules.
+    api: NotificationRule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      event: text
+      filter: jsonb null
+      recipients: jsonb null
+      channels: jsonb null
+      enabled: boolean
+      updated_at: timestamptz default now()
+  compliance_settings:
+    description: Consent, retention and cookie settings, one row per workspace.
+    api: ComplianceSettings
+    columns:
+      workspace_id: uuid pk
+      double_opt_in_default: boolean default true
+      double_opt_in_regions: jsonb null
+      legitimate_interest_allowed: boolean default false
+      require_unsubscribe_links: boolean default true
+      one_click_unsubscribe: boolean default true
+      anonymous_retention_days: integer default 395
+      pending_signup_expiry_days: integer default 7
+      cookie_consent_mode: text default REGION check(ALWAYS,AFTER_CONSENT,REGION)
+      footer_postal_address: text null
+      updated_at: timestamptz default now()
+    singleton: true
+  data_requests:
+    description: Access and erasure requests.
+    api: DataRequest
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      kind: text check(ACCESS,ERASURE)
+      subject_hash: text null
+      contact_email: text null
+      requested_by: varchar(64) null
+      source: text null check(PREFERENCE_PAGE,EMAIL,STAFF,API)
+      status: text check(PENDING_REVIEW,RUNNING,DONE,REJECTED)
+      note: text null
+      created_at: timestamptz default now()
+      completed_at: timestamptz null
+      updated_at: timestamptz default now()
+  data_request_steps:
+    description: Each service confirming its part of a data request.
+    columns:
+      workspace_id: uuid
+      data_request_id: uuid pk fk data_requests(id) cascade
+      service: text pk
+      rows_erased: bigint null
+      confirmed_at: timestamptz null
+  brand_kits:
+    description: Brand kit, one per workspace.
+    api: BrandKit
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      logo_url: text null
+      colors: jsonb null
+      heading_font: text null
+      body_font: text null
+      button_style: text null check(ROUNDED_FILLED,SQUARE_FILLED,OUTLINE,PILL)
+      social_links: jsonb null
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id
+  integrations:
+    description: Third-party integrations (credentials in Secret Manager).
+    api: Integration
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      integration_type: text check(ERP,ACCOUNTING,MARKETING,SUPPORT,CUSTOM)
+      is_active: boolean null
+      sync_direction: text null check(CRM_TO_EXTERNAL,EXTERNAL_TO_CRM,BIDIRECTIONAL)
+      last_sync: timestamptz null
+      sync_status: text null check(IDLE,SYNCING,ERROR)
+      created_at: timestamptz null
+      config: jsonb null
+      secret_ref: text null
+      updated_at: timestamptz default now()
+  jobs:
+    description: Import and export jobs.
+    api: Job
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      kind: text check(IMPORT,EXPORT)
+      entity: text check(CONTACTS,ACCOUNTS,DEALS,TASKS,LISTS,TAGS,CUSTOM_FIELDS)
+      status: text check(QUEUED,RUNNING,SUCCEEDED,PARTIAL,FAILED,CANCELLED)
+      source: text null check(FILE,INTEGRATION,API,UI)
+      file_name: text null
+      integration_id: uuid null fk integrations(id) set null
+      options: jsonb null
+      total_rows: integer null
+      processed_rows: integer null
+      created_rows: integer null
+      updated_rows: integer null
+      skipped_rows: integer null
+      error_rows: integer null
+      result_url: text null
+      result_expires_at: timestamptz null
+      requested_by: varchar(64)
+      message: text null
+      queued_at: timestamptz
+      started_at: timestamptz null
+      finished_at: timestamptz null
+      updated_at: timestamptz default now()
+    api_only:
+    - requested_by_name
+  job_errors:
+    description: Rows a job could not process.
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      job_id: uuid fk jobs(id) cascade
+      row_number: integer
+      message: text
+      raw: jsonb null
+    indexes:
+    - job_id
+    append_only: true
+  audit_entries:
+    description: The audit log. Every CRM service inserts here in its own transaction (crm-audit); only crm/workspace
+      reads it.
+    api: AuditLogEntry
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      service: text
+      entity: varchar(64)
+      entity_id: text
+      action: text check(CREATE,UPDATE,DELETE,STATE_CHANGE,ERASE,LOGIN,EXPORT)
+      actor_kind: text check(USER,API_KEY,SYSTEM)
+      actor_id: varchar(64)
+      changes: jsonb null
+      request_id: text null
+      ip_address: varchar(45) null
+      user_agent: text null
+      created_at: timestamptz default now()
+    indexes:
+    - entity, entity_id, created_at desc
+    - created_at
+    append_only: true
+    schema: audit
+    notes: 'Lives in schema `audit`: INSERT granted to every service role, SELECT only to crm/workspace. Retained
+      2 years (US_55_39).'

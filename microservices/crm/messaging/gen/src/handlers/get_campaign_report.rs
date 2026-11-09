@@ -32,6 +32,10 @@ pub struct Response {
     #[serde(rename = "bounced")]
     pub bounced: i64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "by_location")]
+    pub by_location: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "campaign_id")]
     pub campaign_id: String,
 
@@ -46,11 +50,23 @@ pub struct Response {
     #[serde(rename = "clicked")]
     pub clicked: i64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "clients")]
+    pub clients: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "complained")]
     pub complained: i64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deals_won")]
+    pub deals_won: Option<i64>,
+
     #[serde(rename = "delivered")]
     pub delivered: i64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "delivery")]
+    pub delivery: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "email_clients")]
@@ -59,6 +75,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "forwarded")]
     pub forwarded: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "forwards")]
+    pub forwards: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "from")]
@@ -71,6 +91,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "open_rate")]
     pub open_rate: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open_rate_vs_list_pts")]
+    pub open_rate_vs_list_pts: Option<f64>,
 
     #[serde(rename = "opened")]
     pub opened: i64,
@@ -88,8 +112,20 @@ pub struct Response {
     pub opens_by_location: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "prefetch_opens")]
+    pub prefetch_opens: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "profile_updates")]
+    pub profile_updates: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "replied")]
     pub replied: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "replies")]
+    pub replies: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "revenue")]
@@ -107,8 +143,16 @@ pub struct Response {
     pub social_shares: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "social_shares_by")]
+    pub social_shares_by: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subject")]
     pub subject: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "suppressions_added")]
+    pub suppressions_added: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_clicks")]

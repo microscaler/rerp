@@ -27,6 +27,14 @@ pub struct Response {
     pub completed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "entered_total")]
+    pub entered_total: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "failed")]
+    pub failed: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "goal_reached")]
     pub goal_reached: Option<i64>,
 

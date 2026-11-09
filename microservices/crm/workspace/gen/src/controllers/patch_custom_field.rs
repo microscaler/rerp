@@ -13,31 +13,35 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
     //   "entity": "contact",
-    //   "field_type": "STRING",
     //   "group": "Profile",
+    //   "hint": "",
     //   "id": "9851eff3-bcf4-59e1-9c43-82ba49bdc08c",
+    //   "key": "plan",
     //   "label": "Plan",
-    //   "name": "Northwind Traders",
+    //   "merge_field": "custom.plan",
     //   "options": {},
     //   "required": false,
     //   "searchable": false,
     //   "sequence": 1,
     //   "show_on_card": false,
+    //   "type": "SELECT",
     //   "visible": false
     // }
     match serde_json::from_str::<Response>(
         r#"{
   "entity": "contact",
-  "field_type": "STRING",
   "group": "Profile",
+  "hint": "",
   "id": "9851eff3-bcf4-59e1-9c43-82ba49bdc08c",
+  "key": "plan",
   "label": "Plan",
-  "name": "Northwind Traders",
+  "merge_field": "custom.plan",
   "options": {},
   "required": false,
   "searchable": false,
   "sequence": 1,
   "show_on_card": false,
+  "type": "SELECT",
   "visible": false
 }"#,
     ) {
@@ -53,22 +57,25 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         created_by: Some("example".to_string()),
         default_value: Some("example".to_string()),
         entity: "contact".to_string(),
-        field_type: serde_json::from_value::<FieldType>(serde_json::Value::String(
-            "STRING".to_string(),
-        ))
-        .unwrap_or_default(),
         group: Some("Profile".to_string()),
+        hint: Some("".to_string()),
         id: "9851eff3-bcf4-59e1-9c43-82ba49bdc08c".to_string(),
+        key: "plan".to_string(),
         label: "Plan".to_string(),
-        name: "Northwind Traders".to_string(),
+        merge_field: Some("custom.plan".to_string()),
         options: Some(
             serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null),
         ),
         personalization_tag: Some("example".to_string()),
         required: Some(false),
+        required_at_stage: Some("example".to_string()),
         searchable: Some(false),
         sequence: Some(1),
         show_on_card: Some(false),
+        r#type: serde_json::from_value::<FieldType>(serde_json::Value::String(
+            "SELECT".to_string(),
+        ))
+        .unwrap_or_default(),
         visible: false,
     })
 }

@@ -12,11 +12,13 @@ use crate::handlers::types::AdAudienceMember;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
-    //   "items": []
+    //   "items": [],
+    //   "total": 0
     // }
     match serde_json::from_str::<Response>(
         r#"{
-  "items": []
+  "items": [],
+  "total": 0
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -26,5 +28,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         }
     }
 
-    HttpJson::ok(Response(vec![]))
+    HttpJson::ok(Response {
+        items: vec![],
+        total: Some(0),
+    })
 }

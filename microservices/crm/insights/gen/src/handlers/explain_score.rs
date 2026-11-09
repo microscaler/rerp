@@ -32,6 +32,14 @@ pub struct Response {
     #[serde(rename = "band")]
     pub band: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_id")]
+    pub contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_name")]
+    pub contact_name: Option<String>,
+
     #[serde(rename = "entity_id")]
     pub entity_id: String,
 

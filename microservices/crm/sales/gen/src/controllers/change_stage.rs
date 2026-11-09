@@ -10,6 +10,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
     //   "active": true,
+    //   "attribution": {},
     //   "automated_probability": 12.5,
     //   "campaign_id": "ba26a7ff-002b-53a0-8e3b-a562bf024124",
     //   "color": 3,
@@ -29,6 +30,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "email_from": "priya.natarajan@northwindtraders.example",
     //   "email_normalized": "Email normalized",
     //   "expected_revenue": "1250.00",
+    //   "form": "Form",
     //   "function": "Function",
     //   "id": "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26",
     //   "is_automated_probability": true,
@@ -70,6 +72,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     match serde_json::from_str::<Response>(
         r#"{
   "active": true,
+  "attribution": {},
   "automated_probability": 12.5,
   "campaign_id": "ba26a7ff-002b-53a0-8e3b-a562bf024124",
   "color": 3,
@@ -89,6 +92,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "email_from": "priya.natarajan@northwindtraders.example",
   "email_normalized": "Email normalized",
   "expected_revenue": "1250.00",
+  "form": "Form",
   "function": "Function",
   "id": "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26",
   "is_automated_probability": true,
@@ -137,6 +141,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         active: true,
+        attribution: Some(
+            serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null),
+        ),
         automated_probability: Some(12.5),
         campaign_id: Some("ba26a7ff-002b-53a0-8e3b-a562bf024124".to_string()),
         color: Some(3),
@@ -154,6 +161,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         email_from: Some("priya.natarajan@northwindtraders.example".to_string()),
         email_normalized: Some("Email normalized".to_string()),
         expected_revenue: Some("1250.00".to_string()),
+        form: Some("Form".to_string()),
         function: Some("Function".to_string()),
         id: "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26".to_string(),
         is_automated_probability: Some(true),

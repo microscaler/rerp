@@ -16,6 +16,9 @@ pub struct Activity {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<serde_json::Value>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub id: String,
 
     pub kind: ActivityKind,
@@ -121,6 +124,9 @@ pub struct AddContactNoteResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub data: Option<serde_json::Value>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detail: Option<String>,
+
     pub id: String,
 
     pub kind: ActivityKind,
@@ -142,58 +148,46 @@ pub struct AddContactTagsRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AddContactTagsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
+    pub first_name: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
+    pub list_ids: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
+    pub organisation_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
@@ -202,13 +196,15 @@ pub struct AddContactTagsResponse {
     pub score: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
+    pub sms_consent_updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
+
+    pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -217,16 +213,10 @@ pub struct AddContactTagsResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -414,58 +404,46 @@ pub enum ConsentSource {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Contact {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
+    pub first_name: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
+    pub list_ids: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
+    pub organisation_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
@@ -474,13 +452,15 @@ pub struct Contact {
     pub score: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
+    pub sms_consent_updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
+
+    pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -489,16 +469,10 @@ pub struct Contact {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -535,28 +509,13 @@ pub struct ContactPage {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
+    pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
+    pub domain: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
+    pub industry: Option<String>,
 
     pub name: String,
 
@@ -564,118 +523,52 @@ pub struct CreateAccountRequest {
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_name: Option<String>,
+    pub converted: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_name: Option<String>,
-
-    pub create_date: String,
+    pub customer_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
+    pub domain: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_name: Option<String>,
+    pub industry: Option<String>,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub origin: Option<OrganisationOrigin>,
+    pub open_deal_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub region: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<String>,
+    pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -748,120 +641,36 @@ pub struct CreateBulkJobResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateContactRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub organisation_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct CreateContactResponse {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
+    pub first_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
-
-    pub id: String,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_activity_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub score: Option<i32>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -870,16 +679,81 @@ pub struct CreateContactResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CreateContactResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
+
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
+    pub custom_fields: Option<serde_json::Value>,
+
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub first_name: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub job_title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent_updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tracking_optout: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -901,6 +775,9 @@ pub struct CreateListRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateListResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirmation_template_id: Option<String>,
 
     pub created_at: String,
@@ -910,12 +787,24 @@ pub struct CreateListResponse {
 
     pub double_opt_in: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub growth_30d: Option<Vec<i64>>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_archived: Option<bool>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postal_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reminder_text: Option<String>,
 
     pub sender_id: String,
 
@@ -948,28 +837,13 @@ pub struct CreateMailingListRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateOrganisationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
+    pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
+    pub domain: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
+    pub industry: Option<String>,
 
     pub name: String,
 
@@ -977,22 +851,10 @@ pub struct CreateOrganisationRequest {
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1051,6 +913,9 @@ pub struct CreateSuppressionResponse {
     pub note: Option<String>,
 
     pub reason: SuppressionReason,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_send_id: Option<String>,
@@ -1189,97 +1054,43 @@ pub struct GetAccountHierarchyResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAccountResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_name: Option<String>,
+    pub converted: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_name: Option<String>,
-
-    pub create_date: String,
+    pub customer_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
+    pub domain: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_name: Option<String>,
+    pub industry: Option<String>,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub origin: Option<OrganisationOrigin>,
+    pub open_deal_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub region: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<String>,
+    pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1338,58 +1149,46 @@ pub struct GetContactHierarchyResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetContactResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
+    pub first_name: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
+    pub list_ids: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
+    pub organisation_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
@@ -1398,13 +1197,15 @@ pub struct GetContactResponse {
     pub score: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
+    pub sms_consent_updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
+
+    pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -1413,16 +1214,10 @@ pub struct GetContactResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1463,6 +1258,9 @@ pub struct GetImportJobResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetListResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirmation_template_id: Option<String>,
 
     pub created_at: String,
@@ -1472,12 +1270,24 @@ pub struct GetListResponse {
 
     pub double_opt_in: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub growth_30d: Option<Vec<i64>>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_archived: Option<bool>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postal_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reminder_text: Option<String>,
 
     pub sender_id: String,
 
@@ -1717,6 +1527,9 @@ pub struct ListTagsResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct MailingList {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirmation_template_id: Option<String>,
 
     pub created_at: String,
@@ -1726,12 +1539,24 @@ pub struct MailingList {
 
     pub double_opt_in: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub growth_30d: Option<Vec<i64>>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_archived: Option<bool>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postal_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reminder_text: Option<String>,
 
     pub sender_id: String,
 
@@ -1788,117 +1613,43 @@ pub struct MergeResult {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Organisation {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_name: Option<String>,
+    pub converted: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_name: Option<String>,
-
-    pub create_date: String,
+    pub customer_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
+    pub domain: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_name: Option<String>,
+    pub industry: Option<String>,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub origin: Option<OrganisationOrigin>,
+    pub open_deal_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
+    pub size: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub region: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<String>,
+    pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct OrganisationOrigin {
-    pub conversion_id: String,
-
-    pub converted_at: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub converted_by: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub funnel_lead_id: Option<String>,
-
-    pub reason: String,
-
-    pub reference: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub stripe_customer_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1914,109 +1665,38 @@ pub struct OrganisationPage {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PatchContactRequest {
-    pub active: bool,
-
-    pub city: String,
-
-    pub country_id: String,
-
-    pub department: String,
-
-    pub email: String,
-
-    pub function: String,
-
-    pub mobile: String,
-
-    pub name: String,
-
-    pub organisation_id: String,
-
-    pub parent_id: String,
-
-    pub phone: String,
-
-    pub state_id: String,
-
-    pub street: String,
-
-    pub street2: String,
-
-    pub title: String,
-
-    pub zip: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PatchContactResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
-
-    pub id: String,
+    pub first_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_activity_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub score: Option<i32>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -2025,16 +1705,81 @@ pub struct PatchContactResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PatchContactResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
+
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
+    pub custom_fields: Option<serde_json::Value>,
+
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub first_name: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub job_title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent_updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tracking_optout: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2045,58 +1790,46 @@ pub struct RemoveContactTagsRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct RemoveContactTagsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
+    pub first_name: Option<String>,
 
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_activity_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
+    pub list_ids: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
+    pub organisation_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
@@ -2105,13 +1838,15 @@ pub struct RemoveContactTagsResponse {
     pub score: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
+    pub sms_consent_updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
+
+    pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -2120,16 +1855,10 @@ pub struct RemoveContactTagsResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2322,6 +2051,9 @@ pub struct Suppression {
     pub reason: SuppressionReason,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub source_send_id: Option<String>,
 }
 
@@ -2479,242 +2211,104 @@ pub struct UnsubscribeResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAccountRequest {
-    pub active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_code: Option<String>,
 
-    pub annual_revenue: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
 
-    pub city: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub industry: Option<String>,
 
-    pub company_size: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<String>,
 
-    pub email: String,
-
-    pub employees: i32,
-
-    pub industry_id: String,
-
-    pub name: String,
-
-    pub parent_id: String,
-
-    pub phone: String,
-
-    pub state_id: String,
-
-    pub street: String,
-
-    pub street2: String,
-
-    pub website: String,
-
-    pub zip: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAccountResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_lead_count: Option<i32>,
+    pub converted: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<String>,
+    pub country_code: Option<String>,
+
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_ids: Option<Vec<String>>,
+    pub customer_account_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
+    pub domain: Option<String>,
+
+    pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
+    pub industry: Option<String>,
+
+    pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_size: Option<String>,
+    pub open_deal_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub parent_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_name: Option<String>,
+    pub size: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateContactRequest {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_name: Option<String>,
-
-    pub create_date: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub employees: Option<i32>,
-
-    pub id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub industry_name: Option<String>,
-
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub origin: Option<OrganisationOrigin>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub phone: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub region: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub tax_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub website: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateContactRequest {
-    pub active: bool,
-
-    pub city: String,
-
-    pub country_id: String,
-
-    pub department: String,
-
-    pub email: String,
-
-    pub function: String,
-
-    pub mobile: String,
-
-    pub name: String,
-
-    pub organisation_id: String,
-
-    pub parent_id: String,
-
-    pub phone: String,
-
-    pub state_id: String,
-
-    pub street: String,
-
-    pub street2: String,
-
-    pub title: String,
-
-    pub zip: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct UpdateContactResponse {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub active: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub child_contact_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub country_id: Option<String>,
-
-    pub create_date: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub custom_fields: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub department: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub email: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub function: Option<String>,
-
-    pub id: String,
+    pub first_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub is_company: Option<bool>,
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub last_activity_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub mobile: Option<String>,
-
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub opportunity_count: Option<i32>,
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub phone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub score: Option<i32>,
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub street2: Option<String>,
+    pub source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tags: Option<Vec<String>>,
@@ -2723,16 +2317,81 @@ pub struct UpdateContactResponse {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub title: Option<String>,
+    pub tracking_optout: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct UpdateContactResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub user_ids: Option<Vec<String>>,
+    pub country_code: Option<String>,
+
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub write_date: Option<String>,
+    pub custom_fields: Option<serde_json::Value>,
+
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub zip: Option<String>,
+    pub first_name: Option<String>,
+
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub job_title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub last_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message_stats: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub phone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub score: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sms_consent_updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source: Option<String>,
+
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub timezone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tracking_optout: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub updated_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2756,6 +2415,9 @@ pub struct UpdateListRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateListResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub confirmation_template_id: Option<String>,
 
     pub created_at: String,
@@ -2765,12 +2427,24 @@ pub struct UpdateListResponse {
 
     pub double_opt_in: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub growth_30d: Option<Vec<i64>>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub is_archived: Option<bool>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pending_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub postal_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reminder_text: Option<String>,
 
     pub sender_id: String,
 
@@ -2804,39 +2478,26 @@ pub struct UpdateMailingListRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateOrganisationRequest {
-    pub active: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub country_code: Option<String>,
 
-    pub annual_revenue: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub domain: Option<String>,
 
-    pub city: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub industry: Option<String>,
 
-    pub company_size: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub name: Option<String>,
 
-    pub country_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parent_id: Option<String>,
 
-    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size: Option<String>,
 
-    pub email: String,
-
-    pub employees: i32,
-
-    pub industry_id: String,
-
-    pub name: String,
-
-    pub parent_id: String,
-
-    pub phone: String,
-
-    pub state_id: String,
-
-    pub street: String,
-
-    pub street2: String,
-
-    pub website: String,
-
-    pub zip: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub website: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

@@ -43,6 +43,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "skipped")]
     pub skipped: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "workflow_id")]
+    pub workflow_id: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

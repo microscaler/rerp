@@ -65,8 +65,16 @@ pub struct Response {
     pub clicked_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "clicks")]
+    pub clicks: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "contact_id")]
     pub contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_id")]
+    pub deal_id: Option<String>,
 
     #[serde(rename = "direction")]
     pub direction: String,
@@ -79,6 +87,10 @@ pub struct Response {
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "kind")]
+    pub kind: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "mailbox_id")]
     pub mailbox_id: Option<String>,
 
@@ -87,12 +99,20 @@ pub struct Response {
     pub opened_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "opens")]
+    pub opens: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "replied_at")]
     pub replied_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "saved_response_id")]
     pub saved_response_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sent_at")]
+    pub sent_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "snippet")]

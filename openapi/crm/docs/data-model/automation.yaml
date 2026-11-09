@@ -1,0 +1,209 @@
+service: automation
+database: crm
+schema: automation
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  workflows:
+    description: Workflows; the step graph lives in versions.
+    api: Workflow
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      description: text null
+      is_active: boolean
+      conditions: jsonb null
+      exit_rules: jsonb null
+      unsubscribe_scope: text null check(TRIGGER_LISTS,ALL_LISTS,NONE)
+      access_group_ids: jsonb null
+      tracking: jsonb null
+      recipe_id: text null
+      bindings: jsonb null
+      entry_step_id: uuid null
+      reentry: text null check(ONCE,MULTIPLE,CONCURRENT,RESTART)
+      sequence: integer
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      stop_on_unsubscribe: boolean null
+      stop_on_conversion_id: uuid null
+      status: text default DRAFT check(DRAFT,ACTIVE,PAUSED)
+      current_version: integer default 0
+    api_only:
+    - unbound_parameters
+    - active_enrolments
+    - completed_enrolments
+    - run_count
+    - last_run
+    - step_count
+    - goal_rate
+  workflow_versions:
+    description: Published versions of a workflow graph; enrolments keep their version.
+    columns:
+      workspace_id: uuid
+      workflow_id: uuid pk fk workflows(id) cascade
+      version: integer pk
+      entry_step_id: uuid null
+      published_by: varchar(64) null
+      published_at: timestamptz default now()
+    append_only: true
+  workflow_steps:
+    description: Steps of a workflow version.
+    api: WorkflowStep
+    columns:
+      workspace_id: uuid
+      workflow_id: uuid pk
+      version: integer pk
+      id: uuid pk
+      kind: text check(ACTION,WAIT,IF_ELSE,SPLIT,GOAL,GOTO,END)
+      label: text null
+      action_type: text null
+      action_config: jsonb null
+      wait: jsonb null
+      conditions: jsonb null
+      split: jsonb null
+      goal: jsonb null
+      next_step_id: uuid null
+      yes_step_id: uuid null
+      no_step_id: uuid null
+      goto_step_id: uuid null
+      position: jsonb null
+      updated_at: timestamptz default now()
+    foreign_keys:
+    - (workflow_id, version) references workflow_versions(workflow_id, version) on delete cascade
+  workflow_step_notes:
+    description: Notes pinned to steps in the builder.
+    api: StepNote
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid fk workflows(id) cascade
+      step_id: uuid
+      body: text
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  workflow_triggers:
+    description: What starts a workflow.
+    api: Trigger
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid fk workflows(id) cascade
+      trigger_type: text check(STAGE_CHANGE,FIELD_CHANGE,TIME_BASED,WEBHOOK,MANUAL,ON_CREATE,ON_UPDATE,ON_DELETE,SUBSCRIBED_TO_LIST,UNSUBSCRIBED_FROM_LIST,TAG_ADDED,TAG_REMOVED,FORM_SUBMITTED,MESSAGE_OPENED,MESSAGE_CLICKED,MESSAGE_REPLIED,MESSAGE_BOUNCED,SITE_VISIT,CUSTOM_EVENT,SCORE_CHANGED,DATE_FIELD,DEAL_CREATED,DEAL_STAGE_CHANGE,DEAL_WON,DEAL_LOST,DEAL_VALUE_CHANGED,DEAL_STATUS_CHANGED,DEAL_FIELD_CHANGED,ENTERED_PIPELINE,ACCOUNT_FIELD_CHANGED,TASK_COMPLETED,MESSAGE_FORWARDED,MESSAGE_SHARED,FILE_DOWNLOADED,RSS_ITEM,JUMPED_TO,GOAL_REACHED,AD_CLICKED)
+      entity: varchar(64)
+      field: varchar(128) null
+      schedule: text null
+      enabled: boolean
+      created_at: timestamptz null
+      filter: jsonb null
+      fire_once_per_contact: boolean default true
+      updated_at: timestamptz default now()
+    api_only:
+    - last_fired
+    indexes:
+    - trigger_type
+  workflow_rules:
+    description: Field rules evaluated by the rules engine.
+    api: Rule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid fk workflows(id) cascade
+      condition_field: varchar(128)
+      condition_operator: text check(EQUALS,NOT_EQUALS,GREATER_THAN,LESS_THAN,CONTAINS,NOT_CONTAINS,IS_EMPTY,IS_NOT_EMPTY,IN,NOT_IN)
+      condition_value: text null
+      condition_value_type: text null check(TEXT,INTEGER,FLOAT,BOOLEAN,DATE,ENTITY)
+      action_type: text null check(SEND_EMAIL,SEND_MESSAGE,CREATE_TASK,UPDATE_FIELD,ASSIGN_LEAD,CALL_WEBHOOK,CREATE_RECORD,SET_VALUE,ESCALATE,ADD_TAG,REMOVE_TAG,SUBSCRIBE_LIST,UNSUBSCRIBE_LIST,ADJUST_SCORE,NOTIFY,CREATE_DEAL,UPDATE_DEAL_STAGE,ADD_NOTE,START_WORKFLOW,STOP_WORKFLOW,SEND_1TO1_EMAIL,SEND_TRANSACTIONAL,INTERNAL_NOTIFICATION,CONVERT,ARCHIVE_CONTACT,COMPLETE_TASK,UPDATE_DEAL_OWNER,UPDATE_DEAL_VALUE,UPDATE_DEAL_STATUS,UPDATE_DEAL_TITLE,UPDATE_DEAL_FIELD,ADD_TO_AD_AUDIENCE,REMOVE_FROM_AD_AUDIENCE,ADD_DEAL_NOTE,ADJUST_DEAL_SCORE,UPDATE_ACCOUNT_FIELD,UPDATE_ACCOUNT_OWNER,ADD_ACCOUNT_NOTE,ADD_TO_ACCOUNT,FORMAT_DATA,END)
+      action_config: jsonb null
+      is_active: boolean
+      sequence: integer
+      created_at: timestamptz null
+      updated_at: timestamptz default now()
+  enrolments:
+    description: A contact (or deal) moving through a workflow.
+    api: Enrolment
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid fk workflows(id) cascade
+      contact_id: uuid
+      status: text check(ACTIVE,WAITING,COMPLETED,GOAL_REACHED,EXITED,RESTARTED,STOPPED,FAILED)
+      current_step_id: uuid null
+      next_run_at: timestamptz null
+      entered_by: text null
+      trigger_id: uuid null
+      trigger_type: text null check(STAGE_CHANGE,FIELD_CHANGE,TIME_BASED,WEBHOOK,MANUAL,ON_CREATE,ON_UPDATE,ON_DELETE,SUBSCRIBED_TO_LIST,UNSUBSCRIBED_FROM_LIST,TAG_ADDED,TAG_REMOVED,FORM_SUBMITTED,MESSAGE_OPENED,MESSAGE_CLICKED,MESSAGE_REPLIED,MESSAGE_BOUNCED,SITE_VISIT,CUSTOM_EVENT,SCORE_CHANGED,DATE_FIELD,DEAL_CREATED,DEAL_STAGE_CHANGE,DEAL_WON,DEAL_LOST,DEAL_VALUE_CHANGED,DEAL_STATUS_CHANGED,DEAL_FIELD_CHANGED,ENTERED_PIPELINE,ACCOUNT_FIELD_CHANGED,TASK_COMPLETED,MESSAGE_FORWARDED,MESSAGE_SHARED,FILE_DOWNLOADED,RSS_ITEM,JUMPED_TO,GOAL_REACHED,AD_CLICKED)
+      trigger_subject: text null
+      exit_reason: text null check(UNSUBSCRIBED,CONVERTED,GOAL_REACHED,DATE_PASSED,ARCHIVED,STOPPED_BY_WORKFLOW,STOPPED_BY_USER,WORKFLOW_ARCHIVED,RESTARTED)
+      entered_at: timestamptz
+      ended_at: timestamptz null
+      deal_id: uuid null
+      workflow_version: integer
+      attempts: integer default 0
+      updated_at: timestamptz default now()
+    api_only:
+    - workflow_name
+    - contact_email
+    - split_paths
+    - goal_step_id
+    - history
+    - contact_name
+    indexes:
+    - workflow_id, status
+    - contact_id
+    - next_run_at
+  enrolment_steps:
+    description: Step history of an enrolment.
+    api: EnrolmentStepRecord
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      enrolment_id: uuid fk enrolments(id) cascade
+      step_id: uuid
+      kind: text
+      outcome: text check(DONE,SKIPPED,WAITING,FAILED)
+      skip_reason: text null
+      send_id: uuid null
+      error: text null
+      at: timestamptz default now()
+      left_at: timestamptz null
+    indexes:
+    - enrolment_id, at
+    append_only: true
+  timers:
+    description: 'Durable timers: due enrolment steps released by the scheduler.'
+    columns:
+      workspace_id: uuid
+      enrolment_id: uuid pk fk enrolments(id) cascade
+      step_id: uuid
+      due_at: timestamptz
+      kind: text check(WAIT,GOAL_TIMEOUT,RETRY)
+      locked_until: timestamptz null
+    indexes:
+    - due_at
+  scheduled_actions:
+    description: One-off and recurring scheduled actions.
+    api: ScheduledAction
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid null fk workflows(id) cascade
+      scheduled_at: timestamptz
+      status: text check(PENDING,RUNNING,SUCCESS,FAILED,CANCELLED)
+      action_config: jsonb null
+      executed_at: timestamptz null
+      created_at: timestamptz null
+      updated_at: timestamptz default now()
+  workflow_runs:
+    description: Batch runs of a workflow.
+    api: WorkflowRun
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      workflow_id: uuid fk workflows(id) cascade
+      started_at: timestamptz
+      finished_at: timestamptz null
+      status: text null check(PENDING,RUNNING,SUCCESS,FAILED,CANCELLED)
+      contacts_processed: integer null
+      errors: integer null
+      updated_at: timestamptz default now()

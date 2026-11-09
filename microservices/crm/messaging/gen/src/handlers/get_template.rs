@@ -29,11 +29,23 @@ pub struct Response {
     #[serde(rename = "body_format")]
     pub body_format: BodyFormat,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "called_by")]
+    pub called_by: Option<String>,
+
     #[serde(rename = "channel")]
     pub channel: Channel,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "click_rate")]
+    pub click_rate: Option<f64>,
+
     #[serde(rename = "created_at")]
     pub created_at: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "delivered_rate")]
+    pub delivered_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "design")]
@@ -50,6 +62,10 @@ pub struct Response {
     pub kind: TemplateKind,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "language_code")]
+    pub language_code: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "merge_fields")]
     pub merge_fields: Option<Vec<String>>,
 
@@ -57,12 +73,28 @@ pub struct Response {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open_rate")]
+    pub open_rate: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "preheader")]
     pub preheader: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "priority")]
+    pub priority: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sent_30d")]
+    pub sent_30d: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subject")]
     pub subject: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tag")]
+    pub tag: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "text_body")]
@@ -73,11 +105,23 @@ pub struct Response {
     pub thumbnail_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "unsub_30d")]
+    pub unsub_30d: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "used_by")]
+    pub used_by: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "version")]
     pub version: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "versions")]
+    pub versions: Option<Vec<serde_json::Value>>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

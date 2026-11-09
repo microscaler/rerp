@@ -25,6 +25,10 @@ pub struct Response {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "account_name")]
+    pub account_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "consent_basis")]
     pub consent_basis: Option<String>,
 

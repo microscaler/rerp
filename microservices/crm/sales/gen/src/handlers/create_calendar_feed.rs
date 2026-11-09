@@ -70,6 +70,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "url")]
     pub url: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "user_id")]
+    pub user_id: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

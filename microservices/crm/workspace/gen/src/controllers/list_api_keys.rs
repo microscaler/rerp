@@ -17,6 +17,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-07-28T16:00:00Z",
     //       "id": "b90438d1-e134-5543-919f-19864d0919d3",
     //       "is_active": true,
+    //       "last_used_at": "2026-11-05T15:59:48Z",
     //       "name": "Website (public tracking key)",
     //       "scopes": {}
     //     },
@@ -24,6 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-07-28T16:00:00Z",
     //       "id": "08dd68b1-5f07-5687-b207-d5b9cf18daaf",
     //       "is_active": true,
+    //       "last_used_at": "2026-11-05T15:59:59Z",
     //       "name": "Product backend",
     //       "scopes": {}
     //     },
@@ -31,6 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "created_at": "2026-07-28T16:00:00Z",
     //       "id": "02a937b8-4dcd-59b0-9797-dcefad332287",
     //       "is_active": true,
+    //       "last_used_at": "2026-11-04T16:00:00Z",
     //       "name": "BI export",
     //       "scopes": {}
     //     }
@@ -46,6 +49,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-07-28T16:00:00Z",
       "id": "b90438d1-e134-5543-919f-19864d0919d3",
       "is_active": true,
+      "last_used_at": "2026-11-05T15:59:48Z",
       "name": "Website (public tracking key)",
       "scopes": {}
     },
@@ -53,6 +57,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-07-28T16:00:00Z",
       "id": "08dd68b1-5f07-5687-b207-d5b9cf18daaf",
       "is_active": true,
+      "last_used_at": "2026-11-05T15:59:59Z",
       "name": "Product backend",
       "scopes": {}
     },
@@ -60,6 +65,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "created_at": "2026-07-28T16:00:00Z",
       "id": "02a937b8-4dcd-59b0-9797-dcefad332287",
       "is_active": true,
+      "last_used_at": "2026-11-04T16:00:00Z",
       "name": "BI export",
       "scopes": {}
     }
@@ -77,6 +83,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"b90438d1-e134-5543-919f-19864d0919d3","is_active":true,"name":"Website (public tracking key)","scopes":{}})).unwrap_or_default(), serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"08dd68b1-5f07-5687-b207-d5b9cf18daaf","is_active":true,"name":"Product backend","scopes":{}})).unwrap_or_default(), serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"02a937b8-4dcd-59b0-9797-dcefad332287","is_active":true,"name":"BI export","scopes":{}})).unwrap_or_default()],limit: 25,page: 1,total: 3,
+        items: vec![serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"b90438d1-e134-5543-919f-19864d0919d3","is_active":true,"last_used_at":"2026-11-05T15:59:48Z","name":"Website (public tracking key)","scopes":{}})).unwrap_or_default(), serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"08dd68b1-5f07-5687-b207-d5b9cf18daaf","is_active":true,"last_used_at":"2026-11-05T15:59:59Z","name":"Product backend","scopes":{}})).unwrap_or_default(), serde_json::from_value::<ApiKey>(serde_json::json!({"created_at":"2026-07-28T16:00:00Z","id":"02a937b8-4dcd-59b0-9797-dcefad332287","is_active":true,"last_used_at":"2026-11-04T16:00:00Z","name":"BI export","scopes":{}})).unwrap_or_default()],limit: 25,page: 1,total: 3,
     })
 }

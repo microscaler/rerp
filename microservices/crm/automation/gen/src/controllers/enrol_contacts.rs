@@ -14,7 +14,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "excluded": 3,
     //   "skipped": [
     //     {}
-    //   ]
+    //   ],
+    //   "workflow_id": "22e49987-c27c-538a-9688-56d9ca17a7ec"
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -23,7 +24,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "excluded": 3,
   "skipped": [
     {}
-  ]
+  ],
+  "workflow_id": "22e49987-c27c-538a-9688-56d9ca17a7ec"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -41,5 +43,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         skipped: Some(vec![
             serde_json::from_str::<serde_json::Value>(r#"{}"#).unwrap_or(serde_json::Value::Null)
         ]),
+        workflow_id: Some("22e49987-c27c-538a-9688-56d9ca17a7ec".to_string()),
     })
 }

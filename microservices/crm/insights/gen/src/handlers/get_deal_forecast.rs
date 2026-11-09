@@ -66,6 +66,10 @@ pub struct Response {
     #[serde(rename = "granularity")]
     pub granularity: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "no_close_date")]
+    pub no_close_date: Option<serde_json::Value>,
+
     #[serde(rename = "periods")]
     pub periods: Vec<ForecastPeriod>,
 

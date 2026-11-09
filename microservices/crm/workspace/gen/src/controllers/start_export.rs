@@ -28,6 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "progress_pct": 0,
     //   "queued_at": "2026-11-05T16:00:00Z",
     //   "requested_by": "alex",
+    //   "requested_by_name": "Alex Morgan",
     //   "source": "UI",
     //   "status": "QUEUED"
     // }
@@ -43,6 +44,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "progress_pct": 0,
   "queued_at": "2026-11-05T16:00:00Z",
   "requested_by": "alex",
+  "requested_by_name": "Alex Morgan",
   "source": "UI",
   "status": "QUEUED"
 }"#,
@@ -76,6 +78,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         progress_pct: Some(0.0),
         queued_at: "2026-11-05T16:00:00Z".to_string(),
         requested_by: "alex".to_string(),
+        requested_by_name: Some("Alex Morgan".to_string()),
         result_expires_at: Some("example".to_string()),
         result_url: Some("example".to_string()),
         skipped_rows: Some(42),

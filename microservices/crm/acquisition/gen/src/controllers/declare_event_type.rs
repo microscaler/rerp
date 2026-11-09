@@ -13,7 +13,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "declared": true,
     //   "description": "First successful import in the product",
     //   "last_seen_at": "2026-11-05T15:58:00Z",
-    //   "name": "activated"
+    //   "name": "activated",
+    //   "used_by": "Welcome series · goal"
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -21,7 +22,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "declared": true,
   "description": "First successful import in the product",
   "last_seen_at": "2026-11-05T15:58:00Z",
-  "name": "activated"
+  "name": "activated",
+  "used_by": "Welcome series · goal"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -38,5 +40,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         enabled: Some(true),
         last_seen_at: Some("2026-11-05T15:58:00Z".to_string()),
         name: "activated".to_string(),
+        used_by: Some("Welcome series · goal".to_string()),
     })
 }

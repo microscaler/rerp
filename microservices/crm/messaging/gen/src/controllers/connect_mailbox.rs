@@ -32,7 +32,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "sync_since": "2026-10-01T00:00:00Z",
     //   "track_clicks": true,
     //   "track_opens": true,
-    //   "user_id": "alex"
+    //   "user_id": "alex",
+    //   "user_name": "Alex Morgan"
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -52,7 +53,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sync_since": "2026-10-01T00:00:00Z",
   "track_clicks": true,
   "track_opens": true,
-  "user_id": "alex"
+  "user_id": "alex",
+  "user_name": "Alex Morgan"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -89,5 +91,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         track_opens: Some(true),
         updated_at: Some("example".to_string()),
         user_id: "alex".to_string(),
+        user_name: Some("Alex Morgan".to_string()),
     })
 }

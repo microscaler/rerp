@@ -37,6 +37,10 @@ pub struct Response {
     #[serde(rename = "created_at")]
     pub created_at: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_id")]
+    pub deal_id: Option<String>,
+
     #[serde(rename = "id")]
     pub id: String,
 

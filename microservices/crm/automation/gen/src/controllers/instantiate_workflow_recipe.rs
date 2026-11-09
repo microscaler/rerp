@@ -32,6 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "is_active": true,
     //   "name": "Welcome series",
     //   "sequence": 1,
+    //   "step_count": 9,
     //   "trigger_type": "SUBSCRIBED_TO_LIST"
     // }
     match serde_json::from_str::<Response>(
@@ -42,6 +43,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "is_active": true,
   "name": "Welcome series",
   "sequence": 1,
+  "step_count": 9,
   "trigger_type": "SUBSCRIBED_TO_LIST"
 }"#,
     ) {
@@ -53,6 +55,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        access_group_ids: Some(vec![]),action_config: Some(Default::default()),action_type: Some(Default::default()),active_enrolments: Some(42),bindings: Some(Default::default()),completed_enrolments: Some(42),conditions: Some(Default::default()),created_at: "2026-11-05T16:00:00Z".to_string(),description: Some("Five emails over seven days after a list subscription, ending early when the contact activates.".to_string()),entry_step_id: Some("example".to_string()),exit_rules: Some(Default::default()),id: "6b579986-98a1-52bc-b486-8c48e0820541".to_string(),is_active: true,last_run: Some("example".to_string()),name: "Welcome series".to_string(),notes: Some(vec![]),recipe_id: Some("example".to_string()),reentry: Some(Default::default()),run_count: Some(42),sequence: 1,status: Some("example".to_string()),tracking: Some(Default::default()),trigger_config: Some(Default::default()),trigger_type: Some(serde_json::from_value::<TriggerType>(serde_json::Value::String("SUBSCRIBED_TO_LIST".to_string())).unwrap_or_default()),triggers: Some(vec![]),unbound_parameters: Some(vec![]),unsubscribe_scope: Some("example".to_string()),updated_at: Some("example".to_string()),
+        access_group_ids: Some(vec![]),action_config: Some(Default::default()),action_type: Some(Default::default()),active_enrolments: Some(42),bindings: Some(Default::default()),completed_enrolments: Some(42),conditions: Some(Default::default()),created_at: "2026-11-05T16:00:00Z".to_string(),description: Some("Five emails over seven days after a list subscription, ending early when the contact activates.".to_string()),entry_step_id: Some("example".to_string()),exit_rules: Some(Default::default()),goal_rate: Some(1.5),id: "6b579986-98a1-52bc-b486-8c48e0820541".to_string(),is_active: true,last_run: Some("example".to_string()),messages_sent: Some(42),name: "Welcome series".to_string(),notes: Some(vec![]),recipe_id: Some("example".to_string()),reentry: Some(Default::default()),run_count: Some(42),sequence: 1,status: Some("example".to_string()),step_count: Some(9),stop_on_conversion_id: Some("example".to_string()),stop_on_unsubscribe: Some(true),tracking: Some(Default::default()),trigger_config: Some(Default::default()),trigger_type: Some(serde_json::from_value::<TriggerType>(serde_json::Value::String("SUBSCRIBED_TO_LIST".to_string())).unwrap_or_default()),triggers: Some(vec![]),unbound_parameters: Some(vec![]),unsubscribe_scope: Some("example".to_string()),updated_at: Some("example".to_string()),
     })
 }

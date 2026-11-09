@@ -21,8 +21,9 @@ deployed per component to GKE Autopilot. Its first user is the PriceWhisperer pl
 | [edge](edge/) | The public surface: form submit, confirm, tracking, pixels, unsubscribe, provider and ad webhooks, OAuth callbacks | 19 | 14 | none (publishes only) |
 | [intake](intake/) | The quarantine: anonymous submissions wait here until confirmed or screened (ADR 004) | 4 | 3 | intake database |
 
-Each folder holds `openapi.yaml` (HTTP), `asyncapi.yaml` (events) and a README. Generated crates are in
-`microservices/crm/<service>/gen`. Operation counts and event counts come from the contracts; the checker below keeps
+Each folder holds `openapi.yaml` (HTTP), `asyncapi.yaml` (events) and a README. Tables are in
+[`docs/data-model/<service>.yaml`](docs/data-model/). Crates are in `microservices/crm/<service>/` (`gen/` generated,
+`impl/` implementation, today a stub per operation returning its contract example). Operation counts and event counts come from the contracts; the checker below keeps
 them honest.
 
 Also here, and still in use:
@@ -70,6 +71,8 @@ flowchart LR
 | [docs/11-permissions.md](docs/11-permissions.md) | Generated | Who may call what |
 | [docs/12-portal-migration.md](docs/12-portal-migration.md) | Work list | Moving the portal and mock to the new contracts, with the full path map |
 | [docs/13-implementation-plan.md](docs/13-implementation-plan.md) | Plan | Platform, shared crates, build order, definition of done, open questions |
+| [docs/14-data-model.md](docs/14-data-model.md) | Generated | Tables per service with ERDs, from [docs/data-model/](docs/data-model/) (128 tables) |
+| [docs/crm/](../../docs/crm/README.md) (repository docs) | Work list | The 58 implementation stories, the coding-agent brief and the supervision checklist |
 | [docs/06-marketing-feature-map.md](docs/06-marketing-feature-map.md) | Reference | Feature inventory the v1 scope was curated from |
 | [docs/07-ad-buying-landscape.md](docs/07-ad-buying-landscape.md) | Reference | Ad platforms and DSPs, and how acquisition hooks in |
 | [ADR 003](../../docs/adrs/003-crm-funnel-conversion-boundary.md), [ADR 004](../../docs/adrs/004-crm-capture-intake-and-workspaces.md) | Accepted | The funnel boundary; capture, intake, workspaces and runtime |
@@ -80,6 +83,9 @@ flowchart LR
 ```bash
 # check conventions, examples and events; rewrite the generated docs
 python3 openapi/crm/tools/check_specs.py --docs
+
+# check the data model, rewrite 14-data-model.md, compare LifeModels with it
+python3 openapi/crm/tools/data_model.py --docs --models
 
 # validate every RERP spec, ports, and lint one CRM spec as codegen sees it
 tooling/.venv/bin/rerp openapi validate

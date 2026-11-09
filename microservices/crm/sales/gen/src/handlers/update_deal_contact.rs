@@ -46,6 +46,10 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_id")]
+    pub contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "contacts")]
     pub contacts: Option<Vec<DealContact>>,
 
@@ -72,11 +76,19 @@ pub struct Response {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "email")]
+    pub email: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "expected_close_date")]
     pub expected_close_date: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "is_primary")]
+    pub is_primary: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "last_activity_at")]
@@ -85,6 +97,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "lost_reason")]
     pub lost_reason: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "name")]
+    pub name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "next_task_at")]
@@ -124,6 +140,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "probability")]
     pub probability: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "role")]
+    pub role: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "source")]

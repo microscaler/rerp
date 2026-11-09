@@ -38,6 +38,10 @@ pub struct Response {
     pub sentiment: Sentiment,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "task_type_ids")]
+    pub task_type_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "used_by_type_ids")]
     pub used_by_type_ids: Option<Vec<String>>,
 }

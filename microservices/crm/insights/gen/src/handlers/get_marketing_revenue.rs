@@ -63,6 +63,10 @@ pub struct Response {
     #[serde(rename = "top_campaigns")]
     pub top_campaigns: Option<Vec<RevenueSourceRow>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total_conversions")]
+    pub total_conversions: Option<i64>,
+
     #[serde(rename = "total_revenue")]
     pub total_revenue: String,
 }

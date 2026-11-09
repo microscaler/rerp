@@ -35,6 +35,10 @@ pub struct Response {
     pub active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "attribution")]
+    pub attribution: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "automated_probability")]
     pub automated_probability: Option<f64>,
 
@@ -100,6 +104,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "expected_revenue")]
     pub expected_revenue: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "form")]
+    pub form: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "function")]

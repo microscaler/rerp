@@ -29,6 +29,10 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "funnel")]
+    pub funnel: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "rows")]
     pub rows: Vec<serde_json::Value>,
 }

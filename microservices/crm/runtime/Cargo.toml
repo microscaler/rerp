@@ -1,0 +1,12 @@
+[package]
+name = "rerp_crm_runtime"
+version = "0.1.0"
+edition = "2021"
+description = "What every RERP CRM service shares: request context, errors, events, audit, idempotency, tokens, conditions"
+
+[dependencies]
+brrtrouter = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }

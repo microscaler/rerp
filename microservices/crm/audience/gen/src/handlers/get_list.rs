@@ -21,6 +21,10 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "channel")]
+    pub channel: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "confirmation_template_id")]
     pub confirmation_template_id: Option<String>,
 
@@ -34,6 +38,10 @@ pub struct Response {
     #[serde(rename = "double_opt_in")]
     pub double_opt_in: bool,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "growth_30d")]
+    pub growth_30d: Option<Vec<i64>>,
+
     #[serde(rename = "id")]
     pub id: String,
 
@@ -43,6 +51,18 @@ pub struct Response {
 
     #[serde(rename = "name")]
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "pending_count")]
+    pub pending_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "postal_address")]
+    pub postal_address: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "reminder_text")]
+    pub reminder_text: Option<String>,
 
     #[serde(rename = "sender_id")]
     pub sender_id: String,

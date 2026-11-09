@@ -27,6 +27,14 @@ pub struct Response {
     #[serde(rename = "created_at")]
     pub created_at: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_id")]
+    pub deal_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "file_name")]
+    pub file_name: Option<String>,
+
     #[serde(rename = "filename")]
     pub filename: String,
 
@@ -35,6 +43,10 @@ pub struct Response {
 
     #[serde(rename = "size")]
     pub size: i64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "size_bytes")]
+    pub size_bytes: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "uploaded_by")]

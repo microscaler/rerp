@@ -30,6 +30,10 @@ pub struct Request {
     pub enabled: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "label")]
+    pub label: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "utm_campaign")]
     pub utm_campaign: Option<String>,
 
@@ -77,6 +81,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "id")]
     pub id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "label")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "utm_campaign")]

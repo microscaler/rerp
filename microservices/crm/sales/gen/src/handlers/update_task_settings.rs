@@ -12,8 +12,16 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "allow_unlinked_tasks")]
+    pub allow_unlinked_tasks: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "default_due_offset_minutes")]
     pub default_due_offset_minutes: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "default_reminder_minutes")]
+    pub default_reminder_minutes: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "default_reminders")]
@@ -22,6 +30,10 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "require_outcomes")]
     pub require_outcomes: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
 
     #[serde(rename = "X-Workspace-Id")]
     pub x_workspace_id: String,
@@ -31,8 +43,16 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "allow_unlinked_tasks")]
+    pub allow_unlinked_tasks: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "default_due_offset_minutes")]
     pub default_due_offset_minutes: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "default_reminder_minutes")]
+    pub default_reminder_minutes: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "default_reminders")]
@@ -41,6 +61,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "require_outcomes")]
     pub require_outcomes: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

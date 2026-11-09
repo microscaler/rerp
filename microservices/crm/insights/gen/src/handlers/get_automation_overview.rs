@@ -41,6 +41,10 @@ pub struct Response {
     #[serde(rename = "completion_rate")]
     pub completion_rate: f64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contacts_active")]
+    pub contacts_active: Option<i64>,
+
     #[serde(rename = "contacts_finished")]
     pub contacts_finished: i32,
 

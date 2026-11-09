@@ -51,6 +51,10 @@ pub struct Response {
     pub reason: SuppressionReason,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "source")]
+    pub source: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "source_send_id")]
     pub source_send_id: Option<String>,
 }

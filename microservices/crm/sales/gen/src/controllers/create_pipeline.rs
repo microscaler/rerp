@@ -10,8 +10,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
     //   "auto_assign": "ROUND_ROBIN",
+    //   "closed_deals": 7,
     //   "created_at": "2026-03-30T16:00:00Z",
     //   "currency": "EUR",
+    //   "fiscal_year_start": "JAN",
     //   "id": "d9a2022e-96ff-53a3-a94d-2b169424fd31",
     //   "name": "Sales",
     //   "open_deals": 38,
@@ -21,8 +23,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     match serde_json::from_str::<Response>(
         r#"{
   "auto_assign": "ROUND_ROBIN",
+  "closed_deals": 7,
   "created_at": "2026-03-30T16:00:00Z",
   "currency": "EUR",
+  "fiscal_year_start": "JAN",
   "id": "d9a2022e-96ff-53a3-a94d-2b169424fd31",
   "name": "Sales",
   "open_deals": 38,
@@ -40,8 +44,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         auto_assign: Some("ROUND_ROBIN".to_string()),
         auto_assign_user_ids: Some(vec![]),
+        closed_deals: Some(7),
         created_at: "2026-03-30T16:00:00Z".to_string(),
         currency: "EUR".to_string(),
+        fiscal_year_start: Some("JAN".to_string()),
         forecast_mode: Some("example".to_string()),
         group_ids: Some(vec![]),
         id: "d9a2022e-96ff-53a3-a94d-2b169424fd31".to_string(),

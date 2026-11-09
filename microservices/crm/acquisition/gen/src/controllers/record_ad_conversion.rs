@@ -17,7 +17,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "id": "e67555dd-33f4-5fee-9da3-a019895219b1",
     //       "status": "QUEUED"
     //     }
-    //   ]
+    //   ],
+    //   "queued": 3,
+    //   "rules_matched": 1
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -26,7 +28,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "id": "e67555dd-33f4-5fee-9da3-a019895219b1",
       "status": "QUEUED"
     }
-  ]
+  ],
+  "queued": 3,
+  "rules_matched": 1
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -36,8 +40,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         }
     }
 
-    HttpJson::ok(Response(vec![serde_json::from_value::<AdConversion>(
-        serde_json::json!({"id":"e67555dd-33f4-5fee-9da3-a019895219b1","status":"QUEUED"}),
-    )
-    .unwrap_or_default()]))
+    HttpJson::ok(Response {
+        items: vec![serde_json::from_value::<AdConversion>(
+            serde_json::json!({"id":"e67555dd-33f4-5fee-9da3-a019895219b1","status":"QUEUED"}),
+        )
+        .unwrap_or_default()],
+        queued: Some(3),
+        rules_matched: Some(1),
+    })
 }

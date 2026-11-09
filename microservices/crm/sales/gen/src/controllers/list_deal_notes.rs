@@ -16,12 +16,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     {
     //       "author": "Alex Morgan",
     //       "created_at": "2026-11-04T14:00:00Z",
+    //       "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
     //       "id": "c5a53e54-861c-5955-9c05-355ff0f0ab0c",
     //       "text": "Priya confirmed budget approved for 120 seats; SSO is the blocker. Sent SAML docs."
     //     },
     //     {
     //       "author": "Automation · Hot lead handoff",
     //       "created_at": "2026-11-02T09:00:00Z",
+    //       "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
     //       "id": "938887ff-e5fb-5b68-b294-071e744f7951",
     //       "text": "Deal created from form \"Contact sales\" (seats = 120)."
     //     }
@@ -36,12 +38,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {
       "author": "Alex Morgan",
       "created_at": "2026-11-04T14:00:00Z",
+      "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
       "id": "c5a53e54-861c-5955-9c05-355ff0f0ab0c",
       "text": "Priya confirmed budget approved for 120 seats; SSO is the blocker. Sent SAML docs."
     },
     {
       "author": "Automation · Hot lead handoff",
       "created_at": "2026-11-02T09:00:00Z",
+      "deal_id": "63a6661f-5860-50ed-8697-f28d29a3917f",
       "id": "938887ff-e5fb-5b68-b294-071e744f7951",
       "text": "Deal created from form \"Contact sales\" (seats = 120)."
     }
@@ -59,6 +63,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<Note>(serde_json::json!({"author":"Alex Morgan","created_at":"2026-11-04T14:00:00Z","id":"c5a53e54-861c-5955-9c05-355ff0f0ab0c","text":"Priya confirmed budget approved for 120 seats; SSO is the blocker. Sent SAML docs."})).unwrap_or_default(), serde_json::from_value::<Note>(serde_json::json!({"author":"Automation · Hot lead handoff","created_at":"2026-11-02T09:00:00Z","id":"938887ff-e5fb-5b68-b294-071e744f7951","text":"Deal created from form \"Contact sales\" (seats = 120)."})).unwrap_or_default()],limit: 20,page: 1,total: 2,
+        items: vec![serde_json::from_value::<Note>(serde_json::json!({"author":"Alex Morgan","created_at":"2026-11-04T14:00:00Z","deal_id":"63a6661f-5860-50ed-8697-f28d29a3917f","id":"c5a53e54-861c-5955-9c05-355ff0f0ab0c","text":"Priya confirmed budget approved for 120 seats; SSO is the blocker. Sent SAML docs."})).unwrap_or_default(), serde_json::from_value::<Note>(serde_json::json!({"author":"Automation · Hot lead handoff","created_at":"2026-11-02T09:00:00Z","deal_id":"63a6661f-5860-50ed-8697-f28d29a3917f","id":"938887ff-e5fb-5b68-b294-071e744f7951","text":"Deal created from form \"Contact sales\" (seats = 120)."})).unwrap_or_default()],limit: 20,page: 1,total: 2,
     })
 }

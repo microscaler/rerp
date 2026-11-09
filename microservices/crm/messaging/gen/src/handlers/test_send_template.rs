@@ -39,6 +39,10 @@ pub struct Response {
     #[serde(rename = "campaign_id")]
     pub campaign_id: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "campaign_name")]
+    pub campaign_name: Option<String>,
+
     #[serde(rename = "channel")]
     pub channel: Channel,
 
@@ -46,8 +50,16 @@ pub struct Response {
     #[serde(rename = "clicked_at")]
     pub clicked_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "clicked_link")]
+    pub clicked_link: Option<String>,
+
     #[serde(rename = "contact_id")]
     pub contact_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_name")]
+    pub contact_name: Option<String>,
 
     #[serde(rename = "created_at")]
     pub created_at: String,
@@ -78,6 +90,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "provider_message_id")]
     pub provider_message_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "queued")]
+    pub queued: Option<i64>,
 
     #[serde(rename = "status")]
     pub status: SendStatus,

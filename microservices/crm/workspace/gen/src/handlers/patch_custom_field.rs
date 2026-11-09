@@ -15,10 +15,6 @@ pub struct Request {
     pub default_value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "field_type")]
-    pub field_type: Option<FieldType>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "group")]
     pub group: Option<String>,
 
@@ -46,6 +42,10 @@ pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "show_on_card")]
     pub show_on_card: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type")]
+    pub r#type: Option<FieldType>,
 
     #[serde(rename = "visible")]
     pub visible: bool,
@@ -75,21 +75,26 @@ pub struct Response {
     #[serde(rename = "entity")]
     pub entity: String,
 
-    #[serde(rename = "field_type")]
-    pub field_type: FieldType,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "group")]
     pub group: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "hint")]
+    pub hint: Option<String>,
+
     #[serde(rename = "id")]
     pub id: String,
+
+    #[serde(rename = "key")]
+    pub key: String,
 
     #[serde(rename = "label")]
     pub label: String,
 
-    #[serde(rename = "name")]
-    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "merge_field")]
+    pub merge_field: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "options")]
@@ -104,6 +109,10 @@ pub struct Response {
     pub required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "required_at_stage")]
+    pub required_at_stage: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "searchable")]
     pub searchable: Option<bool>,
 
@@ -114,6 +123,9 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "show_on_card")]
     pub show_on_card: Option<bool>,
+
+    #[serde(rename = "type")]
+    pub r#type: FieldType,
 
     #[serde(rename = "visible")]
     pub visible: bool,

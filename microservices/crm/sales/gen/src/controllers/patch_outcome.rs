@@ -14,13 +14,15 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // {
     //   "id": "0a7437f6-0e3e-51ae-a9fd-4a44b900f91e",
     //   "label": "Reached",
-    //   "sentiment": "POSITIVE"
+    //   "sentiment": "POSITIVE",
+    //   "task_type_ids": []
     // }
     match serde_json::from_str::<Response>(
         r#"{
   "id": "0a7437f6-0e3e-51ae-a9fd-4a44b900f91e",
   "label": "Reached",
-  "sentiment": "POSITIVE"
+  "sentiment": "POSITIVE",
+  "task_type_ids": []
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -38,6 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
             "POSITIVE".to_string(),
         ))
         .unwrap_or_default(),
+        task_type_ids: Some(vec![]),
         used_by_type_ids: Some(vec![]),
     })
 }

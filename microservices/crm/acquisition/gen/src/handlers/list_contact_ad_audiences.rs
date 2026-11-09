@@ -19,9 +19,15 @@ pub struct Request {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-// Newtype wrapping the array: must be transparent so JSON matches OpenAPI `type: array` (not `{"0":[...]}`).
-#[serde(transparent)]
-pub struct Response(pub Vec<AdAudienceMember>);
+
+pub struct Response {
+    #[serde(rename = "items")]
+    pub items: Vec<AdAudienceMember>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "total")]
+    pub total: Option<i64>,
+}
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;

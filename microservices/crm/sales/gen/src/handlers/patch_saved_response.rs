@@ -74,8 +74,16 @@ pub struct Response {
     pub subject: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "title")]
+    pub title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]
     pub updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "use_count")]
+    pub use_count: Option<i64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

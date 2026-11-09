@@ -1,0 +1,410 @@
+service: messaging
+database: crm
+schema: messaging
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  templates:
+    description: Message templates (email and SMS); every save creates a version.
+    api: Template
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      channel: text check(EMAIL,SMS,WHATSAPP)
+      kind: text check(CAMPAIGN,AUTOMATION,TRANSACTIONAL)
+      subject: varchar(255) null
+      preheader: varchar(255) null
+      body_format: text check(MARKDOWN,MJML,HTML,TEXT)
+      body: text
+      text_body: text null
+      design: jsonb null
+      is_archived: boolean default false
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      priority: text null
+      language_code: text null
+      tag: text null
+      version: integer default 1
+    api_only:
+    - merge_fields
+    - thumbnail_url
+    - versions
+    - used_by
+    - sent_30d
+    - open_rate
+    - click_rate
+    - unsub_30d
+    - delivered_rate
+    - called_by
+  template_versions:
+    description: Immutable versions of a template; sends record the version used.
+    columns:
+      workspace_id: uuid
+      template_id: uuid pk fk templates(id) cascade
+      version: integer pk
+      subject: varchar(255) null
+      preheader: varchar(255) null
+      body_format: text check(MARKDOWN,BLOCKS,MJML,HTML,TEXT)
+      body: text
+      text_body: text null
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+    append_only: true
+  snippets:
+    description: Reusable blocks inserted as {{snippet.key}}.
+    api: Snippet
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      key: text
+      value: text
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, key
+  assets:
+    description: Images in the asset store (bytes in object storage).
+    api: Asset
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      url: text
+      content_type: text null
+      size_bytes: bigint null
+      width: integer null
+      height: integer null
+      created_at: timestamptz default now()
+      storage_key: text
+      uploaded_at: timestamptz null
+      updated_at: timestamptz default now()
+  senders:
+    description: From identities and their verification.
+    api: Sender
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      from_name: varchar(128)
+      from_address: text
+      reply_to: text null
+      domain: text
+      provider: text null check(SES,POSTMARK,RESEND,TWILIO,META)
+      status: text check(PENDING,VERIFIED,FAILED)
+      postal_address: text null
+      last_checked_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - dns_records
+    - used_by
+  sms_senders:
+    description: SMS sender ids and numbers.
+    api: SmsSender
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      label: text
+      kind: text check(ALPHANUMERIC,LONG_CODE,SHORT_CODE,TOLL_FREE)
+      number: text null
+      countries: jsonb null
+      verified: boolean null
+      updated_at: timestamptz default now()
+  tracking_domains:
+    description: Custom tracking domains and their DNS checks.
+    api: TrackingDomain
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      domain: text
+      status: text check(PENDING,VERIFIED,FAILED)
+      tls: boolean null
+      last_checked_at: timestamptz null
+      records: jsonb null
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, domain
+  postal_addresses:
+    description: Postal addresses for message footers.
+    api: PostalAddress
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      address: text
+      is_default: boolean null
+      updated_at: timestamptz default now()
+  list_exclusions:
+    description: Address patterns excluded from lists.
+    api: ListExclusion
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      pattern: text
+      list_ids: jsonb null
+      reason: text null
+      created_by: varchar(64) null
+      created_at: timestamptz null
+      updated_at: timestamptz default now()
+  campaigns:
+    description: 'Campaigns: email or SMS, one-time, A/B, RSS, recurring or reminder.'
+    api: Campaign
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      kind: text check(ONE_TIME,AB_TEST,RSS,REMINDER,RECURRING)
+      channel: text check(EMAIL,SMS,WHATSAPP)
+      status: text check(DRAFT,SCHEDULED,SENDING,SENT,CANCELLED,FAILED)
+      sender_id: uuid null fk senders(id) restrict
+      template_id: uuid null fk templates(id) restrict
+      variants: jsonb null
+      ab_test: jsonb null
+      list_ids: jsonb
+      exclude_list_ids: jsonb null
+      segment: jsonb null
+      reminder: jsonb null
+      recurrence: jsonb null
+      reply_to: text null
+      preheader: varchar(255) null
+      track_replies: boolean null
+      links: jsonb null
+      on_open_workflow_ids: jsonb null
+      postal_address_id: uuid null fk postal_addresses(id) set null
+      public_archive: boolean null
+      utm_campaign_id: uuid null
+      send_at: timestamptz null
+      send_in_contact_timezone: boolean null
+      track_opens: boolean null
+      track_clicks: boolean null
+      folder: text null
+      started_at: timestamptz null
+      completed_at: timestamptz null
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      subject: text null
+      template_version: integer null
+      audience_count: bigint null
+      scheduled_at: timestamptz null
+      cancelled_at: timestamptz null
+    api_only:
+    - readiness
+    - sent_count
+    - template_name
+    - list_names
+    - open_rate
+    - click_rate
+    - unsubscribed
+    indexes:
+    - status, send_at
+  campaign_variants:
+    description: A/B variants of a campaign.
+    api: CampaignVariant
+    columns:
+      workspace_id: uuid
+      campaign_id: uuid pk fk campaigns(id) cascade
+      key: varchar(8) pk
+      template_id: uuid fk templates(id) restrict
+      template_version: integer null
+      weight_pct: integer default 50
+  sends:
+    description: 'The send ledger: one row per recipient per message.'
+    api: Send
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      contact_id: uuid
+      campaign_id: uuid null fk campaigns(id) restrict
+      variant_key: text null
+      workflow_id: uuid null
+      enrolment_id: uuid null
+      template_id: uuid null
+      template_version: integer null
+      channel: text check(EMAIL,SMS,WHATSAPP)
+      to_address: text null
+      subject: text null
+      status: text check(QUEUED,SENT,DELIVERED,BOUNCED,FAILED,SUPPRESSED)
+      provider: text null check(SES,POSTMARK,RESEND,TWILIO,META)
+      provider_message_id: text null
+      error: text null
+      opened_at: timestamptz null
+      clicked_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - events
+    - campaign_name
+    - contact_name
+    - clicked_link
+    - queued
+    unique:
+    - campaign_id, contact_id
+    indexes:
+    - contact_id, created_at
+    - provider_message_id
+    - enrolment_id
+    notes: Unique per campaign and contact makes a resumed send idempotent; automation and transactional sends have
+      no campaign_id and use their idempotency key instead.
+  message_events:
+    description: Engagement and delivery events per send (append-only).
+    api: MessageEvent
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      send_id: uuid fk sends(id) cascade
+      contact_id: uuid
+      campaign_id: uuid null
+      event_type: text check(QUEUED,SENT,DELIVERED,DEFERRED,OPENED,CLICKED,SOFT_BOUNCED,HARD_BOUNCED,COMPLAINED,UNSUBSCRIBED,REPLIED)
+      at: timestamptz
+      link_url: text null
+      link_index: integer null
+      user_agent: text null
+      ip: varchar(45) null
+      bounce_code: text null
+      provider_event_id: text null
+      machine: boolean default false
+    unique:
+    - provider_event_id
+    indexes:
+    - send_id
+    - contact_id, at
+    - campaign_id, event_type
+    append_only: true
+    notes: Candidate for monthly range partitioning on `at` once volume requires it (an authored migration).
+  tracked_links:
+    description: Links rewritten for click tracking; the edge token carries the target.
+    api: TrackedLink
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      campaign_id: uuid null fk campaigns(id) cascade
+      template_id: uuid null fk templates(id) cascade
+      url: text
+      report_name: text null
+      start_workflow_ids: jsonb null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  mailboxes:
+    description: Connected 1:1 mailboxes (tokens in Secret Manager, never here).
+    api: Mailbox
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      user_id: varchar(64)
+      address: text
+      display_name: text null
+      provider: text check(GOOGLE,MICROSOFT,IMAP)
+      status: text check(AUTHORIZING,CONNECTED,SYNCING,DISCONNECTED,ERROR)
+      sync_enabled: boolean
+      sync_since: timestamptz null
+      sync_scope: text null check(KNOWN_CONTACTS,ALL)
+      log_to_deals: boolean null
+      track_opens: boolean null
+      track_clicks: boolean null
+      signature_html: text null
+      shared_with_user_ids: jsonb null
+      imap: jsonb null
+      last_sync_at: timestamptz null
+      last_error: text null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      secret_ref: text null
+    api_only:
+    - user_name
+  mailbox_messages:
+    description: Messages synced from connected mailboxes.
+    api: MailboxMessage
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      mailbox_id: uuid fk mailboxes(id) cascade
+      direction: text check(INBOUND,OUTBOUND)
+      external_id: text null
+      thread_id: text null
+      from_address: text
+      to_addresses: jsonb
+      cc_addresses: jsonb null
+      subject: text
+      snippet: text null
+      body_html: text null
+      sent_at: timestamptz
+      contact_ids: jsonb null
+      deal_ids: jsonb null
+      opens: integer null
+      clicks: integer null
+      replied: boolean null
+      attachments: jsonb null
+      updated_at: timestamptz default now()
+    api_only:
+    - contact_name
+    - deal_title
+    unique:
+    - mailbox_id, external_id
+    indexes:
+    - thread_id
+  social_accounts:
+    description: Connected social accounts.
+    api: SocialAccount
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      platform: text check(X,INSTAGRAM,THREADS,LINKEDIN,FACEBOOK,BLUESKY,MASTODON)
+      handle: text
+      display_name: text null
+      avatar_url: text null
+      status: text check(CONNECTING,CONNECTED,PAUSED,TOKEN_EXPIRED,DISCONNECTED)
+      paused_reason: text null
+      token_expires_at: timestamptz null
+      created_at: timestamptz default now()
+      secret_ref: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - authorization_url
+    - followers
+  social_posts:
+    description: Social posts and their approval.
+    api: SocialPost
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      status: text check(DRAFT,PENDING_APPROVAL,APPROVED,SCHEDULED,PUBLISHING,PUBLISHED,PARTIAL,FAILED,SKIPPED)
+      body: text
+      media: jsonb null
+      link_url: text null
+      utm_campaign_id: uuid null
+      scheduled_at: timestamptz null
+      requires_approval: boolean null
+      approved_at: timestamptz null
+      skip_reason: text null
+      source: text null
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - approved_by
+  social_post_targets:
+    description: Where a post is published, per account.
+    api: PostTarget
+    columns:
+      workspace_id: uuid
+      post_id: uuid pk fk social_posts(id) cascade
+      account_id: uuid pk fk social_accounts(id) cascade
+      body_override: text null
+      status: text check(DRAFT,PENDING_APPROVAL,SCHEDULED,PUBLISHED,FAILED,SKIPPED)
+      platform_post_id: text null
+      permalink: text null
+      error: text null
+      published_at: timestamptz null
+  social_post_audit:
+    description: Approval and publishing audit for social posts.
+    api: AuditEntry
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      at: timestamptz
+      actor: text
+      action: text check(CREATED,UPDATED,APPROVED,SKIPPED,PUBLISHED,FAILED,PAUSED,RESUMED,CONNECTED,DISCONNECTED)
+      post_id: uuid null fk social_posts(id) cascade
+      account_id: uuid null
+      note: text null
+    append_only: true

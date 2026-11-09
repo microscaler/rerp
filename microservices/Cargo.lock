@@ -2359,7 +2359,7 @@ dependencies = [
  "log",
  "may",
  "may_minihttp",
- "may_postgres",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
  "may_tracing",
  "microscaler-timing",
  "once_cell",
@@ -2405,7 +2405,7 @@ dependencies = [
  "lifeguard",
  "lifeguard-derive",
  "log",
- "may_postgres",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
  "pathdiff",
  "regex",
  "rust_decimal",
@@ -2548,6 +2548,25 @@ dependencies = [
  "postgres-types",
  "rustls",
  "rustls-pemfile",
+ "smallvec",
+ "spin 0.9.9",
+]
+
+[[package]]
+name = "may_postgres"
+version = "0.1.0"
+source = "git+https://github.com/microscaler/may_postgres.git?branch=master#0f93c04ae2a372e7a909093255e967d370d2cfb2"
+dependencies = [
+ "byteorder",
+ "bytes",
+ "crossbeam",
+ "fallible-iterator",
+ "log",
+ "may",
+ "percent-encoding",
+ "phf",
+ "postgres-protocol",
+ "postgres-types",
  "smallvec",
  "spin 0.9.9",
 ]
@@ -4556,6 +4575,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_acquisition"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_acquisition_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_acquisition_gen"
 version = "0.1.0"
 dependencies = [
@@ -4576,6 +4618,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_audience"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_audience_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_audience_gen"
 version = "0.1.0"
 dependencies = [
@@ -4593,6 +4658,29 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tikv-jemallocator",
+]
+
+[[package]]
+name = "rerp_crm_automation"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_automation_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
 ]
 
 [[package]]
@@ -4630,6 +4718,24 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_edge"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "may",
+ "rerp_crm_edge_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_edge_gen"
 version = "0.1.0"
 dependencies = [
@@ -4647,6 +4753,29 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tikv-jemallocator",
+]
+
+[[package]]
+name = "rerp_crm_insights"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_insights_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
 ]
 
 [[package]]
@@ -4670,6 +4799,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_intake"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_intake_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_intake_gen"
 version = "0.1.0"
 dependencies = [
@@ -4687,6 +4839,29 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tikv-jemallocator",
+]
+
+[[package]]
+name = "rerp_crm_messaging"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_messaging_gen",
+ "rerp_crm_runtime",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
 ]
 
 [[package]]
@@ -4754,6 +4929,40 @@ dependencies = [
 ]
 
 [[package]]
+name = "rerp_crm_runtime"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "chrono",
+ "serde",
+ "serde_json",
+ "uuid",
+]
+
+[[package]]
+name = "rerp_crm_sales"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_runtime",
+ "rerp_crm_sales_gen",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
+]
+
+[[package]]
 name = "rerp_crm_sales_gen"
 version = "0.1.0"
 dependencies = [
@@ -4771,6 +4980,29 @@ dependencies = [
  "serde_json",
  "serde_yaml",
  "tikv-jemallocator",
+]
+
+[[package]]
+name = "rerp_crm_workspace"
+version = "0.1.0"
+dependencies = [
+ "brrtrouter",
+ "brrtrouter_macros",
+ "chrono",
+ "clap",
+ "lifeguard",
+ "lifeguard-derive",
+ "lifeguard-migrate",
+ "may",
+ "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "rerp_crm_runtime",
+ "rerp_crm_workspace_gen",
+ "rust_decimal",
+ "sea-query",
+ "serde",
+ "serde_json",
+ "tikv-jemallocator",
+ "uuid",
 ]
 
 [[package]]
@@ -4845,6 +5077,14 @@ dependencies = [
  "rerp_accounting_financial_reports",
  "rerp_accounting_general_ledger",
  "rerp_accounting_invoice",
+ "rerp_crm_acquisition",
+ "rerp_crm_audience",
+ "rerp_crm_automation",
+ "rerp_crm_insights",
+ "rerp_crm_intake",
+ "rerp_crm_messaging",
+ "rerp_crm_sales",
+ "rerp_crm_workspace",
  "rerp_documents_render",
 ]
 

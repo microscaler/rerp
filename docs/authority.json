@@ -74,6 +74,18 @@
       "superseded_by": []
     },
     {
+      "id": "PLAN-002",
+      "scope": "crm.implementation",
+      "path": "docs/crm/README.md",
+      "kind": "roadmap",
+      "status": "ACTIVE",
+      "authority": "working",
+      "owner": "RERP CRM",
+      "last_reviewed": "2026-11-09",
+      "supersedes": [],
+      "superseded_by": []
+    },
+    {
       "id": "PLAN-001",
       "scope": "accounting.hauliage-dogfood-delivery",
       "path": "docs/roadmap/hauliage-accounting-dogfood/README.md",

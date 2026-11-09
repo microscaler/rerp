@@ -12,11 +12,17 @@ use crate::handlers::types::Reminder;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
-    //   "require_outcomes": true
+    //   "allow_unlinked_tasks": false,
+    //   "default_reminder_minutes": 15,
+    //   "require_outcomes": true,
+    //   "updated_at": "2026-11-03T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
         r#"{
-  "require_outcomes": true
+  "allow_unlinked_tasks": false,
+  "default_reminder_minutes": 15,
+  "require_outcomes": true,
+  "updated_at": "2026-11-03T16:00:00Z"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -27,8 +33,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
+        allow_unlinked_tasks: Some(false),
         default_due_offset_minutes: Some(42),
+        default_reminder_minutes: Some(15),
         default_reminders: Some(vec![]),
         require_outcomes: Some(true),
+        updated_at: Some("2026-11-03T16:00:00Z".to_string()),
     })
 }

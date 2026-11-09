@@ -1,0 +1,31 @@
+// Implementation stub for handler 'capture_social_lead'
+// This file is a starting point for your implementation.
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
+use brrtrouter_macros::handler;
+use rerp_crm_messaging_gen::handlers::capture_social_lead::{Request, Response};
+
+#[allow(unused_imports)]
+use rerp_crm_messaging_gen::handlers::types::Platform;
+
+#[handler(CaptureSocialLeadController)]
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let display_name = req.inner.display_name;// let email = req.inner.email;// let handle = req.inner.handle;// let interaction = req.inner.interaction;// let platform = req.inner.platform;// let post_id = req.inner.post_id;// let text = req.inner.text;// let utm_campaign_id = req.inner.utm_campaign_id;// let x_workspace_id = req.inner.x_workspace_id;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
+    HttpJson::ok(Response {
+        lead_id: None,          // TODO: Set from your business logic
+        matched_existing: None, // TODO: Set from your business logic
+    })
+}

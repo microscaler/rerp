@@ -60,11 +60,19 @@ pub struct Response {
     #[serde(rename = "auto_assign_user_ids")]
     pub auto_assign_user_ids: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "closed_deals")]
+    pub closed_deals: Option<i64>,
+
     #[serde(rename = "created_at")]
     pub created_at: String,
 
     #[serde(rename = "currency")]
     pub currency: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "fiscal_year_start")]
+    pub fiscal_year_start: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "forecast_mode")]

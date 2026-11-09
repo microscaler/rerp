@@ -19,19 +19,24 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         "contact.subscribed",
     //         "contact.unsubscribed"
     //       ],
+    //       "failures": 0,
     //       "id": "9a087430-47c9-5317-8abb-3f6fe7a9cbf9",
     //       "is_active": true,
     //       "name": "Northwind Traders",
+    //       "status": "OK",
     //       "url": "https://api.acme.example/hooks/crm"
     //     },
     //     {
     //       "created_at": "2026-09-26T16:00:00Z",
+    //       "detail": "Signed · Pub/Sub",
     //       "events": [
     //         "deal.won"
     //       ],
+    //       "failures": 0,
     //       "id": "ebc7ef80-6cc7-5bcc-896f-309e9b0e282e",
     //       "is_active": true,
     //       "name": "Northwind Traders",
+    //       "status": "OK",
     //       "url": "https://erp.acme.example/crm-conversions"
     //     }
     //   ],
@@ -48,19 +53,24 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         "contact.subscribed",
         "contact.unsubscribed"
       ],
+      "failures": 0,
       "id": "9a087430-47c9-5317-8abb-3f6fe7a9cbf9",
       "is_active": true,
       "name": "Northwind Traders",
+      "status": "OK",
       "url": "https://api.acme.example/hooks/crm"
     },
     {
       "created_at": "2026-09-26T16:00:00Z",
+      "detail": "Signed · Pub/Sub",
       "events": [
         "deal.won"
       ],
+      "failures": 0,
       "id": "ebc7ef80-6cc7-5bcc-896f-309e9b0e282e",
       "is_active": true,
       "name": "Northwind Traders",
+      "status": "OK",
       "url": "https://erp.acme.example/crm-conversions"
     }
   ],
@@ -77,6 +87,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<Webhook>(serde_json::json!({"created_at":"2026-08-07T16:00:00Z","events":["contact.subscribed","contact.unsubscribed"],"id":"9a087430-47c9-5317-8abb-3f6fe7a9cbf9","is_active":true,"name":"Northwind Traders","url":"https://api.acme.example/hooks/crm"})).unwrap_or_default(), serde_json::from_value::<Webhook>(serde_json::json!({"created_at":"2026-09-26T16:00:00Z","events":["deal.won"],"id":"ebc7ef80-6cc7-5bcc-896f-309e9b0e282e","is_active":true,"name":"Northwind Traders","url":"https://erp.acme.example/crm-conversions"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
+        items: vec![serde_json::from_value::<Webhook>(serde_json::json!({"created_at":"2026-08-07T16:00:00Z","events":["contact.subscribed","contact.unsubscribed"],"failures":0,"id":"9a087430-47c9-5317-8abb-3f6fe7a9cbf9","is_active":true,"name":"Northwind Traders","status":"OK","url":"https://api.acme.example/hooks/crm"})).unwrap_or_default(), serde_json::from_value::<Webhook>(serde_json::json!({"created_at":"2026-09-26T16:00:00Z","detail":"Signed · Pub/Sub","events":["deal.won"],"failures":0,"id":"ebc7ef80-6cc7-5bcc-896f-309e9b0e282e","is_active":true,"name":"Northwind Traders","status":"OK","url":"https://erp.acme.example/crm-conversions"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

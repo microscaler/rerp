@@ -35,8 +35,16 @@ pub struct Response {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_name")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "current_step_id")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "current_step_label")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "ended_at")]

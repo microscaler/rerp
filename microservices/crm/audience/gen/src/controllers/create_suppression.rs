@@ -19,7 +19,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "created_at": "2026-10-28T16:00:00Z",
     //   "id": "fc58b14d-e13f-5d43-bad7-0a86f5d330c6",
     //   "note": "October product update",
-    //   "reason": "HARD_BOUNCE"
+    //   "reason": "HARD_BOUNCE",
+    //   "source": "October product update"
     // }
     match serde_json::from_str::<Response>(
         r#"{
@@ -28,7 +29,8 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "created_at": "2026-10-28T16:00:00Z",
   "id": "fc58b14d-e13f-5d43-bad7-0a86f5d330c6",
   "note": "October product update",
-  "reason": "HARD_BOUNCE"
+  "reason": "HARD_BOUNCE",
+  "source": "October product update"
 }"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
@@ -51,6 +53,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
             "HARD_BOUNCE".to_string(),
         ))
         .unwrap_or_default(),
+        source: Some("October product update".to_string()),
         source_send_id: Some("example".to_string()),
     })
 }

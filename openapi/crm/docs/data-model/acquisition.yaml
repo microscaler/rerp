@@ -1,0 +1,500 @@
+service: acquisition
+database: crm
+schema: acquisition
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  forms:
+    description: 'Web forms: fields, actions, style, embed.'
+    api: WebForm
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      description: text null
+      fields: jsonb null
+      actions: jsonb null
+      style: jsonb null
+      double_opt_in: boolean null
+      allowed_origins: jsonb null
+      redirect_url: text null
+      on_submit: text null check(THANK_YOU,REDIRECT)
+      is_active: boolean null
+      allow_blank_overwrite: boolean null
+      block_free_mail: boolean null
+      blocked_domains: jsonb null
+      custom_html: text null
+      team_id: uuid null
+      user_id: varchar(64) null
+      utm_source_id: uuid null
+      utm_medium_id: uuid null
+      utm_campaign_id: uuid null
+      consent_required: boolean null
+      consent_text: text null
+      created_at: timestamptz default now()
+      placement: text null
+      updated_at: timestamptz default now()
+      archived_at: timestamptz null
+    api_only:
+    - submission_count
+    - conversion_rate
+    - public_url
+    - workflow_ids
+    - api_endpoint
+    - embed_code
+    - view_count_30d
+  form_submissions:
+    description: Admitted submissions per form (from intake.admitted).
+    api: FormSubmission
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      form_id: uuid fk forms(id) cascade
+      contact_id: uuid null
+      lead_id: uuid null
+      visitor_id: text null
+      field_values: jsonb
+      attribution: jsonb null
+      ip: varchar(45) null
+      user_agent: text null
+      submitted_at: timestamptz
+      intake_submission_id: uuid unique
+    api_only:
+    - form_name
+    - contact_name
+    - email
+    - at
+    - utm_source
+    - utm_medium
+    - utm_campaign
+    indexes:
+    - form_id, submitted_at desc
+    append_only: true
+  tracked_sites:
+    description: Sites carrying the tracking script.
+    api: TrackedSite
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      origin: text
+      kind: text default SCRIPT check(SCRIPT,SERVER)
+      include_all_pages: boolean default true
+      enabled: boolean default true
+      tracking_key: text unique
+      last_event_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  event_types:
+    description: Custom event names seen or declared.
+    api: EventTypeDef
+    columns:
+      name: text pk
+      workspace_id: uuid pk
+      description: text null
+      declared: boolean default false
+      enabled: boolean default true
+      last_seen_at: timestamptz null
+  visitors:
+    description: Visitors (anonymous until identified).
+    api: VisitorTracking
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      visitor_id: text
+      url_visited: text null
+      referrer: text null
+      user_agent: text null
+      country: text null
+      city: text null
+      first_seen: timestamptz
+      last_seen: timestamptz null
+      pages_viewed: integer null
+      contact_id: uuid null
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, visitor_id
+    indexes:
+    - contact_id
+  page_views:
+    description: Page views and custom events (append-only, partitioned by month).
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      visitor_id: text
+      contact_id: uuid null
+      site_id: uuid null fk tracked_sites(id) set null
+      kind: text check(PAGE_VIEW,EVENT)
+      name: text null
+      url: text null
+      referrer: text null
+      value: numeric(19,4) null
+      properties: jsonb null
+      at: timestamptz default now()
+    indexes:
+    - visitor_id, at
+    - contact_id, at
+    append_only: true
+    notes: Candidate for monthly range partitioning on `at` once volume requires it (an authored migration).
+  conversion_definitions:
+    description: Named, valued conversions.
+    api: ConversionDefinition
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      trigger_def: jsonb
+      value_mode: text null check(NONE,FIXED,FROM_EVENT)
+      value: numeric(19,4) null
+      currency: text null
+      once_per_contact: boolean null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  goals:
+    description: Business goals against a conversion.
+    api: Goal
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      period: text null
+      period_start: date null
+      period_end: date null
+      conversion_id: uuid fk conversion_definitions(id) restrict
+      target: numeric(19,4)
+      unit: text null check(COUNT,REVENUE)
+      note: text null
+      drivers: text null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - conversion_name
+  ad_accounts:
+    description: Connected ad accounts (tokens in Secret Manager).
+    api: AdAccount
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      platform: text check(META,GOOGLE_ADS,LINKEDIN,X,TIKTOK,MICROSOFT_ADS,PINTEREST,REDDIT,AMAZON_DSP,DSP_TRADE_DESK,DSP_DV360,DSP_STACKADAPT,DSP_ADFORM,DSP_ADMIXER,DSP_SMARTYADS,DSP_EPOM,BIDDER_BEESWAX,OPENRTB,LIVERAMP)
+      name: text
+      external_account_id: text null
+      status: text check(AUTHORIZING,CONNECTED,TOKEN_EXPIRED,PAUSED,DISCONNECTED,ERROR)
+      conversion_endpoint: text null check(META_CAPI,GOOGLE_OFFLINE,GOOGLE_ENHANCED,LINKEDIN_CAPI,TIKTOK_EVENTS,MICROSOFT_OFFLINE,NONE)
+      pixel_id: text null
+      default_currency: text null
+      last_sync_at: timestamptz null
+      last_spend_import_at: timestamptz null
+      connected_by: text null
+      created_at: timestamptz default now()
+      secret_ref: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - authorize_url
+    - capabilities
+    - match_rate_last
+    - last_error
+    - audience_count
+    - spend_30d
+  ad_audiences:
+    description: Contact audiences synced to ad platforms.
+    api: AdAudience
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      account_id: uuid fk ad_accounts(id) restrict
+      platform: text check(META,GOOGLE_ADS,LINKEDIN,X,TIKTOK,MICROSOFT_ADS,PINTEREST,REDDIT,AMAZON_DSP,DSP_TRADE_DESK,DSP_DV360,DSP_STACKADAPT,DSP_ADFORM,DSP_ADMIXER,DSP_SMARTYADS,DSP_EPOM,BIDDER_BEESWAX,OPENRTB,LIVERAMP)
+      external_audience_id: text null
+      source: jsonb
+      mode: text null check(CONTINUOUS,ONE_OFF)
+      sync_interval_minutes: integer null
+      identifiers: jsonb null
+      consent_basis: text null check(CONSENT,LEGITIMATE_INTEREST,CONTRACT)
+      suppress_on: jsonb null
+      exclude_source: jsonb null
+      lookalike: jsonb null
+      purpose: text null check(WARM_UP,RETARGET,EXCLUDE,LOOKALIKE_SEED,OTHER)
+      warm_up: jsonb null
+      status: text check(BUILDING,ACTIVE,PAUSED,ERROR)
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    api_only:
+    - stats
+    - last_error
+    - account_name
+  ad_audience_members:
+    description: Who is in an audience and what was uploaded (hashed identifiers only).
+    columns:
+      workspace_id: uuid
+      audience_id: uuid pk fk ad_audiences(id) cascade
+      contact_id: uuid pk
+      identifiers_hash: text null
+      added_at: timestamptz default now()
+      removed_at: timestamptz null
+  ad_audience_sync_runs:
+    description: Sync runs of an audience.
+    api: AdAudienceSyncRun
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      audience_id: uuid fk ad_audiences(id) cascade
+      status: text check(QUEUED,RUNNING,DONE,FAILED)
+      run_trigger: text null check(SCHEDULE,MANUAL,SOURCE_CHANGED,CREATED)
+      added: bigint null
+      removed: bigint null
+      failed: bigint null
+      uploaded_total: bigint null
+      platform_size: bigint null
+      started_at: timestamptz null
+      finished_at: timestamptz null
+      error: text null
+    append_only: true
+  ad_buys:
+    description: Ad buys (campaigns placed through adapters).
+    api: AdBuy
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      purpose: text null check(WARM_UP,RETARGET,ACQUISITION,OTHER)
+      warm_up_for_campaign_id: uuid null
+      spec: jsonb
+      status: text check(DRAFT,REVIEW,SCHEDULED,LIVE,PAUSED,ENDED,REJECTED,ERROR)
+      accounts: jsonb null
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      warm_up_send_at: timestamptz null
+      holdout_percent: integer null
+      holdout_contacts: bigint null
+    api_only:
+    - totals
+    - warm_up_for_campaign_name
+    - pacing_note
+    - recommendation
+  ad_creatives:
+    description: Creatives and their platform review state.
+    api: AdCreative
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      kind: text check(IMAGE,VIDEO,HTML5,NATIVE,TEXT,CAROUSEL)
+      name: text
+      asset_id: uuid null
+      url: text null
+      width: integer null
+      height: integer null
+      duration_seconds: integer null
+      headline: text null
+      body: text null
+      call_to_action: text null
+      landing_url: text null
+      brand_kit_applied: boolean null
+      platforms: jsonb null
+      created_at: timestamptz default now()
+      review: jsonb null
+      updated_at: timestamptz default now()
+  ad_clicks:
+    description: Landings with ad click ids.
+    api: AdClick
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      visitor_id: text null
+      contact_id: uuid null
+      platform: text null
+      click_id_param: text null
+      click_id_value: text null
+      account_id: uuid null fk ad_accounts(id) set null
+      campaign: text null
+      ad_set: text null
+      ad: text null
+      utm: jsonb null
+      landing_url: text null
+      referrer: text null
+      consent_applied: text null
+      at: timestamptz
+    api_only:
+    - contact_name
+    indexes:
+    - visitor_id
+    - contact_id
+    - at
+    append_only: true
+  ad_link_tag_rules:
+    description: Link decoration rules (UTM and click ids).
+    api: AdLinkTagRule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      label: text null
+      applies_to: text
+      domains: jsonb null
+      utm_source: text null
+      utm_medium: text null
+      utm_campaign: text null
+      utm_content: text null
+      add_click_id: boolean default false
+      add_contact_token: boolean default false
+      enabled: boolean default true
+      updated_at: timestamptz default now()
+  ad_conversion_rules:
+    description: Which conversions are relayed to which ad accounts.
+    api: AdConversionRule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text null
+      event: text check(FORM_SUBMITTED,CONTACT_CREATED,LEAD_QUALIFIED,TRIAL_ACTIVATED,DEAL_CREATED,DEAL_STAGE_REACHED,DEAL_WON,PAYMENT,SUBSCRIPTION_RENEWED,CALL_BOOKED,CUSTOM_EVENT)
+      event_filter: jsonb null
+      account_id: uuid null fk ad_accounts(id) cascade
+      external_event_name: text null
+      value_from: text null check(DEAL_VALUE,PAYMENT_AMOUNT,FIXED,NONE)
+      fixed_value: numeric(19,4) null
+      currency: text null
+      window_days: integer null
+      require_click: boolean null
+      dedupe_key: text null check(DEAL_ID,PAYMENT_ID,CONTACT_EVENT)
+      consent_required: boolean null
+      enabled: boolean null
+      account_ids: jsonb null
+      require_click_param: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - sent_30d
+    - failed_30d
+    - account_names
+  ad_conversions:
+    description: The conversion relay log.
+    api: AdConversion
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      rule_id: uuid null fk ad_conversion_rules(id) set null
+      account_id: uuid null fk ad_accounts(id) set null
+      platform: text null
+      event: text null
+      external_event_name: text null
+      contact_id: uuid null
+      deal_id: uuid null
+      value: numeric(19,4) null
+      currency: text null
+      click_id_param: text null
+      identifiers_sent: jsonb null
+      status: text check(QUEUED,SENT,FAILED,SKIPPED_NO_MATCH,SKIPPED_NO_CONSENT,SKIPPED_DUPLICATE)
+      platform_response: text null
+      occurred_at: timestamptz null
+      sent_at: timestamptz null
+      error: text null
+      conversion_definition_id: uuid null fk conversion_definitions(id) set null
+      dedupe_key: text null
+      updated_at: timestamptz default now()
+    api_only:
+    - contact_name
+    unique:
+    - account_id, dedupe_key
+    indexes:
+    - contact_id
+    - status
+  touchpoints:
+    description: Attribution touchpoints per contact.
+    api: AdTouchpoint
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      contact_id: uuid
+      kind: text
+      channel: text null
+      platform: text null
+      campaign: text null
+      ad_set: text null
+      ad: text null
+      url: text null
+      click_id: uuid null fk ad_clicks(id) set null
+      at: timestamptz
+    indexes:
+    - contact_id, at
+    append_only: true
+  attribution_models:
+    description: Attribution models (built-in and custom).
+    api: AttributionModel
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      kind: text
+      weights: jsonb null
+      half_life_days: double precision null
+      window_days: integer default 90
+      count_kinds: jsonb null
+      is_default: boolean default false
+      builtin: boolean default false
+      updated_at: timestamptz default now()
+  ad_spend:
+    description: Daily spend imported from ad platforms.
+    api: AdSpendRow
+    columns:
+      workspace_id: uuid
+      account_id: uuid pk fk ad_accounts(id) cascade
+      date: date pk
+      campaign: text pk
+      spend: numeric(19,4)
+      currency: char(3)
+      impressions: bigint default 0
+      clicks: bigint default 0
+      imported_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  ad_settings:
+    description: Ad tracking settings, one row per workspace.
+    api: AdTrackingSettings
+    columns:
+      workspace_id: uuid pk
+      settings: jsonb
+      updated_at: timestamptz default now()
+    singleton: true
+  utm_campaigns:
+    description: UTM campaigns.
+    api: UTMCampaign
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      active: boolean null
+      sequence: integer null
+      updated_at: timestamptz default now()
+  utm_mediums:
+    description: UTM mediums.
+    api: UTMMedium
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(64)
+      active: boolean null
+      updated_at: timestamptz default now()
+  utm_sources:
+    description: UTM sources.
+    api: UTMSource
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(64)
+      medium_id: uuid null fk utm_mediums(id) set null
+      active: boolean null
+      updated_at: timestamptz default now()
+  event_registrations:
+    description: Event registrations (parked feature; admitted through intake).
+    api: EventRegistration
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      event_name: text
+      event_date: timestamptz null
+      attendee_name: text null
+      attendee_email: text
+      attendee_company: text null
+      attendee_phone: text null
+      attendee_function: text null
+      source: text null
+      attended: boolean null
+      registration_date: timestamptz null
+      updated_at: timestamptz default now()

@@ -75,6 +75,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/AdTouchpoint'
               example:
+                matched_contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                touchpoint_id: 6722b484-8b57-56f2-b588-3995ec2cbb3a
                 kind: AD_CLICK
                 at: '2026-11-05T16:00:00Z'
         '401':
@@ -963,6 +965,14 @@ components:
           type: number
           format: float
           description: Share of the conversion under the requested model, 0–1
+        matched_contact_id:
+          type: string
+          format: uuid
+          readOnly: true
+        touchpoint_id:
+          type: string
+          format: uuid
+          readOnly: true
     EventRegistration:
       type: object
       required:

@@ -16,6 +16,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     {
     //       "can_approve_social": true,
     //       "can_send": true,
+    //       "can_send_label": "Yes",
     //       "last_active_at": "2026-11-05T16:00:00Z",
     //       "name": "Alex Morgan",
     //       "role": "owner",
@@ -24,6 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     {
     //       "can_approve_social": false,
     //       "can_send": false,
+    //       "can_send_label": "No · transactional only",
     //       "last_active_at": "2026-11-05T14:00:00Z",
     //       "name": "Sam Lee",
     //       "role": "owner",
@@ -32,6 +34,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //     {
     //       "can_approve_social": true,
     //       "can_send": false,
+    //       "can_send_label": "Drafts only",
     //       "last_active_at": "2026-11-04T16:00:00Z",
     //       "name": "Riya Kapoor",
     //       "role": "owner",
@@ -48,6 +51,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {
       "can_approve_social": true,
       "can_send": true,
+      "can_send_label": "Yes",
       "last_active_at": "2026-11-05T16:00:00Z",
       "name": "Alex Morgan",
       "role": "owner",
@@ -56,6 +60,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {
       "can_approve_social": false,
       "can_send": false,
+      "can_send_label": "No · transactional only",
       "last_active_at": "2026-11-05T14:00:00Z",
       "name": "Sam Lee",
       "role": "owner",
@@ -64,6 +69,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {
       "can_approve_social": true,
       "can_send": false,
+      "can_send_label": "Drafts only",
       "last_active_at": "2026-11-04T16:00:00Z",
       "name": "Riya Kapoor",
       "role": "owner",
@@ -83,6 +89,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":true,"can_send":true,"last_active_at":"2026-11-05T16:00:00Z","name":"Alex Morgan","role":"owner","user_id":"alex"})).unwrap_or_default(), serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":false,"can_send":false,"last_active_at":"2026-11-05T14:00:00Z","name":"Sam Lee","role":"owner","user_id":"sam"})).unwrap_or_default(), serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":true,"can_send":false,"last_active_at":"2026-11-04T16:00:00Z","name":"Riya Kapoor","role":"owner","user_id":"riya"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
+        items: vec![serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":true,"can_send":true,"can_send_label":"Yes","last_active_at":"2026-11-05T16:00:00Z","name":"Alex Morgan","role":"owner","user_id":"alex"})).unwrap_or_default(), serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":false,"can_send":false,"can_send_label":"No · transactional only","last_active_at":"2026-11-05T14:00:00Z","name":"Sam Lee","role":"owner","user_id":"sam"})).unwrap_or_default(), serde_json::from_value::<TeamMember>(serde_json::json!({"can_approve_social":true,"can_send":false,"can_send_label":"Drafts only","last_active_at":"2026-11-04T16:00:00Z","name":"Riya Kapoor","role":"owner","user_id":"riya"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

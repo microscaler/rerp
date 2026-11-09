@@ -26,8 +26,8 @@ pub struct Request {
     pub outcome_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "assignee_id")]
-    pub assignee_id: Option<String>,
+    #[serde(rename = "owner_id")]
+    pub owner_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "group_id")]
@@ -164,13 +164,13 @@ impl TryFrom<HandlerRequest> for Request {
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("assignee_id") {
+        if let Some(v) = req.get_query_param("owner_id") {
             // Built once, not per request: decode_param_value reads only its types.
             static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
                 || serde_json::json!({"description":"Sesame user id (the sub claim of the access token)","maxLength":64,"type":"string"}),
             );
             data_map.insert(
-                "assignee_id".to_string(),
+                "owner_id".to_string(),
                 brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {

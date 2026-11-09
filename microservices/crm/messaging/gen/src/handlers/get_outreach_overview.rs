@@ -44,14 +44,38 @@ pub struct Response {
     pub click_rate: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "click_rate_delta_pts")]
+    pub click_rate_delta_pts: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "click_to_open_rate")]
     pub click_to_open_rate: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "complaint_rate")]
+    pub complaint_rate: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_growth")]
+    pub contact_growth: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contacts_added_30d")]
+    pub contacts_added_30d: Option<i64>,
 
     #[serde(rename = "messages_sent")]
     pub messages_sent: i64,
 
     #[serde(rename = "open_rate")]
     pub open_rate: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open_rate_delta_pts")]
+    pub open_rate_delta_pts: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "setup")]
+    pub setup: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subscribed_contacts")]

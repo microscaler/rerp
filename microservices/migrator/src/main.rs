@@ -18,6 +18,7 @@ type GenerateSql = fn() -> Result<SqlRows, String>;
 enum Suite {
     Accounting,
     Documents,
+    Crm,
 }
 
 impl Suite {
@@ -25,6 +26,7 @@ impl Suite {
         match self {
             Self::Accounting => "accounting",
             Self::Documents => "documents",
+            Self::Crm => "crm",
         }
     }
 }
@@ -269,6 +271,93 @@ fn documents_providers() -> Vec<Provider> {
     }]
 }
 
+/// CRM services with tables (crm/edge has none). Database per service: openapi/crm/docs/14-data-model.md.
+#[cfg(feature = "crm")]
+fn crm_providers() -> Vec<Provider> {
+    vec![
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "audience",
+            },
+            generate_sql: || {
+                rerp_crm_audience::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "messaging",
+            },
+            generate_sql: || {
+                rerp_crm_messaging::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "automation",
+            },
+            generate_sql: || {
+                rerp_crm_automation::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "sales",
+            },
+            generate_sql: || {
+                rerp_crm_sales::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "acquisition",
+            },
+            generate_sql: || {
+                rerp_crm_acquisition::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "insights",
+            },
+            generate_sql: || {
+                rerp_crm_insights::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "workspace",
+            },
+            generate_sql: || {
+                rerp_crm_workspace::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+        Provider {
+            id: ProviderId {
+                suite: Suite::Crm,
+                service: "intake",
+            },
+            generate_sql: || {
+                rerp_crm_intake::models::entity_registry::generate_sql_for_all()
+                    .map_err(|error| error.to_string())
+            },
+        },
+    ]
+}
+
 fn providers_for_suite(suite: Suite) -> Result<Vec<Provider>, String> {
     // Each arm yields a Result, so the match has a type whichever suite features are compiled
     // in. (With neither feature, as `cargo check --workspace` builds it, every arm used to
@@ -298,6 +387,16 @@ fn providers_for_suite(suite: Suite) -> Result<Vec<Provider>, String> {
                     "the documents provider is not compiled; rerun with --features documents"
                         .to_string(),
                 )
+            }
+        }
+        Suite::Crm => {
+            #[cfg(feature = "crm")]
+            {
+                Ok(crm_providers())
+            }
+            #[cfg(not(feature = "crm"))]
+            {
+                Err("the crm providers are not compiled; rerun with --features crm".to_string())
             }
         }
     };

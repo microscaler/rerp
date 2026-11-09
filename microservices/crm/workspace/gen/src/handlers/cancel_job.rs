@@ -80,6 +80,10 @@ pub struct Response {
     pub requested_by: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "requested_by_name")]
+    pub requested_by_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "result_expires_at")]
     pub result_expires_at: Option<String>,
 

@@ -135,6 +135,10 @@ pub struct Response {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "placement")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "public_url")]
     pub public_url: Option<String>,
 
@@ -169,6 +173,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "utm_source_id")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "view_count_30d")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "workflow_ids")]

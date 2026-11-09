@@ -106,6 +106,10 @@ pub struct Response {
     pub updated_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "utm_campaign")]
+    pub utm_campaign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "utm_campaign_id")]
     pub utm_campaign_id: Option<String>,
 }

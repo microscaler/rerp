@@ -15,10 +15,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "items": [
     //     {
     //       "entity": "Entity",
-    //       "field_type": "STRING",
     //       "id": "94b293ed-258b-5091-8e79-75d2ac471f25",
+    //       "key": "snippet.signature",
     //       "label": "Primary",
-    //       "name": "Northwind Traders",
+    //       "type": "STRING",
     //       "visible": false
     //     }
     //   ],
@@ -31,10 +31,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "items": [
     {
       "entity": "Entity",
-      "field_type": "STRING",
       "id": "94b293ed-258b-5091-8e79-75d2ac471f25",
+      "key": "snippet.signature",
       "label": "Primary",
-      "name": "Northwind Traders",
+      "type": "STRING",
       "visible": false
     }
   ],
@@ -51,6 +51,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<CustomField>(serde_json::json!({"entity":"Entity","field_type":"STRING","id":"94b293ed-258b-5091-8e79-75d2ac471f25","label":"Primary","name":"Northwind Traders","visible":false})).unwrap_or_default()],limit: 25,page: 1,total: 2,
+        items: vec![serde_json::from_value::<CustomField>(serde_json::json!({"entity":"Entity","id":"94b293ed-258b-5091-8e79-75d2ac471f25","key":"snippet.signature","label":"Primary","type":"STRING","visible":false})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

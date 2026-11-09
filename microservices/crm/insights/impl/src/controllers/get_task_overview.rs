@@ -1,0 +1,42 @@
+// Implementation stub for handler 'get_task_overview'
+// This file is a starting point for your implementation.
+// After implementing business logic, add this line at the top to protect from --force regen:
+//   // BRRTRouter: user-owned
+// To create missing stubs only: brrtrouter-gen generate-stubs
+// To patch signature/Response on protected stubs: brrtrouter-gen generate-stubs --sync
+
+use brrtrouter::typed::{HttpJson, TypedHandlerRequest};
+use brrtrouter_macros::handler;
+use rerp_crm_insights_gen::handlers::get_task_overview::{Request, Response};
+
+#[allow(unused_imports)]
+use rerp_crm_insights_gen::handlers::types::PeriodCount;
+#[allow(unused_imports)]
+use rerp_crm_insights_gen::handlers::types::TaskOutcomeRow;
+#[allow(unused_imports)]
+use rerp_crm_insights_gen::handlers::types::TaskOwnerRow;
+#[allow(unused_imports)]
+use rerp_crm_insights_gen::handlers::types::TaskTotals;
+#[allow(unused_imports)]
+use rerp_crm_insights_gen::handlers::types::TaskTypeRow;
+
+#[handler(GetTaskOverviewController)]
+pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // TODO: Implement your business logic here
+    //
+    // Example: Access request data
+    // let x_workspace_id = req.inner.x_workspace_id;// let owner_id = req.inner.owner_id;// let team_id = req.inner.team_id;// let task_type_id = req.inner.task_type_id;// let related_kind = req.inner.related_kind;// let from = req.inner.from;// let to = req.inner.to;
+    //
+    // Example: Database query, validation, etc.
+    // let result = your_service.process(&req.inner)?;
+    //
+    // Example: Return response
+
+    HttpJson::ok(Response {
+        by_outcome: vec![serde_json::from_value::<TaskOutcomeRow>(serde_json::json!({"count":44,"label":"Reached","outcome_id":"0a7437f6-0e3e-51ae-a9fd-4a44b900f91e","sentiment":"POSITIVE"})).unwrap_or_default(), serde_json::from_value::<TaskOutcomeRow>(serde_json::json!({"count":23,"label":"Replied","outcome_id":"ca29541d-dde8-5a9e-818d-b0717df850c9","sentiment":"POSITIVE"})).unwrap_or_default(), serde_json::from_value::<TaskOutcomeRow>(serde_json::json!({"count":25,"label":"Held","outcome_id":"822890d5-c8b4-5558-a84c-60e98767732f","sentiment":"POSITIVE"})).unwrap_or_default()], // TODO: Set from your business logic
+        by_owner: vec![serde_json::from_value::<TaskOwnerRow>(serde_json::json!({"completed":96,"completion_rate":0.84,"name":"Alex Morgan","open":18,"outcomes":{"negative":11,"neutral":24,"positive":61},"overdue":2,"user_id":"alex"})).unwrap_or_default(), serde_json::from_value::<TaskOwnerRow>(serde_json::json!({"completed":64,"completion_rate":0.8,"name":"Sam Lee","open":16,"outcomes":{"negative":12,"neutral":22,"positive":30},"overdue":0,"user_id":"sam"})).unwrap_or_default(), serde_json::from_value::<TaskOwnerRow>(serde_json::json!({"completed":28,"completion_rate":0.78,"name":"Riya Kapoor","open":8,"outcomes":{"negative":4,"neutral":9,"positive":15},"overdue":4,"user_id":"riya"})).unwrap_or_default()], // TODO: Set from your business logic
+        by_type: vec![serde_json::from_value::<TaskTypeRow>(serde_json::json!({"completed":84,"completion_rate":0.82,"name":"Call","open":18,"overdue":2,"task_type_id":"4eec3526-5869-5e76-820f-ac2358c6b899"})).unwrap_or_default(), serde_json::from_value::<TaskTypeRow>(serde_json::json!({"completed":61,"completion_rate":0.85,"name":"Email","open":12,"overdue":1,"task_type_id":"099104fc-dcee-57bf-b906-d2b826beb51d"})).unwrap_or_default(), serde_json::from_value::<TaskTypeRow>(serde_json::json!({"completed":29,"completion_rate":0.81,"name":"Meeting","open":7,"overdue":2,"task_type_id":"645bfe17-69c3-558e-82cd-9594c3609fa2"})).unwrap_or_default()], // TODO: Set from your business logic
+        completed_per_period: None, // TODO: Set from your business logic
+        totals: serde_json::from_value::<TaskTotals>(serde_json::json!({"avg_hours_to_complete":31,"completed":188,"completion_rate":0.82,"due_today":4,"open":42,"overdue":6})).unwrap_or_default(), // TODO: Set from your business logic
+    })
+}

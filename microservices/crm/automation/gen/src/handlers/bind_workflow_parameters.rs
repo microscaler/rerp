@@ -71,6 +71,10 @@ pub struct Response {
     #[serde(rename = "exit_rules")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "goal_rate")]
+    pub goal_rate: Option<f64>,
+
     #[serde(rename = "id")]
     pub id: String,
 
@@ -80,6 +84,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "last_run")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "messages_sent")]
+    pub messages_sent: Option<i64>,
 
     #[serde(rename = "name")]
     pub name: String,
@@ -106,6 +114,18 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "status")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "step_count")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "stop_on_conversion_id")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "stop_on_unsubscribe")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tracking")]

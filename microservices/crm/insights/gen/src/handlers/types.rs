@@ -95,6 +95,9 @@ pub struct AutomationContactRow {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -152,6 +155,9 @@ pub struct AutomationGoalRow {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg_seconds_to_achieve: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub condition: Option<String>,
 
     pub contacts_achieved: i32,
 
@@ -244,6 +250,9 @@ pub struct AutomationOverviewReport {
     pub click_rate: Option<f64>,
 
     pub completion_rate: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts_active: Option<i64>,
 
     pub contacts_finished: i32,
 
@@ -547,6 +556,9 @@ pub struct DealForecastReport {
 
     pub granularity: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_close_date: Option<serde_json::Value>,
+
     pub periods: Vec<ForecastPeriod>,
 
     pub pipeline_id: String,
@@ -697,6 +709,9 @@ pub struct EmailClientRow {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub share_pct: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub verified_pct: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -731,6 +746,12 @@ pub struct ErrorResponse {
 pub struct ExplainScoreResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub band: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
 
     pub entity_id: String,
 
@@ -835,18 +856,42 @@ pub struct ForecastEntry {
 
     pub expected_close_revenue: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub month: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub open_deals: Option<i64>,
+
     pub period: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pipeline_value: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub target: Option<i64>,
 
     pub variance: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub weighted: Option<i64>,
+
     pub weighted_pipeline: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub won: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ForecastEntryPage {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accuracy_last_3_months: Option<f64>,
+
     pub items: Vec<ForecastEntry>,
 
     pub limit: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_close_date: Option<serde_json::Value>,
 
     pub page: i32,
 
@@ -876,7 +921,16 @@ pub struct ForecastPeriod {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FunnelData {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avg_days_to_close: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<serde_json::Value>>,
+
     pub stages: Vec<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_rate: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -950,6 +1004,9 @@ pub struct GetAutomationOverviewResponse {
     pub click_rate: Option<f64>,
 
     pub completion_rate: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contacts_active: Option<i64>,
 
     pub contacts_finished: i32,
 
@@ -1044,6 +1101,9 @@ pub struct GetDealForecastResponse {
 
     pub granularity: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_close_date: Option<serde_json::Value>,
+
     pub periods: Vec<ForecastPeriod>,
 
     pub pipeline_id: String,
@@ -1132,7 +1192,16 @@ pub struct GetForecastAccuracyResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetFunnelResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub avg_days_to_close: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<serde_json::Value>>,
+
     pub stages: Vec<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub win_rate: Option<f64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1192,14 +1261,23 @@ pub struct GetMarketingRevenueResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_campaigns: Option<Vec<RevenueSourceRow>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_conversions: Option<i64>,
+
     pub total_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetMonthlyForecastResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accuracy_last_3_months: Option<f64>,
+
     pub items: Vec<ForecastEntry>,
 
     pub limit: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_close_date: Option<serde_json::Value>,
 
     pub page: i32,
 
@@ -1269,9 +1347,15 @@ pub struct GetPredictiveContentResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetQuarterlyForecastResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accuracy_last_3_months: Option<f64>,
+
     pub items: Vec<ForecastEntry>,
 
     pub limit: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub no_close_date: Option<serde_json::Value>,
 
     pub page: i32,
 
@@ -1285,6 +1369,9 @@ pub struct GetRepPerformanceResponse {
     pub avg_deal_size: String,
 
     pub avg_sales_cycle_days: f64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<serde_json::Value>>,
 
     pub leads_created: i32,
 
@@ -1612,12 +1699,18 @@ pub struct MarketingRevenueReport {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_campaigns: Option<Vec<RevenueSourceRow>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total_conversions: Option<i64>,
+
     pub total_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct NameCount {
     pub count: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub delta: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -1674,6 +1767,9 @@ pub struct OneToOneEmailRow {
     pub bounces: Option<i32>,
 
     pub email_name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub sender_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sender_user_id: Option<String>,
@@ -1791,6 +1887,9 @@ pub struct RepPerformance {
 
     pub avg_sales_cycle_days: f64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub items: Option<Vec<serde_json::Value>>,
+
     pub leads_created: i32,
 
     pub opportunities_active: i32,
@@ -1869,6 +1968,12 @@ pub struct RevenueSourceRow {
     pub name: String,
 
     pub revenue: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_name: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2013,6 +2118,12 @@ pub struct Score {
 pub struct ScoreExplanation {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub band: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
 
     pub entity_id: String,
 

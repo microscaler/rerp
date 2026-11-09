@@ -49,6 +49,8 @@ Details per component are in each folder's README and [08 §4](docs/08-service-d
 
 ## 4. Data
 
+Every table, with ERDs: [14-data-model.md](docs/14-data-model.md) (design source: [docs/data-model/](docs/data-model/)).
+
 | Store | Holds |
 |---|---|
 | CRM store: Postgres on GCP (Crossplane) | one schema per service (audience, messaging, automation, sales, acquisition, workspace), RLS on `workspace_id` everywhere |
@@ -75,5 +77,6 @@ Details per component are in each folder's README and [08 §4](docs/08-service-d
 3. [ADR 003](../../docs/adrs/003-crm-funnel-conversion-boundary.md) and
    [ADR 004](../../docs/adrs/004-crm-capture-intake-and-workspaces.md).
 4. [09-api-conventions.md](docs/09-api-conventions.md), then the service folders.
-5. [13-implementation-plan.md](docs/13-implementation-plan.md) before writing code;
+5. [13-implementation-plan.md](docs/13-implementation-plan.md) and [14-data-model.md](docs/14-data-model.md) before writing code, then the
+   stories in [docs/crm/](../../docs/crm/README.md);
    [12-portal-migration.md](docs/12-portal-migration.md) before touching the portal.

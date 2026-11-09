@@ -1,0 +1,308 @@
+service: audience
+database: crm
+schema: audience
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  contacts:
+    description: People the workspace can reach. Email unique per workspace (case-insensitive).
+    api: Contact
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      email: varchar(255)
+      first_name: varchar(128) null
+      last_name: varchar(128) null
+      phone: varchar(32) null
+      job_title: varchar(128) null
+      organisation_id: uuid null fk organisations(id) set null
+      country_code: char(2) null
+      timezone: text null
+      custom_fields: jsonb default '{}'
+      source: text null
+      attribution: jsonb null
+      sms_consent: boolean default false
+      tracking_optout: boolean default false
+      last_activity_at: timestamptz null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      status: text default PENDING check(SUBSCRIBED,UNSUBSCRIBED,PENDING,BOUNCED)
+      sms_consent_at: timestamptz null
+      archived_at: timestamptz null
+      erased_at: timestamptz null
+      created_by: varchar(64) null
+    api_only:
+    - organisation_name
+    - list_ids
+    - list_names
+    - score
+    - message_stats
+    unique:
+    - workspace_id, lower(email)
+    indexes:
+    - organisation_id
+    - status
+    - last_activity_at
+    - created_at
+    notes: '`status` is maintained from subscriptions (any SUBSCRIBED list → SUBSCRIBED). Tags live in contact_tags.
+      Erasure blanks personal columns and sets erased_at (tombstone kept for suppression).'
+  organisations:
+    description: Prospect companies. A customer exists only in RERP crm/accounts (ADR 003).
+    api: Organisation
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(255)
+      domain: varchar(255) null
+      website: text null
+      industry: varchar(128) null
+      size: text null check(1-10,11-50,51-200,201-1000,1001-5000,5000+)
+      country_code: char(2) null
+      parent_id: uuid null fk organisations(id) set null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      customer_account_id: uuid null
+      converted_at: timestamptz null
+      archived_at: timestamptz null
+    api_only:
+    - contact_count
+    - open_deal_count
+    - converted
+    unique:
+    - workspace_id, lower(domain)
+    indexes:
+    - parent_id
+    - name
+  tags:
+    description: Tag definitions; names unique per workspace.
+    api: Tag
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(64)
+      color: char(7) null
+      description: text null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, lower(name)
+  contact_tags:
+    description: Which contacts carry which tags.
+    columns:
+      workspace_id: uuid
+      contact_id: uuid pk fk contacts(id) cascade
+      tag_id: uuid pk fk tags(id) cascade
+      source: text default USER check(USER,AUTOMATION,BULK_JOB,IMPORT,FORM)
+      created_at: timestamptz default now()
+    indexes:
+    - tag_id
+  lists:
+    description: Mailing lists (email or SMS) with their consent settings.
+    api: MailingList
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      description: text null
+      sender_id: uuid
+      double_opt_in: boolean
+      confirmation_template_id: uuid null
+      is_archived: boolean default false
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      channel: text default EMAIL check(EMAIL,SMS)
+      postal_address: text null
+      reminder_text: text null
+    api_only:
+    - subscriber_count
+    - unsubscribed_count
+    - pending_count
+    - growth_30d
+    unique:
+    - workspace_id, lower(name)
+  subscriptions:
+    description: One contact on one list, with the consent that put them there.
+    api: Subscription
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      contact_id: uuid fk contacts(id) cascade
+      list_id: uuid fk lists(id) cascade
+      status: text check(PENDING,SUBSCRIBED,UNSUBSCRIBED,BOUNCED,COMPLAINED)
+      consent_source: text null check(WEB_FORM,DOUBLE_OPT_IN,IMPORT,STAFF,API,PREFERENCE_PAGE,CHECKOUT)
+      consent_at: timestamptz null
+      consent_ip: varchar(45) null
+      consent_text: text null
+      form_id: uuid null
+      unsubscribed_at: timestamptz null
+      unsubscribe_reason: text null
+      created_at: timestamptz default now()
+      confirmed_at: timestamptz null
+      updated_at: timestamptz default now()
+    api_only:
+    - list_name
+    - history
+    unique:
+    - list_id, contact_id
+    indexes:
+    - contact_id
+    - status
+  consent_events:
+    description: Append-only history of each subscription status change (the consent evidence).
+    api: ConsentEvent
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      subscription_id: uuid fk subscriptions(id) cascade
+      from_status: text null
+      to_status: text check(PENDING,SUBSCRIBED,UNSUBSCRIBED,BOUNCED)
+      source: text
+      actor: text null
+      ip: varchar(45) null
+      note: text null
+      at: timestamptz default now()
+    indexes:
+    - subscription_id, at
+    append_only: true
+  suppressions:
+    description: Addresses no list may message (hard bounce, complaint, manual, erased).
+    api: Suppression
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      address: text
+      channel: text default EMAIL check(EMAIL,SMS)
+      reason: text check(HARD_BOUNCE,COMPLAINT,MANUAL,GLOBAL_UNSUBSCRIBE)
+      note: text null
+      source_send_id: uuid null
+      created_at: timestamptz default now()
+      source: text null
+      updated_at: timestamptz default now()
+    unique:
+    - workspace_id, channel, lower(address)
+  segments:
+    description: 'Saved segments: a two-level condition tree over the contact facts.'
+    api: Segment
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: varchar(128)
+      description: text null
+      conditions: jsonb
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+      contact_count: bigint null
+      counted_at: timestamptz null
+  contact_notes:
+    description: Notes on a contact.
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      contact_id: uuid fk contacts(id) cascade
+      body: text
+      pinned: boolean default false
+      created_by: varchar(64) null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+    indexes:
+    - contact_id, created_at
+  timeline_items:
+    description: The contact timeline, projected from events of every service.
+    api: Activity
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      contact_id: uuid fk contacts(id) cascade
+      kind: text check(MESSAGE_SENT,MESSAGE_OPENED,MESSAGE_CLICKED,MESSAGE_BOUNCED,UNSUBSCRIBED,SUBSCRIBED,FORM_SUBMITTED,PAGE_VIEW,SITE_EVENT,WORKFLOW_ENTERED,WORKFLOW_STEP,WORKFLOW_ENDED,TAG_ADDED,TAG_REMOVED,FIELD_CHANGED,SCORE_CHANGED,DEAL_CREATED,DEAL_STAGE_CHANGED,NOTE,CHAT)
+      at: timestamptz
+      summary: text
+      actor: text null
+      ref_service: text null
+      ref_id: uuid null
+      data: jsonb null
+    api_only:
+    - detail
+    indexes:
+    - contact_id, at desc
+    append_only: true
+  contact_facts:
+    description: Per-contact projection of facts from other services, so a segment is one query.
+    columns:
+      workspace_id: uuid
+      contact_id: uuid pk fk contacts(id) cascade
+      last_opened_at: timestamptz null
+      last_clicked_at: timestamptz null
+      last_sent_at: timestamptz null
+      opens_30d: integer default 0
+      clicks_30d: integer default 0
+      pages_visited_30d: jsonb null
+      events_30d: jsonb null
+      forms_submitted: jsonb null
+      deal_stage_ids: jsonb null
+      open_deal_count: integer default 0
+      score_bands: jsonb null
+      active_workflow_ids: jsonb null
+      updated_at: timestamptz default now()
+    notes: Rebuilt from events; never written by the API.
+  bulk_jobs:
+    description: Changes applied to many contacts; undoable for 7 days.
+    api: BulkJob
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      label: text null
+      action: text check(ADD_TAG,REMOVE_TAG,SUBSCRIBE,UNSUBSCRIBE,SET_FIELD,ARCHIVE)
+      value: text null
+      field_key: text null
+      list_id: uuid null fk lists(id) set null
+      segment_id: uuid null fk segments(id) set null
+      contact_total: bigint null
+      status: text check(QUEUED,RUNNING,DONE,FAILED,UNDONE)
+      started_by: text null
+      undoable: boolean null
+      undo_until: timestamptz null
+      created_at: timestamptz default now()
+      finished_at: timestamptz null
+      undone_at: timestamptz null
+      updated_at: timestamptz default now()
+  bulk_job_changes:
+    description: Before and after values per contact, for undo.
+    columns:
+      workspace_id: uuid
+      job_id: uuid pk fk bulk_jobs(id) cascade
+      contact_id: uuid pk
+      before: jsonb
+      after: jsonb
+    append_only: true
+  import_jobs:
+    description: Contact imports and exports run by audience.
+    api: ImportJob
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      kind: text check(IMPORT,EXPORT)
+      status: text check(QUEUED,RUNNING,DONE,FAILED)
+      total_rows: bigint null
+      processed_rows: bigint null
+      created_rows: bigint null
+      updated_rows: bigint null
+      skipped_rows: bigint null
+      errors: jsonb null
+      download_url: text null
+      created_at: timestamptz default now()
+      finished_at: timestamptz null
+      updated_at: timestamptz default now()
+infrastructure: 'outbox (authored SQL, every schema): id uuid pk, event_type text, entity_id text, payload jsonb,
+  occurred_at
+
+  timestamptz, published_at timestamptz null, attempts int, last_error text null — written in the same transaction
+  as the
+
+  change, relayed to Pub/Sub after commit (crm-events).
+
+  processed_events (authored SQL, every schema): event_id uuid pk, event_type text, processed_at timestamptz — the
+
+  idempotent consumer''s ledger.
+
+  idempotency_keys (authored SQL, every schema with side-effecting commands): workspace_id, key varchar(128), request_hash
+
+  text, status int, response jsonb, created_at, expires_at (24 h); primary key (workspace_id, key).'

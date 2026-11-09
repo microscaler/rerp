@@ -40,9 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "code": "UNKNOWN_FIELD",
     //       "field": "plan",
     //       "message": "Column \"plan\" was not mapped to a field",
-    //       "raw": {
-    //         "plan": "Business"
-    //       },
+    //       "raw": {},
     //       "row": 203
     //     }
     //   ],
@@ -80,9 +78,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "code": "UNKNOWN_FIELD",
       "field": "plan",
       "message": "Column \"plan\" was not mapped to a field",
-      "raw": {
-        "plan": "Business"
-      },
+      "raw": {},
       "row": 203
     }
   ],
@@ -99,6 +95,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<JobError>(serde_json::json!({"code":"INVALID_EMAIL","field":"email","message":"\"jane@@example\" is not a valid address","raw":{"Company":"Acme","Email":"jane@@example","First":"Jane","Last":"Doe"},"row":14})).unwrap_or_default(), serde_json::from_value::<JobError>(serde_json::json!({"code":"DUPLICATE","field":"email","message":"Row 12 has the same email; dedupe on EMAIL kept the first","raw":{"Email":"priya.natarajan@northwindtraders.example","First":"P","Last":"Natarajan"},"row":88})).unwrap_or_default(), serde_json::from_value::<JobError>(serde_json::json!({"code":"UNKNOWN_FIELD","field":"plan","message":"Column \"plan\" was not mapped to a field","raw":{"plan":"Business"},"row":203})).unwrap_or_default()],limit: 20,page: 1,total: 4,
+        items: vec![serde_json::from_value::<JobError>(serde_json::json!({"code":"INVALID_EMAIL","field":"email","message":"\"jane@@example\" is not a valid address","raw":{"Company":"Acme","Email":"jane@@example","First":"Jane","Last":"Doe"},"row":14})).unwrap_or_default(), serde_json::from_value::<JobError>(serde_json::json!({"code":"DUPLICATE","field":"email","message":"Row 12 has the same email; dedupe on EMAIL kept the first","raw":{"Email":"priya.natarajan@northwindtraders.example","First":"P","Last":"Natarajan"},"row":88})).unwrap_or_default(), serde_json::from_value::<JobError>(serde_json::json!({"code":"UNKNOWN_FIELD","field":"plan","message":"Column \"plan\" was not mapped to a field","raw":{},"row":203})).unwrap_or_default()],limit: 20,page: 1,total: 4,
     })
 }

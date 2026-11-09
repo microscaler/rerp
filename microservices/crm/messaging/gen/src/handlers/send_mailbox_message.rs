@@ -100,8 +100,16 @@ pub struct Response {
     pub contact_ids: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "contact_name")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "deal_ids")]
     pub deal_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_title")]
+    pub deal_title: Option<String>,
 
     #[serde(rename = "direction")]
     pub direction: String,

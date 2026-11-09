@@ -11,163 +11,47 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "city")]
-    pub city: Option<String>,
+    #[serde(rename = "attribution")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "country_id")]
-    pub country_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "department")]
-    pub department: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "email")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "function")]
-    pub function: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "mobile")]
-    pub mobile: Option<String>,
-
-    #[serde(rename = "name")]
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "organisation_id")]
-    pub organisation_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "parent_id")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "phone")]
-    pub phone: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "state_id")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street2")]
-    pub street2: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "title")]
-    pub title: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "zip")]
-    pub zip: Option<String>,
-
-    #[serde(rename = "X-Workspace-Id")]
-    pub x_workspace_id: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-
-pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "active")]
-    pub active: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "child_contact_ids")]
-    pub child_contact_ids: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "city")]
-    pub city: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "color")]
-    pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "country_id")]
-    pub country_id: Option<String>,
-
-    #[serde(rename = "create_date")]
-    pub create_date: String,
+    #[serde(rename = "country_code")]
+    pub country_code: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "custom_fields")]
     pub custom_fields: Option<serde_json::Value>,
 
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "department")]
-    pub department: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "email")]
-    pub email: Option<String>,
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "function")]
-    pub function: Option<String>,
-
-    #[serde(rename = "id")]
-    pub id: String,
+    #[serde(rename = "first_name")]
+    pub first_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "is_company")]
-    pub is_company: Option<bool>,
+    #[serde(rename = "job_title")]
+    pub job_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "last_activity_at")]
-    pub last_activity_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "lead_count")]
-    pub lead_count: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "mobile")]
-    pub mobile: Option<String>,
-
-    #[serde(rename = "name")]
-    pub name: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "opportunity_count")]
-    pub opportunity_count: Option<i32>,
+    #[serde(rename = "last_name")]
+    pub last_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "organisation_id")]
     pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "parent_id")]
-    pub parent_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "phone")]
     pub phone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "score")]
-    pub score: Option<i32>,
+    #[serde(rename = "sms_consent")]
+    pub sms_consent: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "state_id")]
-    pub state_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street")]
-    pub street: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "street2")]
-    pub street2: Option<String>,
+    #[serde(rename = "source")]
+    pub source: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "tags")]
@@ -178,20 +62,111 @@ pub struct Response {
     pub timezone: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "title")]
-    pub title: Option<String>,
+    #[serde(rename = "tracking_optout")]
+    pub tracking_optout: Option<bool>,
+
+    #[serde(rename = "X-Workspace-Id")]
+    pub x_workspace_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+
+pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "attribution")]
+    pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "user_ids")]
-    pub user_ids: Option<Vec<String>>,
+    #[serde(rename = "country_code")]
+    pub country_code: Option<String>,
+
+    #[serde(rename = "created_at")]
+    pub created_at: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "write_date")]
-    pub write_date: Option<String>,
+    #[serde(rename = "custom_fields")]
+    pub custom_fields: Option<serde_json::Value>,
+
+    #[serde(rename = "email")]
+    pub email: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "zip")]
-    pub zip: Option<String>,
+    #[serde(rename = "first_name")]
+    pub first_name: Option<String>,
+
+    #[serde(rename = "id")]
+    pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "job_title")]
+    pub job_title: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "last_activity_at")]
+    pub last_activity_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "last_name")]
+    pub last_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "list_ids")]
+    pub list_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "list_names")]
+    pub list_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "message_stats")]
+    pub message_stats: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_id")]
+    pub organisation_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_name")]
+    pub organisation_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "phone")]
+    pub phone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "score")]
+    pub score: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sms_consent")]
+    pub sms_consent: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sms_consent_updated_at")]
+    pub sms_consent_updated_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "source")]
+    pub source: Option<String>,
+
+    #[serde(rename = "status")]
+    pub status: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tags")]
+    pub tags: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "timezone")]
+    pub timezone: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "tracking_optout")]
+    pub tracking_optout: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "updated_at")]
+    pub updated_at: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

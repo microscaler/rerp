@@ -33,6 +33,14 @@ pub struct Response {
     #[serde(rename = "created_by")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "holdout_contacts")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "holdout_percent")]
+    pub holdout_percent: Option<i64>,
+
     #[serde(rename = "id")]
     pub id: String,
 
@@ -40,8 +48,16 @@ pub struct Response {
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "pacing_note")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "purpose")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "recommendation")]
+    pub recommendation: Option<String>,
 
     #[serde(rename = "spec")]
     pub spec: AdBuySpec,
@@ -60,6 +76,14 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "warm_up_for_campaign_id")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "warm_up_for_campaign_name")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "warm_up_send_at")]
+    pub warm_up_send_at: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

@@ -29,8 +29,20 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "avg_days_to_close")]
+    pub avg_days_to_close: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "items")]
+    pub items: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "stages")]
     pub stages: Vec<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "win_rate")]
+    pub win_rate: Option<f64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

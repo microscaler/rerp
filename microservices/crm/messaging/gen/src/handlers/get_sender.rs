@@ -60,6 +60,10 @@ pub struct Response {
 
     #[serde(rename = "status")]
     pub status: SenderStatus,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "used_by")]
+    pub used_by: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

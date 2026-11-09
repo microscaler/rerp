@@ -17,6 +17,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "actor": "contact",
     //       "at": "2026-11-05T14:00:00Z",
     //       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+    //       "detail": "Campaign · opened twice, clicked Read the changelog",
     //       "id": "ec537d04-feb3-5edb-8713-78bcb173e477",
     //       "kind": "MESSAGE_OPENED",
     //       "summary": "Opened \"October product update\""
@@ -25,6 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "actor": "contact",
     //       "at": "2026-11-05T11:00:00Z",
     //       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+    //       "detail": "From email link · 2 min 40 s · also /docs/sso",
     //       "id": "17b94f6b-e922-5fd5-8c50-7e7f4a9483f7",
     //       "kind": "PAGE_VIEW",
     //       "summary": "Visited /pricing"
@@ -33,6 +35,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "actor": "contact",
     //       "at": "2026-11-04T16:00:00Z",
     //       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+    //       "detail": "Trigger: date field renewal_date − 30 days",
     //       "id": "85b3de6c-cd6e-5c99-a045-33d7479d3f12",
     //       "kind": "WORKFLOW_ENTERED",
     //       "summary": "Entered \"Renewal reminder · 30 days out\""
@@ -49,6 +52,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "actor": "contact",
       "at": "2026-11-05T14:00:00Z",
       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+      "detail": "Campaign · opened twice, clicked Read the changelog",
       "id": "ec537d04-feb3-5edb-8713-78bcb173e477",
       "kind": "MESSAGE_OPENED",
       "summary": "Opened \"October product update\""
@@ -57,6 +61,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "actor": "contact",
       "at": "2026-11-05T11:00:00Z",
       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+      "detail": "From email link · 2 min 40 s · also /docs/sso",
       "id": "17b94f6b-e922-5fd5-8c50-7e7f4a9483f7",
       "kind": "PAGE_VIEW",
       "summary": "Visited /pricing"
@@ -65,6 +70,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "actor": "contact",
       "at": "2026-11-04T16:00:00Z",
       "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
+      "detail": "Trigger: date field renewal_date − 30 days",
       "id": "85b3de6c-cd6e-5c99-a045-33d7479d3f12",
       "kind": "WORKFLOW_ENTERED",
       "summary": "Entered \"Renewal reminder · 30 days out\""
@@ -83,6 +89,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-05T14:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","id":"ec537d04-feb3-5edb-8713-78bcb173e477","kind":"MESSAGE_OPENED","summary":"Opened \"October product update\""})).unwrap_or_default(), serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-05T11:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","id":"17b94f6b-e922-5fd5-8c50-7e7f4a9483f7","kind":"PAGE_VIEW","summary":"Visited /pricing"})).unwrap_or_default(), serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-04T16:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","id":"85b3de6c-cd6e-5c99-a045-33d7479d3f12","kind":"WORKFLOW_ENTERED","summary":"Entered \"Renewal reminder · 30 days out\""})).unwrap_or_default()],limit: 20,page: 1,total: 10,
+        items: vec![serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-05T14:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","detail":"Campaign · opened twice, clicked Read the changelog","id":"ec537d04-feb3-5edb-8713-78bcb173e477","kind":"MESSAGE_OPENED","summary":"Opened \"October product update\""})).unwrap_or_default(), serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-05T11:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","detail":"From email link · 2 min 40 s · also /docs/sso","id":"17b94f6b-e922-5fd5-8c50-7e7f4a9483f7","kind":"PAGE_VIEW","summary":"Visited /pricing"})).unwrap_or_default(), serde_json::from_value::<Activity>(serde_json::json!({"actor":"contact","at":"2026-11-04T16:00:00Z","contact_id":"af512c4f-0beb-50b6-bf61-7a9d8bd417b5","detail":"Trigger: date field renewal_date − 30 days","id":"85b3de6c-cd6e-5c99-a045-33d7479d3f12","kind":"WORKFLOW_ENTERED","summary":"Entered \"Renewal reminder · 30 days out\""})).unwrap_or_default()],limit: 20,page: 1,total: 10,
     })
 }

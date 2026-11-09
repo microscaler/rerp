@@ -42,6 +42,10 @@ pub struct Response {
     #[serde(rename = "avg_sales_cycle_days")]
     pub avg_sales_cycle_days: f64,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "items")]
+    pub items: Option<Vec<serde_json::Value>>,
+
     #[serde(rename = "leads_created")]
     pub leads_created: i32,
 

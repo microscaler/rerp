@@ -30,6 +30,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         {},
     //         {}
     //       ],
+    //       "review": {
+    //         "GOOGLE_ADS": "APPROVED",
+    //         "LINKEDIN": "APPROVED",
+    //         "META": "APPROVED"
+    //       },
     //       "width": 1200
     //     },
     //     {
@@ -48,6 +53,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         {},
     //         {}
     //       ],
+    //       "review": {
+    //         "LINKEDIN": "PENDING",
+    //         "META": "APPROVED"
+    //       },
     //       "width": 1080
     //     },
     //     {
@@ -65,6 +74,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "platforms": [
     //         {}
     //       ],
+    //       "review": {
+    //         "LINKEDIN": "APPROVED"
+    //       },
     //       "width": 1920
     //     }
     //   ],
@@ -92,6 +104,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         {},
         {}
       ],
+      "review": {
+        "GOOGLE_ADS": "APPROVED",
+        "LINKEDIN": "APPROVED",
+        "META": "APPROVED"
+      },
       "width": 1200
     },
     {
@@ -110,6 +127,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         {},
         {}
       ],
+      "review": {
+        "LINKEDIN": "PENDING",
+        "META": "APPROVED"
+      },
       "width": 1080
     },
     {
@@ -127,6 +148,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "platforms": [
         {}
       ],
+      "review": {
+        "LINKEDIN": "APPROVED"
+      },
       "width": 1920
     }
   ],
@@ -143,6 +167,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        items: vec![serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-10-30T16:00:00Z","duration_seconds":3,"headline":"48 hours before everyone else","height":628,"id":"30f4c733-b7f5-51d2-b900-0be84807ebb2","kind":"IMAGE","landing_url":"https://acme.example/early-access","name":"BF hero","platforms":[{},{},{}],"width":1200})).unwrap_or_default(), serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-10-31T16:00:00Z","duration_seconds":3,"headline":"Early access · 21 Nov","height":1080,"id":"8767be08-2adf-5232-a68d-eefde450d501","kind":"IMAGE","landing_url":"https://acme.example/early-access","name":"BF square","platforms":[{},{}],"width":1080})).unwrap_or_default(), serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-11-01T16:00:00Z","duration_seconds":15,"headline":"Pricing that holds up","height":1080,"id":"3998574b-7118-511a-bd3b-fad92e7cddfd","kind":"VIDEO","landing_url":"https://acme.example/webinar","name":"Webinar","platforms":[{}],"width":1920})).unwrap_or_default()],limit: 25,page: 1,total: 3,
+        items: vec![serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-10-30T16:00:00Z","duration_seconds":3,"headline":"48 hours before everyone else","height":628,"id":"30f4c733-b7f5-51d2-b900-0be84807ebb2","kind":"IMAGE","landing_url":"https://acme.example/early-access","name":"BF hero","platforms":[{},{},{}],"review":{"GOOGLE_ADS":"APPROVED","LINKEDIN":"APPROVED","META":"APPROVED"},"width":1200})).unwrap_or_default(), serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-10-31T16:00:00Z","duration_seconds":3,"headline":"Early access · 21 Nov","height":1080,"id":"8767be08-2adf-5232-a68d-eefde450d501","kind":"IMAGE","landing_url":"https://acme.example/early-access","name":"BF square","platforms":[{},{}],"review":{"LINKEDIN":"PENDING","META":"APPROVED"},"width":1080})).unwrap_or_default(), serde_json::from_value::<AdCreative>(serde_json::json!({"body":"","brand_kit_applied":true,"call_to_action":"LEARN_MORE","created_at":"2026-11-01T16:00:00Z","duration_seconds":15,"headline":"Pricing that holds up","height":1080,"id":"3998574b-7118-511a-bd3b-fad92e7cddfd","kind":"VIDEO","landing_url":"https://acme.example/webinar","name":"Webinar","platforms":[{}],"review":{"LINKEDIN":"APPROVED"},"width":1920})).unwrap_or_default()],limit: 25,page: 1,total: 3,
     })
 }

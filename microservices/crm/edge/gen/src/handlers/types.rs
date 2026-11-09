@@ -53,7 +53,13 @@ pub struct AdTouchpoint {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub touchpoint_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
@@ -478,7 +484,13 @@ pub struct RecordAdCallResponse {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub matched_contact_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub platform: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub touchpoint_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,

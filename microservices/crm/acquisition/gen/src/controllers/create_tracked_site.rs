@@ -10,7 +10,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
     //   "created_at": "2026-05-09T16:00:00Z",
+    //   "events_24h": 18402,
     //   "id": "f3a558f4-397d-5377-8279-803f527fe211",
+    //   "identified_30d": 3114,
+    //   "kind": "SCRIPT",
     //   "last_event_at": "2026-11-05T15:59:48Z",
     //   "name": "Marketing site",
     //   "origin": "https://acme.example",
@@ -19,7 +22,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     match serde_json::from_str::<Response>(
         r#"{
   "created_at": "2026-05-09T16:00:00Z",
+  "events_24h": 18402,
   "id": "f3a558f4-397d-5377-8279-803f527fe211",
+  "identified_30d": 3114,
+  "kind": "SCRIPT",
   "last_event_at": "2026-11-05T15:59:48Z",
   "name": "Marketing site",
   "origin": "https://acme.example",
@@ -36,8 +42,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     HttpJson::ok(Response {
         created_at: "2026-05-09T16:00:00Z".to_string(),
         enabled: Some(true),
+        events_24h: Some(18402),
         id: "f3a558f4-397d-5377-8279-803f527fe211".to_string(),
+        identified_30d: Some(3114),
         include_all_pages: Some(true),
+        kind: Some("SCRIPT".to_string()),
         last_event_at: Some("2026-11-05T15:59:48Z".to_string()),
         name: Some("Marketing site".to_string()),
         origin: "https://acme.example".to_string(),

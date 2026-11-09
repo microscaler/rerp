@@ -264,7 +264,16 @@ paths:
                 $ref: '#/components/schemas/ContactPage'
               example:
                 items:
-                - tags:
+                - id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  email: priya.natarajan@northwindtraders.example
+                  first_name: Priya
+                  last_name: Natarajan
+                  phone: +49 30 1000000
+                  job_title: Head of Operations
+                  organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                  country_code: DE
+                  timezone: Europe/Berlin
+                  tags:
                   - customer
                   - enterprise
                   custom_fields:
@@ -272,17 +281,43 @@ paths:
                     seats: 5
                     industry: Logistics
                     team_size: 1-10
-                    renewal_date: null
+                    renewal_date: '2026-11-25'
+                  source: form:website-footer
+                  attribution:
+                    utm_source: google
+                    utm_medium: cpc
+                    utm_campaign: q4-webinars
+                  sms_consent: true
+                  tracking_optout: false
+                  organisation_name: Northwind Traders
+                  status: SUBSCRIBED
+                  list_ids:
+                  - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  - f84269dd-7dba-5a82-ad63-986af03f39c1
+                  list_names:
+                  - Newsletter
+                  - Customers
                   score: 85
-                  timezone: Europe/Berlin
+                  sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                  message_stats:
+                    sent: 12
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-05T14:00:00Z'
+                    last_click_at: '2026-11-04T16:00:00Z'
                   last_activity_at: '2026-11-05T15:00:00Z'
-                  id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                  email: priya.natarajan@northwindtraders.example
-                  phone: +49 30 1000000
-                  organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
-                - tags:
+                  created_at: '2026-10-31T16:00:00Z'
+                  updated_at: '2026-11-05T16:00:00Z'
+                - id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  email: tom.okafor@fabrikam.example
+                  first_name: Tom
+                  last_name: Okafor
+                  phone: +49 30 1007919
+                  job_title: Founder
+                  organisation_id: 576a7630-a5b2-566c-ac00-caca59662cb0
+                  country_code: GB
+                  timezone: Europe/London
+                  tags:
                   - trial
                   custom_fields:
                     plan: Team
@@ -290,16 +325,40 @@ paths:
                     industry: Retail
                     team_size: 11-50
                     renewal_date: '2026-12-14'
+                  source: form:launch-waitlist
+                  attribution:
+                    utm_source: linkedin
+                    utm_medium: social
+                    utm_campaign: bf-2026
+                  sms_consent: false
+                  tracking_optout: false
+                  organisation_name: Fabrikam Inc
+                  status: SUBSCRIBED
+                  list_ids:
+                  - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  list_names:
+                  - Newsletter
                   score: 79
-                  timezone: Europe/London
+                  sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                  message_stats:
+                    sent: 13
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-05T09:00:00Z'
+                    last_click_at: '2026-11-03T16:00:00Z'
                   last_activity_at: '2026-11-05T08:00:00Z'
-                  id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
-                  email: tom.okafor@fabrikam.example
-                  phone: +49 30 1007919
-                  organisation_id: 576a7630-a5b2-566c-ac00-caca59662cb0
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
-                - tags:
+                  created_at: '2026-10-20T16:00:00Z'
+                  updated_at: '2026-11-05T15:00:00Z'
+                - id: f25ace60-6582-5cc7-9226-f9367248776c
+                  email: lena.fischer@contoso.example
+                  first_name: Lena
+                  last_name: Fischer
+                  phone: +49 30 1015838
+                  job_title: Marketing Lead
+                  organisation_id: da09c739-6e09-5587-a658-88f6b9eea0bd
+                  country_code: ZA
+                  timezone: Africa/Johannesburg
+                  tags:
                   - waitlist
                   custom_fields:
                     plan: Business
@@ -307,15 +366,30 @@ paths:
                     industry: Finance
                     team_size: 51+
                     renewal_date: '2026-12-23'
+                  source: form:free-trial
+                  attribution:
+                    utm_source: newsletter
+                    utm_medium: email
+                    utm_campaign: oct-product-update
+                  sms_consent: false
+                  tracking_optout: false
+                  organisation_name: Contoso Ltd
+                  status: SUBSCRIBED
+                  list_ids:
+                  - b3e822bf-efcc-5f58-ba14-b485ee6d6542
+                  list_names:
+                  - Product launch waitlist
                   score: 84
-                  timezone: Africa/Johannesburg
+                  sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                  message_stats:
+                    sent: 14
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-05T04:00:00Z'
+                    last_click_at: '2026-11-02T16:00:00Z'
                   last_activity_at: '2026-11-05T01:00:00Z'
-                  id: f25ace60-6582-5cc7-9226-f9367248776c
-                  email: lena.fischer@contoso.example
-                  phone: +49 30 1015838
-                  organisation_id: da09c739-6e09-5587-a658-88f6b9eea0bd
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  created_at: '2026-10-09T16:00:00Z'
+                  updated_at: '2026-11-05T14:00:00Z'
                 total: 30
                 page: 1
                 limit: 25
@@ -349,21 +423,28 @@ paths:
             schema:
               $ref: '#/components/schemas/CreateContactRequest'
             example:
-              name: Northwind Traders
               email: priya.natarajan@northwindtraders.example
+              first_name: Priya
+              last_name: Natarajan
               phone: +49 30 1000000
-              mobile: Mobile
-              title: MR
-              function: Function
-              department: Department
+              job_title: Job title
               organisation_id: 82a361eb-96c9-56a2-8291-33ba572abba9
-              parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-              street: Street
-              street2: Street2
-              city: City
-              state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-              zip: Zip
-              country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
+              country_code: DE
+              timezone: Europe/Berlin
+              tags:
+              - Tags
+              custom_fields: {}
+              source: Source
+              attribution:
+                utm_source: google
+                utm_medium: Utm medium
+                utm_campaign: Utm campaign
+                utm_term: Utm term
+                utm_content: Utm content
+                referrer: Referrer
+                landing_page: Landing page
+              sms_consent: false
+              tracking_optout: false
         description: Create a new contact person
       responses:
         '201':
@@ -373,6 +454,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Head of Operations
+                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - customer
                 - enterprise
@@ -381,16 +471,33 @@ paths:
                   seats: 5
                   industry: Logistics
                   team_size: 1-10
-                  renewal_date: null
+                  renewal_date: '2026-11-25'
+                source: form:website-footer
+                attribution:
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: q4-webinars
+                sms_consent: true
+                tracking_optout: false
+                organisation_name: Northwind Traders
+                status: SUBSCRIBED
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                - f84269dd-7dba-5a82-ad63-986af03f39c1
+                list_names:
+                - Newsletter
+                - Customers
                 score: 85
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                message_stats:
+                  sent: 12
+                  hard_bounces: 0
+                  soft_bounces: 0
+                  last_open_at: '2026-11-05T14:00:00Z'
+                  last_click_at: '2026-11-04T16:00:00Z'
                 last_activity_at: '2026-11-05T15:00:00Z'
-                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                name: Northwind Traders
-                create_date: '2026-11-05T16:00:00Z'
+                created_at: '2026-10-31T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -754,8 +861,9 @@ paths:
               example:
                 items:
                 - id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  email: priya.natarajan@northwindtraders.example
+                  status: SUBSCRIBED
+                  created_at: '2026-11-05T16:00:00Z'
                 total: 2
                 page: 1
                 limit: 25
@@ -799,6 +907,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Head of Operations
+                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - customer
                 - enterprise
@@ -807,16 +924,33 @@ paths:
                   seats: 5
                   industry: Logistics
                   team_size: 1-10
-                  renewal_date: null
+                  renewal_date: '2026-11-25'
+                source: form:website-footer
+                attribution:
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: q4-webinars
+                sms_consent: true
+                tracking_optout: false
+                organisation_name: Northwind Traders
+                status: SUBSCRIBED
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                - f84269dd-7dba-5a82-ad63-986af03f39c1
+                list_names:
+                - Newsletter
+                - Customers
                 score: 85
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                message_stats:
+                  sent: 12
+                  hard_bounces: 0
+                  soft_bounces: 0
+                  last_open_at: '2026-11-05T14:00:00Z'
+                  last_click_at: '2026-11-04T16:00:00Z'
                 last_activity_at: '2026-11-05T15:00:00Z'
-                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                name: Northwind Traders
-                create_date: '2026-11-05T16:00:00Z'
+                created_at: '2026-10-31T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -855,22 +989,28 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateContactRequest'
             example:
-              name: Northwind Traders
-              email: Email
+              email: priya.natarajan@northwindtraders.example
+              first_name: Priya
+              last_name: Natarajan
               phone: +49 30 1000000
-              mobile: Mobile
-              title: MR
-              function: Function
-              department: Department
+              job_title: Job title
               organisation_id: 82a361eb-96c9-56a2-8291-33ba572abba9
-              parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-              street: Street
-              street2: Street2
-              city: City
-              state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-              zip: Zip
-              country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
-              active: true
+              country_code: DE
+              timezone: Europe/Berlin
+              tags:
+              - Tags
+              custom_fields: {}
+              source: Source
+              attribution:
+                utm_source: google
+                utm_medium: Utm medium
+                utm_campaign: Utm campaign
+                utm_term: Utm term
+                utm_content: Utm content
+                referrer: Referrer
+                landing_page: Landing page
+              sms_consent: false
+              tracking_optout: false
         description: Update an existing contact
       responses:
         '200':
@@ -880,6 +1020,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Head of Operations
+                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - customer
                 - enterprise
@@ -888,16 +1037,33 @@ paths:
                   seats: 5
                   industry: Logistics
                   team_size: 1-10
-                  renewal_date: null
+                  renewal_date: '2026-11-25'
+                source: form:website-footer
+                attribution:
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: q4-webinars
+                sms_consent: true
+                tracking_optout: false
+                organisation_name: Northwind Traders
+                status: SUBSCRIBED
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                - f84269dd-7dba-5a82-ad63-986af03f39c1
+                list_names:
+                - Newsletter
+                - Customers
                 score: 85
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                message_stats:
+                  sent: 12
+                  hard_bounces: 0
+                  soft_bounces: 0
+                  last_open_at: '2026-11-05T14:00:00Z'
+                  last_click_at: '2026-11-04T16:00:00Z'
                 last_activity_at: '2026-11-05T15:00:00Z'
-                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                name: Northwind Traders
-                create_date: '2026-11-05T16:00:00Z'
+                created_at: '2026-10-31T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -983,6 +1149,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Head of Operations
+                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - customer
                 - enterprise
@@ -991,16 +1166,33 @@ paths:
                   seats: 5
                   industry: Logistics
                   team_size: 1-10
-                  renewal_date: null
+                  renewal_date: '2026-11-25'
+                source: form:website-footer
+                attribution:
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: q4-webinars
+                sms_consent: true
+                tracking_optout: false
+                organisation_name: Northwind Traders
+                status: SUBSCRIBED
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                - f84269dd-7dba-5a82-ad63-986af03f39c1
+                list_names:
+                - Newsletter
+                - Customers
                 score: 85
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                message_stats:
+                  sent: 12
+                  hard_bounces: 0
+                  soft_bounces: 0
+                  last_open_at: '2026-11-05T14:00:00Z'
+                  last_click_at: '2026-11-04T16:00:00Z'
                 last_activity_at: '2026-11-05T15:00:00Z'
-                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                name: Northwind Traders
-                create_date: '2026-11-05T16:00:00Z'
+                created_at: '2026-10-31T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1022,22 +1214,28 @@ paths:
             schema:
               $ref: '#/components/schemas/UpdateContactRequest'
             example:
-              name: Northwind Traders
-              email: Email
+              email: priya.natarajan@northwindtraders.example
+              first_name: Priya
+              last_name: Natarajan
               phone: +49 30 1000000
-              mobile: Mobile
-              title: MR
-              function: Function
-              department: Department
+              job_title: Job title
               organisation_id: 82a361eb-96c9-56a2-8291-33ba572abba9
-              parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-              street: Street
-              street2: Street2
-              city: City
-              state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-              zip: Zip
-              country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
-              active: true
+              country_code: DE
+              timezone: Europe/Berlin
+              tags:
+              - Tags
+              custom_fields: {}
+              source: Source
+              attribution:
+                utm_source: google
+                utm_medium: Utm medium
+                utm_campaign: Utm campaign
+                utm_term: Utm term
+                utm_content: Utm content
+                referrer: Referrer
+                landing_page: Landing page
+              sms_consent: false
+              tracking_optout: false
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1078,7 +1276,7 @@ paths:
                 items:
                 - id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
                   name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  created_at: '2026-11-05T16:00:00Z'
                 total: 2
                 page: 1
                 limit: 25
@@ -1136,18 +1334,21 @@ paths:
                   at: '2026-11-05T14:00:00Z'
                   summary: Opened "October product update"
                   actor: contact
+                  detail: Campaign · opened twice, clicked Read the changelog
                 - id: 17b94f6b-e922-5fd5-8c50-7e7f4a9483f7
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   kind: PAGE_VIEW
                   at: '2026-11-05T11:00:00Z'
                   summary: Visited /pricing
                   actor: contact
+                  detail: From email link · 2 min 40 s · also /docs/sso
                 - id: 85b3de6c-cd6e-5c99-a045-33d7479d3f12
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   kind: WORKFLOW_ENTERED
                   at: '2026-11-04T16:00:00Z'
                   summary: Entered "Renewal reminder · 30 days out"
                   actor: contact
+                  detail: 'Trigger: date field renewal_date − 30 days'
                 total: 10
                 page: 1
                 limit: 20
@@ -1332,6 +1533,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Head of Operations
+                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - customer
                 - enterprise
@@ -1340,16 +1550,33 @@ paths:
                   seats: 5
                   industry: Logistics
                   team_size: 1-10
-                  renewal_date: null
+                  renewal_date: '2026-11-25'
+                source: form:website-footer
+                attribution:
+                  utm_source: google
+                  utm_medium: cpc
+                  utm_campaign: q4-webinars
+                sms_consent: true
+                tracking_optout: false
+                organisation_name: Northwind Traders
+                status: SUBSCRIBED
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                - f84269dd-7dba-5a82-ad63-986af03f39c1
+                list_names:
+                - Newsletter
+                - Customers
                 score: 85
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-09-26T16:00:00Z'
+                message_stats:
+                  sent: 12
+                  hard_bounces: 0
+                  soft_bounces: 0
+                  last_open_at: '2026-11-05T14:00:00Z'
+                  last_click_at: '2026-11-04T16:00:00Z'
                 last_activity_at: '2026-11-05T15:00:00Z'
-                id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                organisation_id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
-                name: Northwind Traders
-                create_date: '2026-11-05T16:00:00Z'
+                created_at: '2026-10-31T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1395,39 +1622,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/Contact'
               example:
+                id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
+                email: priya.natarajan@northwindtraders.example
+                first_name: Priya
+                last_name: Natarajan
+                phone: +49 30 1000000
+                job_title: Job title
+                organisation_id: 82a361eb-96c9-56a2-8291-33ba572abba9
+                country_code: DE
+                timezone: Europe/Berlin
                 tags:
                 - Tags
-                custom_fields: {}
+                custom_fields:
+                  plan: Plan
+                  seats: 3
+                  industry: Industry
+                  team_size: Team size
+                  renewal_date: '2026-11-25'
+                source: Source
+                attribution:
+                  utm_source: google
+                  utm_medium: Utm medium
+                  utm_campaign: Utm campaign
+                  utm_term: Utm term
+                  utm_content: Utm content
+                  referrer: Referrer
+                  landing_page: Landing page
+                sms_consent: false
+                tracking_optout: false
+                organisation_name: Organisation name
+                status: SUBSCRIBED
+                list_ids:
+                - aa8fda45-3921-50e9-ba9c-b808dad9f340
+                list_names:
+                - List names
                 score: 3
-                timezone: Europe/Berlin
+                sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                message_stats:
+                  sent: 3
+                  hard_bounces: 3
+                  soft_bounces: 3
+                  last_open_at: '2026-11-05T16:00:00Z'
+                  last_click_at: '2026-11-05T16:00:00Z'
                 last_activity_at: '2026-11-05T16:00:00Z'
-                id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
-                name: Northwind Traders
-                email: priya.natarajan@northwindtraders.example
-                phone: +49 30 1000000
-                mobile: Mobile
-                title: MR
-                function: Function
-                department: Department
-                organisation_id: 82a361eb-96c9-56a2-8291-33ba572abba9
-                is_company: true
-                parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-                street: Street
-                street2: Street2
-                city: City
-                state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-                zip: Zip
-                country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
-                user_ids:
-                - User ids
-                active: true
-                color: 3
-                create_date: '2026-11-05T16:00:00Z'
-                write_date: '2026-11-05T16:00:00Z'
-                child_contact_ids:
-                - 8da3ada2-4577-5570-8894-0631a83d0667
-                lead_count: 3
-                opportunity_count: 3
+                created_at: '2026-11-05T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1476,8 +1715,9 @@ paths:
               example:
                 items:
                 - id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  email: priya.natarajan@northwindtraders.example
+                  status: SUBSCRIBED
+                  created_at: '2026-11-05T16:00:00Z'
                 total: 2
                 page: 1
                 limit: 25
@@ -1529,6 +1769,14 @@ paths:
                   subscriber_count: 9870
                   unsubscribed_count: 812
                   created_at: '2026-03-10T16:00:00Z'
+                  channel: EMAIL
+                  pending_count: 144
+                  postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                  reminder_text: You are receiving this because you signed up on our website.
+                  growth_30d:
+                  - 8
+                  - 10
+                  - 12
                 - id: f84269dd-7dba-5a82-ad63-986af03f39c1
                   name: Customers
                   description: Account and billing updates
@@ -1539,6 +1787,14 @@ paths:
                   subscriber_count: 1820
                   unsubscribed_count: 41
                   created_at: '2026-04-09T16:00:00Z'
+                  channel: EMAIL
+                  pending_count: 0
+                  postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                  reminder_text: You are receiving this because you signed up on our website.
+                  growth_30d:
+                  - 12
+                  - 12
+                  - 13
                 - id: 06b96791-3940-54b0-b719-717deb92aad3
                   name: Webinars
                   description: Invitations and recordings
@@ -1549,6 +1805,14 @@ paths:
                   subscriber_count: 3210
                   unsubscribed_count: 290
                   created_at: '2026-05-09T16:00:00Z'
+                  channel: EMAIL
+                  pending_count: 22
+                  postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                  reminder_text: You are receiving this because you signed up on our website.
+                  growth_30d:
+                  - 6
+                  - 9
+                  - 7
                 total: 5
                 page: 1
                 limit: 25
@@ -1603,6 +1867,14 @@ paths:
                 subscriber_count: 9870
                 unsubscribed_count: 812
                 created_at: '2026-03-10T16:00:00Z'
+                channel: EMAIL
+                pending_count: 144
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                reminder_text: You are receiving this because you signed up on our website.
+                growth_30d:
+                - 8
+                - 10
+                - 12
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1650,6 +1922,14 @@ paths:
                 subscriber_count: 9870
                 unsubscribed_count: 812
                 created_at: '2026-03-10T16:00:00Z'
+                channel: EMAIL
+                pending_count: 144
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                reminder_text: You are receiving this because you signed up on our website.
+                growth_30d:
+                - 8
+                - 10
+                - 12
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1706,6 +1986,14 @@ paths:
                 subscriber_count: 9870
                 unsubscribed_count: 812
                 created_at: '2026-03-10T16:00:00Z'
+                channel: EMAIL
+                pending_count: 144
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                reminder_text: You are receiving this because you signed up on our website.
+                growth_30d:
+                - 8
+                - 10
+                - 12
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1857,22 +2145,37 @@ paths:
                 items:
                 - id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
                   name: Northwind Traders
+                  domain: northwindtraders.example
                   website: https://northwind.example
-                  contact_count: 0
+                  industry: Logistics
+                  size: 1-10
                   country_code: DE
-                  create_date: '2026-11-05T16:00:00Z'
+                  contact_count: 0
+                  open_deal_count: 0
+                  converted: true
+                  created_at: '2026-01-09T16:00:00Z'
                 - id: 576a7630-a5b2-566c-ac00-caca59662cb0
                   name: Fabrikam Inc
+                  domain: fabrikam.example
                   website: https://fabrikam.example
-                  contact_count: 0
+                  industry: Retail
+                  size: 11-50
                   country_code: GB
-                  create_date: '2026-11-05T16:00:00Z'
+                  contact_count: 0
+                  open_deal_count: 0
+                  converted: false
+                  created_at: '2026-01-29T16:00:00Z'
                 - id: da09c739-6e09-5587-a658-88f6b9eea0bd
                   name: Contoso Ltd
+                  domain: contoso.example
                   website: https://contoso.example
-                  contact_count: 0
+                  industry: Finance
+                  size: 51-200
                   country_code: ZA
-                  create_date: '2026-11-05T16:00:00Z'
+                  contact_count: 0
+                  open_deal_count: 0
+                  converted: false
+                  created_at: '2026-02-18T16:00:00Z'
                 total: 12
                 page: 1
                 limit: 25
@@ -1907,21 +2210,12 @@ paths:
               $ref: '#/components/schemas/CreateOrganisationRequest'
             example:
               name: Northwind Traders
-              email: priya.natarajan@northwindtraders.example
-              phone: +49 30 1000000
+              domain: northwindtraders.example
               website: https://northwindtraders.example/pricing
-              industry_id: 89b84293-d1b7-589f-a3ef-4ab376970356
-              company_size: STARTUP
-              employees: 3
-              annual_revenue: '1250.00'
-              description: Example
+              industry: Industry
+              size: 1-10
+              country_code: DE
               parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-              street: Street
-              street2: Street2
-              city: City
-              state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-              zip: Zip
-              country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
         description: Create a new account/organization in the CRM
       responses:
         '201':
@@ -1933,10 +2227,15 @@ paths:
               example:
                 id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
                 name: Northwind Traders
+                domain: northwindtraders.example
                 website: https://northwind.example
-                contact_count: 0
+                industry: Logistics
+                size: 1-10
                 country_code: DE
-                create_date: '2026-11-05T16:00:00Z'
+                contact_count: 0
+                open_deal_count: 0
+                converted: true
+                created_at: '2026-01-09T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1991,10 +2290,15 @@ paths:
               example:
                 id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
                 name: Northwind Traders
+                domain: northwindtraders.example
                 website: https://northwind.example
-                contact_count: 0
+                industry: Logistics
+                size: 1-10
                 country_code: DE
-                create_date: '2026-11-05T16:00:00Z'
+                contact_count: 0
+                open_deal_count: 0
+                converted: true
+                created_at: '2026-01-09T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -2034,22 +2338,12 @@ paths:
               $ref: '#/components/schemas/UpdateOrganisationRequest'
             example:
               name: Northwind Traders
-              email: Email
-              phone: +49 30 1000000
-              website: Website
-              industry_id: 89b84293-d1b7-589f-a3ef-4ab376970356
-              company_size: STARTUP
-              employees: 3
-              annual_revenue: '1250.00'
-              description: Example
+              domain: northwindtraders.example
+              website: https://northwindtraders.example/pricing
+              industry: Industry
+              size: 1-10
+              country_code: DE
               parent_id: f72b0f27-57e7-5999-986e-0069569b31a7
-              street: Street
-              street2: Street2
-              city: City
-              state_id: e428ab8b-c4da-5422-b94c-d2c2e53afd04
-              zip: Zip
-              country_id: 805a89a0-e9a0-5bff-b298-223bac74e954
-              active: true
         description: Update an existing account by ID
       responses:
         '200':
@@ -2061,10 +2355,15 @@ paths:
               example:
                 id: d7a2e2b8-61b1-5687-8aee-0ead8943ba3b
                 name: Northwind Traders
+                domain: northwindtraders.example
                 website: https://northwind.example
-                contact_count: 0
+                industry: Logistics
+                size: 1-10
                 country_code: DE
-                create_date: '2026-11-05T16:00:00Z'
+                contact_count: 0
+                open_deal_count: 0
+                converted: true
+                created_at: '2026-01-09T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -2171,8 +2470,9 @@ paths:
               example:
                 items:
                 - id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  email: priya.natarajan@northwindtraders.example
+                  status: SUBSCRIBED
+                  created_at: '2026-11-05T16:00:00Z'
                 total: 2
                 page: 1
                 limit: 25
@@ -2221,7 +2521,7 @@ paths:
                 items:
                 - id: 44f5daeb-faac-5a53-81fb-ac8b5f267d2c
                   name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  created_at: '2026-11-05T16:00:00Z'
                 total: 2
                 page: 1
                 limit: 25
@@ -2420,7 +2720,16 @@ paths:
               example:
                 count: 412
                 sample:
-                - tags:
+                - id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  email: tom.okafor@fabrikam.example
+                  first_name: Tom
+                  last_name: Okafor
+                  phone: +49 30 1007919
+                  job_title: Founder
+                  organisation_id: 576a7630-a5b2-566c-ac00-caca59662cb0
+                  country_code: GB
+                  timezone: Europe/London
+                  tags:
                   - trial
                   custom_fields:
                     plan: Team
@@ -2428,16 +2737,40 @@ paths:
                     industry: Retail
                     team_size: 11-50
                     renewal_date: '2026-12-14'
+                  source: form:launch-waitlist
+                  attribution:
+                    utm_source: linkedin
+                    utm_medium: social
+                    utm_campaign: bf-2026
+                  sms_consent: false
+                  tracking_optout: false
+                  organisation_name: Fabrikam Inc
+                  status: SUBSCRIBED
+                  list_ids:
+                  - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  list_names:
+                  - Newsletter
                   score: 79
-                  timezone: Europe/London
+                  sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                  message_stats:
+                    sent: 13
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-05T09:00:00Z'
+                    last_click_at: '2026-11-03T16:00:00Z'
                   last_activity_at: '2026-11-05T08:00:00Z'
-                  id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
-                  email: tom.okafor@fabrikam.example
-                  phone: +49 30 1007919
-                  organisation_id: 576a7630-a5b2-566c-ac00-caca59662cb0
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
-                - tags:
+                  created_at: '2026-10-20T16:00:00Z'
+                  updated_at: '2026-11-05T15:00:00Z'
+                - id: f25ace60-6582-5cc7-9226-f9367248776c
+                  email: lena.fischer@contoso.example
+                  first_name: Lena
+                  last_name: Fischer
+                  phone: +49 30 1015838
+                  job_title: Marketing Lead
+                  organisation_id: da09c739-6e09-5587-a658-88f6b9eea0bd
+                  country_code: ZA
+                  timezone: Africa/Johannesburg
+                  tags:
                   - waitlist
                   custom_fields:
                     plan: Business
@@ -2445,32 +2778,71 @@ paths:
                     industry: Finance
                     team_size: 51+
                     renewal_date: '2026-12-23'
+                  source: form:free-trial
+                  attribution:
+                    utm_source: newsletter
+                    utm_medium: email
+                    utm_campaign: oct-product-update
+                  sms_consent: false
+                  tracking_optout: false
+                  organisation_name: Contoso Ltd
+                  status: SUBSCRIBED
+                  list_ids:
+                  - b3e822bf-efcc-5f58-ba14-b485ee6d6542
+                  list_names:
+                  - Product launch waitlist
                   score: 84
-                  timezone: Africa/Johannesburg
+                  sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                  message_stats:
+                    sent: 14
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-05T04:00:00Z'
+                    last_click_at: '2026-11-02T16:00:00Z'
                   last_activity_at: '2026-11-05T01:00:00Z'
-                  id: f25ace60-6582-5cc7-9226-f9367248776c
-                  email: lena.fischer@contoso.example
-                  phone: +49 30 1015838
-                  organisation_id: da09c739-6e09-5587-a658-88f6b9eea0bd
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
-                - tags:
+                  created_at: '2026-10-09T16:00:00Z'
+                  updated_at: '2026-11-05T14:00:00Z'
+                - id: 93f1db66-d1af-580b-b546-6a13f1774d12
+                  email: marcus.reid@adventureworks.example
+                  first_name: Marcus
+                  last_name: Reid
+                  phone: +49 30 1023757
+                  job_title: CTO
+                  organisation_id: 3cc2755d-bcec-5a0c-afa0-71d35560b07d
+                  country_code: US
+                  timezone: America/New_York
+                  tags:
                   - churned
                   custom_fields:
                     plan: Free
                     seats: 14
                     industry: SaaS
                     team_size: 1-10
-                    renewal_date: null
+                    renewal_date: '2026-11-25'
+                  source: import
+                  attribution:
+                    utm_source: direct
+                    utm_medium: none
+                    utm_campaign: Utm campaign
+                  sms_consent: false
+                  tracking_optout: false
+                  organisation_name: Adventure Works
+                  status: SUBSCRIBED
+                  list_ids:
+                  - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  list_names:
+                  - Newsletter
                   score: 80
-                  timezone: America/New_York
+                  sms_consent_updated_at: '2026-11-05T16:00:00Z'
+                  message_stats:
+                    sent: 15
+                    hard_bounces: 0
+                    soft_bounces: 0
+                    last_open_at: '2026-11-04T23:00:00Z'
+                    last_click_at: '2026-11-01T16:00:00Z'
                   last_activity_at: '2026-11-04T18:00:00Z'
-                  id: 93f1db66-d1af-580b-b546-6a13f1774d12
-                  email: marcus.reid@adventureworks.example
-                  phone: +49 30 1023757
-                  organisation_id: 3cc2755d-bcec-5a0c-afa0-71d35560b07d
-                  name: Northwind Traders
-                  create_date: '2026-11-05T16:00:00Z'
+                  created_at: '2026-09-28T16:00:00Z'
+                  updated_at: '2026-11-05T13:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2853,18 +3225,21 @@ paths:
                   reason: HARD_BOUNCE
                   note: October product update
                   created_at: '2026-10-28T16:00:00Z'
+                  source: October product update
                 - id: a6c4c319-1fb1-5d3c-b7bc-4626e853c8f7
                   address: old-team@fabrikam.example
                   channel: EMAIL
                   reason: COMPLAINT
                   note: September product update
                   created_at: '2026-09-30T16:00:00Z'
+                  source: September product update
                 - id: 434e2868-e253-5882-bd99-f063c5c7a6aa
                   address: ceo@contoso.example
                   channel: EMAIL
                   reason: MANUAL
                   note: asked by account manager
                   created_at: '2026-10-12T16:00:00Z'
+                  source: Alex Morgan
                 total: 5
                 page: 1
                 limit: 25
@@ -2913,6 +3288,7 @@ paths:
                 reason: HARD_BOUNCE
                 note: October product update
                 created_at: '2026-10-28T16:00:00Z'
+                source: October product update
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -3245,6 +3621,9 @@ components:
         data:
           type: object
           description: Kind-specific detail (template name, link url, form fields, from/to stage)
+        detail:
+          type: string
+          readOnly: true
     ActivityKind:
       type: string
       enum:
@@ -3469,127 +3848,156 @@ components:
       description: Where the consent came from; stored on every subscription change
     Contact:
       type: object
-      required:
-      - id
-      - name
-      - create_date
       properties:
-        tags:
-          type: array
-          items:
-            type: string
-          description: Tag names (see /tags)
-        custom_fields:
-          type: object
-          additionalProperties: true
-          description: Values for crm/platform custom fields, keyed by field key
-        score:
-          type: integer
-          format: int32
-          readOnly: true
-          description: Current crm/intelligence score
-        timezone:
-          type: string
-          description: IANA zone, for send-in-contact-timezone and send windows
-        last_activity_at:
-          type: string
-          format: date-time
-          readOnly: true
         id:
           type: string
           format: uuid
-        name:
-          type: string
-          maxLength: 255
         email:
           type: string
           format: email
           maxLength: 255
-        phone:
-          type: string
-          maxLength: 64
-        mobile:
-          type: string
-          maxLength: 64
-        title:
-          type: string
-          enum:
-          - MR
-          - MRS
-          - MME
-          description: Salutation
-        function:
+        first_name:
           type: string
           maxLength: 128
-        department:
+        last_name:
+          type: string
+          maxLength: 128
+        phone:
+          type: string
+          maxLength: 32
+          description: E.164
+        job_title:
           type: string
           maxLength: 128
         organisation_id:
           type: string
           format: uuid
-          description: Parent company/account
-        is_company:
-          type: boolean
-          default: false
-        parent_id:
+        country_code:
           type: string
-          format: uuid
-          description: Parent contact for org structure
-        street:
+          pattern: ^[A-Z]{2}$
+        timezone:
           type: string
-          maxLength: 255
-        street2:
-          type: string
-          maxLength: 255
-        city:
-          type: string
-          maxLength: 128
-        state_id:
-          type: string
-          format: uuid
-        zip:
-          type: string
-          maxLength: 32
-        country_id:
-          type: string
-          format: uuid
-        user_ids:
+          description: IANA zone, e.g. Europe/Berlin
+        tags:
           type: array
           items:
             type: string
-            maxLength: 64
-            description: Sesame user id (the sub claim of the access token)
-        active:
+          description: Tag names
+        custom_fields:
+          type: object
+          properties:
+            plan:
+              type: string
+              readOnly: true
+            seats:
+              type: integer
+              format: int64
+              readOnly: true
+            industry:
+              type: string
+              readOnly: true
+            team_size:
+              type: string
+              readOnly: true
+            renewal_date:
+              type: string
+              format: date
+              readOnly: true
+          description: Field key to value (definitions in crm/workspace)
+          additionalProperties: true
+        source:
+          type: string
+          description: 'Where the contact came from: form:<slug>, import, api, manual'
+        attribution:
+          type: object
+          properties:
+            utm_source:
+              type: string
+            utm_medium:
+              type: string
+            utm_campaign:
+              type: string
+            utm_term:
+              type: string
+            utm_content:
+              type: string
+            referrer:
+              type: string
+            landing_page:
+              type: string
+          description: First-touch attribution
+        sms_consent:
           type: boolean
-          default: true
-        color:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 16
-        create_date:
+        tracking_optout:
+          type: boolean
+        organisation_name:
           type: string
-          format: date-time
           readOnly: true
-        write_date:
+        status:
           type: string
-          format: date-time
+          enum:
+          - SUBSCRIBED
+          - UNSUBSCRIBED
+          - PENDING
+          - BOUNCED
+          description: 'Email marketing status across lists: SUBSCRIBED when on at least one list'
           readOnly: true
-        child_contact_ids:
+        list_ids:
           type: array
           items:
             type: string
             format: uuid
           readOnly: true
-        lead_count:
+        list_names:
+          type: array
+          items:
+            type: string
+          readOnly: true
+        score:
           type: integer
           format: int32
           readOnly: true
-        opportunity_count:
-          type: integer
-          format: int32
+        sms_consent_updated_at:
+          type: string
+          format: date-time
           readOnly: true
-      description: An individual person associated with an account or lead
+        message_stats:
+          type: object
+          properties:
+            sent:
+              type: integer
+              format: int64
+            hard_bounces:
+              type: integer
+              format: int32
+            soft_bounces:
+              type: integer
+              format: int32
+            last_open_at:
+              type: string
+              format: date-time
+            last_click_at:
+              type: string
+              format: date-time
+          readOnly: true
+        last_activity_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - email
+      - status
+      - created_at
+      description: A person the workspace can reach. Consent lives in subscriptions; status summarises it.
     ContactCountsSummary:
       type: object
       properties:
@@ -3679,50 +4087,70 @@ components:
       - action
     CreateContactRequest:
       type: object
-      required:
-      - name
       properties:
-        name:
-          type: string
-          maxLength: 255
         email:
           type: string
           format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 128
+        last_name:
+          type: string
+          maxLength: 128
         phone:
           type: string
-        mobile:
+          maxLength: 32
+          description: E.164
+        job_title:
           type: string
-        title:
-          type: string
-          enum:
-          - MR
-          - MRS
-          - MME
-        function:
-          type: string
-        department:
-          type: string
+          maxLength: 128
         organisation_id:
           type: string
           format: uuid
-        parent_id:
+        country_code:
           type: string
-          format: uuid
-        street:
+          pattern: ^[A-Z]{2}$
+        timezone:
           type: string
-        street2:
+          description: IANA zone, e.g. Europe/Berlin
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names
+        custom_fields:
+          type: object
+          properties: {}
+          description: Field key to value (definitions in crm/workspace)
+          additionalProperties: true
+        source:
           type: string
-        city:
-          type: string
-        state_id:
-          type: string
-          format: uuid
-        zip:
-          type: string
-        country_id:
-          type: string
-          format: uuid
-      description: Request body for creating a new contact person
+          description: 'Where the contact came from: form:<slug>, import, api, manual'
+        attribution:
+          type: object
+          properties:
+            utm_source:
+              type: string
+            utm_medium:
+              type: string
+            utm_campaign:
+              type: string
+            utm_term:
+              type: string
+            utm_content:
+              type: string
+            referrer:
+              type: string
+            landing_page:
+              type: string
+          description: First-touch attribution
+        sms_consent:
+          type: boolean
+        tracking_optout:
+          type: boolean
+      required:
+      - email
     CreateMailingListRequest:
       type: object
       required:
@@ -3745,58 +4173,37 @@ components:
           format: uuid
     CreateOrganisationRequest:
       type: object
-      required:
-      - name
       properties:
         name:
           type: string
           maxLength: 255
-        email:
+        domain:
           type: string
-          format: email
-        phone:
-          type: string
+          maxLength: 255
         website:
           type: string
           format: uri
-        industry_id:
+        industry:
           type: string
-          format: uuid
-        company_size:
+          maxLength: 128
+        size:
           type: string
           enum:
-          - STARTUP
-          - SMB
-          - MID_MARKET
-          - ENTERPRISE
-        employees:
-          type: integer
-          format: int32
-        annual_revenue:
+          - 1-10
+          - 11-50
+          - 51-200
+          - 201-1000
+          - 1001-5000
+          - 5000+
+          description: Employee band
+        country_code:
           type: string
-          format: decimal
-          pattern: ^-?\d{1,15}(\.\d{1,4})?$
-          description: Decimal string in the currency of the record.
-        description:
-          type: string
+          pattern: ^[A-Z]{2}$
         parent_id:
           type: string
           format: uuid
-        street:
-          type: string
-        street2:
-          type: string
-        city:
-          type: string
-        state_id:
-          type: string
-          format: uuid
-        zip:
-          type: string
-        country_id:
-          type: string
-          format: uuid
-      description: Request body for creating a new account/organization
+      required:
+      - name
     CreateSegmentRequest:
       type: object
       required:
@@ -3938,6 +4345,22 @@ components:
         updated_at:
           type: string
           format: date-time
+        channel:
+          type: string
+        pending_count:
+          type: integer
+          format: int64
+          readOnly: true
+        postal_address:
+          type: string
+        reminder_text:
+          type: string
+        growth_30d:
+          type: array
+          items:
+            type: integer
+            format: int64
+          readOnly: true
       description: A mailing list. Consent is per list; a contact may be on several.
     MergeContactsRequest:
       type: object
@@ -3975,10 +4398,6 @@ components:
       description: Result of merging multiple records together
     Organisation:
       type: object
-      required:
-      - id
-      - name
-      - create_date
       properties:
         id:
           type: string
@@ -3986,153 +4405,60 @@ components:
         name:
           type: string
           maxLength: 255
-        email:
+        domain:
           type: string
-          format: email
           maxLength: 255
-        phone:
-          type: string
-          maxLength: 64
         website:
           type: string
           format: uri
-          maxLength: 255
-        industry_id:
-          type: string
-          format: uuid
-        industry_name:
-          type: string
-          readOnly: true
-        company_size:
-          type: string
-          enum:
-          - STARTUP
-          - SMB
-          - MID_MARKET
-          - ENTERPRISE
-        employees:
-          type: integer
-          format: int32
-        annual_revenue:
-          type: string
-          format: decimal
-          pattern: ^-?\d{1,15}(\.\d{1,4})?$
-          description: Decimal string in the currency of the record.
-        description:
-          type: string
-        parent_id:
-          type: string
-          format: uuid
-          description: Parent company
-        child_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          readOnly: true
-        street:
-          type: string
-          maxLength: 255
-        street2:
-          type: string
-          maxLength: 255
-        city:
+        industry:
           type: string
           maxLength: 128
-        state_id:
+        size:
           type: string
-          format: uuid
-        zip:
-          type: string
-          maxLength: 32
-        country_id:
-          type: string
-          format: uuid
-        country_name:
-          type: string
-          readOnly: true
-        active:
-          type: boolean
-          default: true
-        color:
-          type: integer
-          format: int32
-          minimum: 1
-          maximum: 16
-        create_date:
-          type: string
-          format: date-time
-          readOnly: true
-        write_date:
-          type: string
-          format: date-time
-          readOnly: true
-        contact_count:
-          type: integer
-          format: int32
-          readOnly: true
-        active_lead_count:
-          type: integer
-          format: int32
-          readOnly: true
-        total_revenue:
-          type: string
-          format: decimal
-          pattern: ^-?\d{1,15}(\.\d{1,4})?$
-          description: Decimal string in the currency of the record.
-          readOnly: true
-        contact_name:
-          type: string
-          minLength: 1
-          maxLength: 200
-          description: The person to address at the customer
-        region:
-          type: string
-          minLength: 1
-          maxLength: 100
+          enum:
+          - 1-10
+          - 11-50
+          - 51-200
+          - 201-1000
+          - 1001-5000
+          - 5000+
+          description: Employee band
         country_code:
           type: string
           pattern: ^[A-Z]{2}$
-          description: ISO 3166-1 alpha-2 (RERP has no country table yet; country_id stays unset)
-        tax_id:
-          type: string
-          minLength: 1
-          maxLength: 50
-          description: VAT or tax id
-        origin:
-          $ref: '#/components/schemas/OrganisationOrigin'
-      description: A company or organization that is a customer or prospect
-    OrganisationOrigin:
-      type: object
-      readOnly: true
-      required:
-      - conversion_id
-      - reason
-      - reference
-      - converted_at
-      properties:
-        conversion_id:
+        parent_id:
           type: string
           format: uuid
-        reason:
-          type: string
-          enum:
-          - stripe_checkout
-          - order
-          - contract
-        reference:
-          type: string
-        funnel_lead_id:
+        contact_count:
+          type: integer
+          format: int64
+          readOnly: true
+        open_deal_count:
+          type: integer
+          format: int64
+          readOnly: true
+        converted:
+          type: boolean
+          readOnly: true
+        customer_account_id:
           type: string
           format: uuid
-        stripe_customer_id:
-          type: string
-        converted_by:
-          type: string
-        converted_at:
+          description: RERP crm/accounts customer, after conversion (ADR 003)
+          readOnly: true
+        created_at:
           type: string
           format: date-time
-      description: How the customer crossed into RERP (ADR 003)
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - id
+      - name
+      - created_at
+      description: A prospect company. Becomes a customer in RERP crm/accounts only through a signed conversion.
     OrganisationPage:
       type: object
       required:
@@ -4299,6 +4625,8 @@ components:
           type: string
           format: date-time
           readOnly: true
+        source:
+          type: string
     SuppressionReason:
       type: string
       enum:
@@ -4351,64 +4679,67 @@ components:
     UpdateContactRequest:
       type: object
       properties:
-        name:
-          type: string
         email:
           type: string
+          format: email
+          maxLength: 255
+        first_name:
+          type: string
+          maxLength: 128
+        last_name:
+          type: string
+          maxLength: 128
         phone:
           type: string
-        mobile:
+          maxLength: 32
+          description: E.164
+        job_title:
           type: string
-        title:
-          type: string
-          enum:
-          - MR
-          - MRS
-          - MME
-        function:
-          type: string
-        department:
-          type: string
+          maxLength: 128
         organisation_id:
           type: string
           format: uuid
-        parent_id:
+        country_code:
           type: string
-          format: uuid
-        street:
+          pattern: ^[A-Z]{2}$
+        timezone:
           type: string
-        street2:
+          description: IANA zone, e.g. Europe/Berlin
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names
+        custom_fields:
+          type: object
+          properties: {}
+          description: Field key to value (definitions in crm/workspace)
+          additionalProperties: true
+        source:
           type: string
-        city:
-          type: string
-        state_id:
-          type: string
-          format: uuid
-        zip:
-          type: string
-        country_id:
-          type: string
-          format: uuid
-        active:
+          description: 'Where the contact came from: form:<slug>, import, api, manual'
+        attribution:
+          type: object
+          properties:
+            utm_source:
+              type: string
+            utm_medium:
+              type: string
+            utm_campaign:
+              type: string
+            utm_term:
+              type: string
+            utm_content:
+              type: string
+            referrer:
+              type: string
+            landing_page:
+              type: string
+          description: First-touch attribution
+        sms_consent:
           type: boolean
-      required:
-      - name
-      - email
-      - phone
-      - mobile
-      - title
-      - function
-      - department
-      - organisation_id
-      - parent_id
-      - street
-      - street2
-      - city
-      - state_id
-      - zip
-      - country_id
-      - active
-      description: Request body for updating an existing contact person
+        tracking_optout:
+          type: boolean
     UpdateMailingListRequest:
       type: object
       properties:
@@ -4430,70 +4761,32 @@ components:
       properties:
         name:
           type: string
-        email:
+          maxLength: 255
+        domain:
           type: string
-        phone:
-          type: string
+          maxLength: 255
         website:
           type: string
-        industry_id:
+          format: uri
+        industry:
           type: string
-          format: uuid
-        company_size:
+          maxLength: 128
+        size:
           type: string
           enum:
-          - STARTUP
-          - SMB
-          - MID_MARKET
-          - ENTERPRISE
-        employees:
-          type: integer
-          format: int32
-        annual_revenue:
+          - 1-10
+          - 11-50
+          - 51-200
+          - 201-1000
+          - 1001-5000
+          - 5000+
+          description: Employee band
+        country_code:
           type: string
-          format: decimal
-          pattern: ^-?\d{1,15}(\.\d{1,4})?$
-          description: Decimal string in the currency of the record.
-        description:
-          type: string
+          pattern: ^[A-Z]{2}$
         parent_id:
           type: string
           format: uuid
-        street:
-          type: string
-        street2:
-          type: string
-        city:
-          type: string
-        state_id:
-          type: string
-          format: uuid
-        zip:
-          type: string
-        country_id:
-          type: string
-          format: uuid
-        active:
-          type: boolean
-      required:
-      - name
-      - email
-      - phone
-      - website
-      - industry_id
-      - company_size
-      - employees
-      - annual_revenue
-      - description
-      - parent_id
-      - street
-      - street2
-      - city
-      - state_id
-      - zip
-      - country_id
-      - active
-      description: Request body for updating an existing account/organization
     UpdateTagRequest:
       type: object
       properties:

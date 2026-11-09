@@ -9,12 +9,14 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
+    //   "queued": 1,
     //   "sent_to": [
     //     "priya.natarajan@northwindtraders.example"
     //   ]
     // }
     match serde_json::from_str::<Response>(
         r#"{
+  "queued": 1,
   "sent_to": [
     "priya.natarajan@northwindtraders.example"
   ]
@@ -29,6 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
 
     HttpJson::ok(Response {
         message_ids: Some(vec![]),
+        queued: Some(1),
         sent_to: vec!["priya.natarajan@northwindtraders.example".to_string()],
     })
 }

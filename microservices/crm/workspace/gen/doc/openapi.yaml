@@ -65,16 +65,19 @@ paths:
                   name: Website (public tracking key)
                   scopes: {}
                   created_at: '2026-07-28T16:00:00Z'
+                  last_used_at: '2026-11-05T15:59:48Z'
                   is_active: true
                 - id: 08dd68b1-5f07-5687-b207-d5b9cf18daaf
                   name: Product backend
                   scopes: {}
                   created_at: '2026-07-28T16:00:00Z'
+                  last_used_at: '2026-11-05T15:59:59Z'
                   is_active: true
                 - id: 02a937b8-4dcd-59b0-9797-dcefad332287
                   name: BI export
                   scopes: {}
                   created_at: '2026-07-28T16:00:00Z'
+                  last_used_at: '2026-11-04T16:00:00Z'
                   is_active: true
                 total: 3
                 page: 1
@@ -616,37 +619,43 @@ paths:
                 items:
                 - id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
                   entity: contact
+                  key: plan
                   label: Plan
+                  type: SELECT
                   options: {}
                   required: false
                   searchable: false
                   group: Profile
                   sequence: 1
                   show_on_card: false
-                  name: Northwind Traders
-                  field_type: STRING
+                  merge_field: custom.plan
+                  hint: ''
                   visible: false
                 - id: 6cb8ed49-8877-5cc2-bc25-eafe10a4a357
                   entity: contact
+                  key: renewal_date
                   label: Renewal date
+                  type: DATE
                   required: false
                   searchable: false
                   group: Profile
                   sequence: 2
                   show_on_card: false
-                  name: Northwind Traders
-                  field_type: STRING
+                  merge_field: custom.renewal_date
+                  hint: ''
                   visible: false
                 - id: 8b2236e2-bcc8-589a-baaf-fa871172e5ee
                   entity: contact
+                  key: seats
                   label: Seats
+                  type: STRING
                   required: false
                   searchable: false
                   group: Profile
                   sequence: 3
                   show_on_card: false
-                  name: Northwind Traders
-                  field_type: STRING
+                  merge_field: custom.seats
+                  hint: ''
                   visible: false
                 total: 20
                 page: 1
@@ -682,9 +691,9 @@ paths:
               $ref: '#/components/schemas/CreateCustomFieldRequest'
             example:
               entity: crm.lead
-              name: Northwind Traders
+              key: snippet.signature
               label: Primary
-              field_type: STRING
+              type: STRING
               options: {}
               required: false
               visible: false
@@ -705,15 +714,17 @@ paths:
               example:
                 id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
                 entity: contact
+                key: plan
                 label: Plan
+                type: SELECT
                 options: {}
                 required: false
                 searchable: false
                 group: Profile
                 sequence: 1
                 show_on_card: false
-                name: Northwind Traders
-                field_type: STRING
+                merge_field: custom.plan
+                hint: ''
                 visible: false
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -767,15 +778,17 @@ paths:
               example:
                 id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
                 entity: contact
+                key: plan
                 label: Plan
+                type: SELECT
                 options: {}
                 required: false
                 searchable: false
                 group: Profile
                 sequence: 1
                 show_on_card: false
-                name: Northwind Traders
-                field_type: STRING
+                merge_field: custom.plan
+                hint: ''
                 visible: false
         '404':
           $ref: '#/components/responses/NotFound'
@@ -816,7 +829,7 @@ paths:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
             example:
               label: Primary
-              field_type: STRING
+              type: STRING
               options: {}
               required: false
               visible: false
@@ -837,15 +850,17 @@ paths:
               example:
                 id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
                 entity: contact
+                key: plan
                 label: Plan
+                type: SELECT
                 options: {}
                 required: false
                 searchable: false
                 group: Profile
                 sequence: 1
                 show_on_card: false
-                name: Northwind Traders
-                field_type: STRING
+                merge_field: custom.plan
+                hint: ''
                 visible: false
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -930,15 +945,17 @@ paths:
               example:
                 id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
                 entity: contact
+                key: plan
                 label: Plan
+                type: SELECT
                 options: {}
                 required: false
                 searchable: false
                 group: Profile
                 sequence: 1
                 show_on_card: false
-                name: Northwind Traders
-                field_type: STRING
+                merge_field: custom.plan
+                hint: ''
                 visible: false
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -962,7 +979,7 @@ paths:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
             example:
               label: Primary
-              field_type: STRING
+              type: STRING
               options: {}
               required: false
               visible: false
@@ -1172,9 +1189,9 @@ paths:
                 items:
                 - id: 94b293ed-258b-5091-8e79-75d2ac471f25
                   entity: Entity
-                  name: Northwind Traders
+                  key: snippet.signature
                   label: Primary
-                  field_type: STRING
+                  type: STRING
                   visible: false
                 total: 2
                 page: 1
@@ -1631,6 +1648,7 @@ paths:
                 progress_pct: 0
                 requested_by: alex
                 queued_at: '2026-11-05T16:00:00Z'
+                requested_by_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1694,6 +1712,7 @@ paths:
                 queued_at: '2026-11-05T15:57:00Z'
                 started_at: '2026-11-05T15:58:00Z'
                 finished_at: '2026-11-05T16:00:00Z'
+                requested_by_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1756,6 +1775,7 @@ paths:
                 queued_at: '2026-11-05T15:57:00Z'
                 started_at: '2026-11-05T15:58:00Z'
                 finished_at: '2026-11-05T16:00:00Z'
+                requested_by_name: Alex Morgan
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1829,8 +1849,7 @@ paths:
                   field: plan
                   code: UNKNOWN_FIELD
                   message: Column "plan" was not mapped to a field
-                  raw:
-                    plan: Business
+                  raw: {}
                 total: 4
                 page: 1
                 limit: 20
@@ -2044,18 +2063,21 @@ paths:
                   can_send: true
                   can_approve_social: true
                   last_active_at: '2026-11-05T16:00:00Z'
+                  can_send_label: 'Yes'
                 - user_id: sam
                   name: Sam Lee
                   role: owner
                   can_send: false
                   can_approve_social: false
                   last_active_at: '2026-11-05T14:00:00Z'
+                  can_send_label: No · transactional only
                 - user_id: riya
                   name: Riya Kapoor
                   role: owner
                   can_send: false
                   can_approve_social: true
                   last_active_at: '2026-11-04T16:00:00Z'
+                  can_send_label: Drafts only
                 total: 2
                 page: 1
                 limit: 25
@@ -2108,6 +2130,8 @@ paths:
                   - contact.subscribed
                   - contact.unsubscribed
                   created_at: '2026-08-07T16:00:00Z'
+                  status: OK
+                  failures: 0
                   name: Northwind Traders
                   is_active: true
                 - id: ebc7ef80-6cc7-5bcc-896f-309e9b0e282e
@@ -2115,6 +2139,9 @@ paths:
                   events:
                   - deal.won
                   created_at: '2026-09-26T16:00:00Z'
+                  status: OK
+                  failures: 0
+                  detail: Signed · Pub/Sub
                   name: Northwind Traders
                   is_active: true
                 total: 2
@@ -2172,6 +2199,8 @@ paths:
                 - contact.subscribed
                 - contact.unsubscribed
                 created_at: '2026-08-07T16:00:00Z'
+                status: OK
+                failures: 0
                 name: Northwind Traders
                 is_active: true
         '400':
@@ -2225,6 +2254,8 @@ paths:
                 - contact.subscribed
                 - contact.unsubscribed
                 created_at: '2026-08-07T16:00:00Z'
+                status: OK
+                failures: 0
                 name: Northwind Traders
                 is_active: true
         '404':
@@ -2288,6 +2319,8 @@ paths:
                 - contact.subscribed
                 - contact.unsubscribed
                 created_at: '2026-08-07T16:00:00Z'
+                status: OK
+                failures: 0
                 name: Northwind Traders
                 is_active: true
         '400':
@@ -2908,6 +2941,10 @@ components:
         expires_at:
           type: string
           format: date-time
+        last_used_at:
+          type: string
+          format: date-time
+          readOnly: true
       description: An API key used for authentication and authorization
     AuditAction:
       type: string
@@ -3057,9 +3094,9 @@ components:
       type: object
       required:
       - entity
-      - name
+      - key
       - label
-      - field_type
+      - type
       properties:
         entity:
           type: string
@@ -3072,13 +3109,13 @@ components:
           - crm.opportunity
           - crm.deal
           - crm.task
-        name:
+        key:
           type: string
           maxLength: 128
         label:
           type: string
           maxLength: 255
-        field_type:
+        type:
           $ref: '#/components/schemas/FieldType'
         options:
           type: object
@@ -3166,9 +3203,9 @@ components:
       required:
       - id
       - entity
-      - name
+      - key
       - label
-      - field_type
+      - type
       - visible
       properties:
         id:
@@ -3177,13 +3214,13 @@ components:
         entity:
           type: string
           maxLength: 64
-        name:
+        key:
           type: string
           maxLength: 128
         label:
           type: string
           maxLength: 255
-        field_type:
+        type:
           $ref: '#/components/schemas/FieldType'
         options:
           type: object
@@ -3217,6 +3254,12 @@ components:
         personalization_tag:
           type: string
           description: Merge tag (%FIELD%) usable in templates
+        merge_field:
+          type: string
+        hint:
+          type: string
+        required_at_stage:
+          type: string
       description: A custom field definition for extending entity schemas
     DataRequest:
       type: object
@@ -3500,6 +3543,9 @@ components:
         finished_at:
           type: string
           format: date-time
+        requested_by_name:
+          type: string
+          readOnly: true
       required:
       - id
       - kind
@@ -3538,6 +3584,19 @@ components:
         raw:
           type: object
           description: The source row as received
+          properties:
+            First:
+              type: string
+              readOnly: true
+            Last:
+              type: string
+              readOnly: true
+            Email:
+              type: string
+              readOnly: true
+            Company:
+              type: string
+              readOnly: true
       required:
       - row
       - code
@@ -3799,6 +3858,9 @@ components:
         last_active_at:
           type: string
           format: date-time
+        can_send_label:
+          type: string
+          readOnly: true
       required:
       - user_id
       - role
@@ -3829,7 +3891,7 @@ components:
       properties:
         label:
           type: string
-        field_type:
+        type:
           $ref: '#/components/schemas/FieldType'
         options:
           type: object
@@ -3939,6 +4001,15 @@ components:
         created_at:
           type: string
           format: date-time
+          readOnly: true
+        status:
+          type: string
+        failures:
+          type: integer
+          format: int64
+          readOnly: true
+        detail:
+          type: string
           readOnly: true
       description: A webhook endpoint for receiving event notifications
     WebhookDeliveryLog:

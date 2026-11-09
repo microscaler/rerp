@@ -1,0 +1,214 @@
+service: insights
+database: crm_insights
+schema: insights
+conventions: Every table carries workspace_id with row-level security on it unless marked otherwise; see 14-data-model.md.
+tables:
+  dashboards:
+    description: Dashboards.
+    api: Dashboard
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      user_id: varchar(64)
+      name: text
+      is_default: boolean null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  dashboard_widgets:
+    description: Widgets on a dashboard with their saved query.
+    api: DashboardWidget
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      dashboard_id: uuid fk dashboards(id) cascade
+      title: text
+      kind: text
+      query: jsonb
+      prompt: text null
+      position: integer
+      width: integer default 6
+      refreshed_at: timestamptz null
+      updated_at: timestamptz default now()
+  saved_reports:
+    description: Saved reports.
+    api: SavedReport
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      report_type: text
+      filters: jsonb null
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  report_schedules:
+    description: Scheduled report and widget emails.
+    api: ReportSchedule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      report_id: uuid null fk saved_reports(id) cascade
+      widget_id: uuid null fk dashboard_widgets(id) cascade
+      frequency: text check(DAILY,WEEKLY,MONTHLY)
+      recipient_ids: jsonb
+      is_active: boolean default true
+      last_sent: timestamptz null
+      updated_at: timestamptz default now()
+  scores:
+    description: Named, rule-based scores.
+    api: Score
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      name: text
+      description: text null
+      entity: text check(CONTACT,DEAL)
+      status: text check(DRAFT,ACTIVE)
+      thresholds: jsonb
+      created_at: timestamptz default now()
+      updated_at: timestamptz default now()
+  score_rules:
+    description: Rules of a score.
+    api: ScoreRule
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      score_id: uuid fk scores(id) cascade
+      label: text null
+      subject: text
+      operator: text
+      value: text null
+      points: integer
+      decay_days: integer default 0
+      updated_at: timestamptz default now()
+  entity_scores:
+    description: Current score per contact or deal.
+    columns:
+      workspace_id: uuid
+      score_id: uuid pk fk scores(id) cascade
+      entity_id: uuid pk
+      entity: text check(CONTACT,DEAL)
+      score: integer
+      band: text check(COLD,WARM,HOT)
+      updated_at: timestamptz default now()
+    indexes:
+    - score_id, band
+  score_hits:
+    description: Rule hits that make up a score (for explain and decay).
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      score_id: uuid fk scores(id) cascade
+      rule_id: uuid fk score_rules(id) cascade
+      entity_id: uuid
+      points: integer
+      at: timestamptz
+      decays_at: timestamptz null
+    indexes:
+    - score_id, entity_id
+    - decays_at
+    append_only: true
+  rm_deals:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      deal_id: uuid pk
+      pipeline_id: uuid
+      stage_id: uuid
+      owner_id: varchar(64) null
+      status: text
+      value: numeric(19,4)
+      currency: char(3)
+      source: text null
+      created_at: timestamptz
+      stage_entered_at: timestamptz null
+      closed_at: timestamptz null
+      expected_close_date: date null
+    read_model: true
+  rm_deal_stage_changes:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      deal_id: uuid
+      from_stage_id: uuid null
+      to_stage_id: uuid
+      at: timestamptz
+    read_model: true
+  rm_contacts:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      contact_id: uuid pk
+      status: text
+      source: text null
+      country_code: char(2) null
+      organisation_id: uuid null
+      created_at: timestamptz
+      tags: jsonb null
+      custom_fields: jsonb null
+    read_model: true
+  rm_messages:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      send_id: uuid pk
+      contact_id: uuid
+      campaign_id: uuid null
+      workflow_id: uuid null
+      channel: text
+      sent_at: timestamptz
+      delivered_at: timestamptz null
+      opened_at: timestamptz null
+      clicked_at: timestamptz null
+      bounced_at: timestamptz null
+      complained_at: timestamptz null
+      unsubscribed_at: timestamptz null
+      client: text null
+    read_model: true
+  rm_enrolments:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      enrolment_id: uuid pk
+      workflow_id: uuid
+      contact_id: uuid
+      status: text
+      entered_at: timestamptz
+      ended_at: timestamptz null
+      goal_reached_at: timestamptz null
+    read_model: true
+  rm_tasks:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      task_id: uuid pk
+      type_id: uuid
+      owner_id: varchar(64) null
+      status: text
+      outcome_id: uuid null
+      due_at: timestamptz null
+      completed_at: timestamptz null
+    read_model: true
+  rm_conversions:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      id: uuid pk
+      definition_id: uuid null
+      contact_id: uuid null
+      value: numeric(19,4) null
+      currency: char(3) null
+      source: text null
+      at: timestamptz
+    read_model: true
+  rm_list_daily:
+    description: Read model, rebuilt from events (never written by the API).
+    columns:
+      workspace_id: uuid
+      list_id: uuid pk
+      date: date pk
+      subscribed: integer default 0
+      unsubscribed: integer default 0
+      bounced: integer default 0
+      total: bigint default 0
+    read_model: true

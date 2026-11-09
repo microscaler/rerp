@@ -7,6 +7,9 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AdAccount {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub authorize_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,6 +51,9 @@ pub struct AdAccount {
 
     pub platform: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spend_30d: Option<i64>,
+
     pub status: String,
 }
 
@@ -66,6 +72,9 @@ pub struct AdAdapter {
     pub identity: Option<Vec<String>>,
 
     pub kind: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub minimums: Option<serde_json::Value>,
@@ -109,6 +118,9 @@ pub struct AdAttributionReport {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AdAudience {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
@@ -180,6 +192,9 @@ pub struct AdAudienceMember {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub consent_source: Option<String>,
+
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -246,7 +261,13 @@ pub struct AdAudiencePreview {
     pub excluded: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub identifier_coverage: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub platform_minimum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_count: Option<i64>,
@@ -330,12 +351,24 @@ pub struct AdBuy {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -349,6 +382,12 @@ pub struct AdBuy {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -592,6 +631,12 @@ pub struct AdConversionRule {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -627,6 +672,9 @@ pub struct AdConversionRule {
     pub require_click: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -639,6 +687,12 @@ pub struct AdConversionRule {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AdConversionRuleInput {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
@@ -671,6 +725,9 @@ pub struct AdConversionRuleInput {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
@@ -721,6 +778,9 @@ pub struct AdCreative {
     pub platforms: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub review: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -758,6 +818,9 @@ pub struct AdLinkTagRule {
     pub id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -785,6 +848,9 @@ pub struct AdLinkTagRuleInput {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
@@ -977,12 +1043,24 @@ pub struct ApplyAdRecommendationResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -996,6 +1074,12 @@ pub struct ApplyAdRecommendationResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1058,6 +1142,9 @@ pub struct ArchiveFormResponse {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1083,6 +1170,9 @@ pub struct ArchiveFormResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_ids: Option<Vec<String>>,
@@ -1145,6 +1235,9 @@ pub struct AttributionModelInput {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AttributionOverview {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub funnel: Option<Vec<serde_json::Value>>,
+
     pub rows: Vec<serde_json::Value>,
 }
 
@@ -1190,6 +1283,9 @@ pub struct ConnectAdAccountRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ConnectAdAccountResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub authorize_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1230,6 +1326,9 @@ pub struct ConnectAdAccountResponse {
     pub pixel_id: Option<String>,
 
     pub platform: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spend_30d: Option<i64>,
 
     pub status: String,
 }
@@ -1385,6 +1484,9 @@ pub struct CreateAdAudienceResponse {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1469,12 +1571,24 @@ pub struct CreateAdBuyResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -1488,6 +1602,12 @@ pub struct CreateAdBuyResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1557,6 +1677,9 @@ pub struct CreateAdCreativeResponse {
     pub platforms: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub review: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1581,6 +1704,9 @@ pub struct CreateAdLinkTagRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
@@ -1613,6 +1739,9 @@ pub struct CreateAdLinkTagResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
@@ -1745,6 +1874,12 @@ pub struct CreateConversionRuleRequest {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1778,6 +1913,9 @@ pub struct CreateConversionRuleRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
@@ -1794,6 +1932,12 @@ pub struct CreateConversionRuleResponse {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1827,6 +1971,9 @@ pub struct CreateConversionRuleResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
@@ -1926,6 +2073,9 @@ pub struct CreateFormResponse {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -1951,6 +2101,9 @@ pub struct CreateFormResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_ids: Option<Vec<String>>,
@@ -2031,10 +2184,19 @@ pub struct CreateTrackedSiteResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub events_24h: Option<i64>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub identified_30d: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_all_pages: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_event_at: Option<String>,
@@ -2203,6 +2365,9 @@ pub struct DeclareEventTypeResponse {
     pub last_seen_at: Option<String>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2288,6 +2453,9 @@ pub struct EventTypeDef {
     pub last_seen_at: Option<String>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub used_by: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2382,12 +2550,24 @@ pub struct FormStyle {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct FormSubmission {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub attribution: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub contact_id: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub email: Option<String>,
+
     pub form_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub form_name: Option<String>,
 
     pub id: String,
 
@@ -2401,6 +2581,15 @@ pub struct FormSubmission {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub user_agent: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_campaign: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_medium: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub utm_source: Option<String>,
 
     pub values: serde_json::Value,
 
@@ -2421,6 +2610,9 @@ pub struct FormSubmissionPage {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAdAccountResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience_count: Option<i64>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authorize_url: Option<String>,
 
@@ -2463,6 +2655,9 @@ pub struct GetAdAccountResponse {
 
     pub platform: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spend_30d: Option<i64>,
+
     pub status: String,
 }
 
@@ -2493,6 +2688,9 @@ pub struct GetAdAttributionResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAdAudienceResponse {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
@@ -2570,12 +2768,24 @@ pub struct GetAdBuyResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -2589,6 +2799,12 @@ pub struct GetAdBuyResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2682,6 +2898,9 @@ pub struct GetAdCreativeResponse {
     pub platforms: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub review: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2738,6 +2957,9 @@ pub struct GetAdTrackingSettingsResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetAttributionOverviewResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub funnel: Option<Vec<serde_json::Value>>,
+
     pub rows: Vec<serde_json::Value>,
 }
 
@@ -2805,6 +3027,12 @@ pub struct GetConversionRuleResponse {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2838,6 +3066,9 @@ pub struct GetConversionRuleResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
@@ -2932,6 +3163,9 @@ pub struct GetFormResponse {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -2957,6 +3191,9 @@ pub struct GetFormResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_ids: Option<Vec<String>>,
@@ -3234,6 +3471,9 @@ pub struct ListAttributionModelsResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListContactAdAudiencesResponse {
     pub items: Vec<AdAudienceMember>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub total: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -3374,6 +3614,9 @@ pub struct PauseAdAudienceResponse {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -3440,12 +3683,24 @@ pub struct PauseAdBuyResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -3459,6 +3714,12 @@ pub struct PauseAdBuyResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -3517,7 +3778,13 @@ pub struct PreviewAdAudienceResponse {
     pub excluded: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub identifier_coverage: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub platform_minimum: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source_count: Option<i64>,
@@ -3525,6 +3792,9 @@ pub struct PreviewAdAudienceResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ReconnectAdAccountResponse {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience_count: Option<i64>,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub authorize_url: Option<String>,
 
@@ -3567,6 +3837,9 @@ pub struct ReconnectAdAccountResponse {
 
     pub platform: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spend_30d: Option<i64>,
+
     pub status: String,
 }
 
@@ -3598,11 +3871,20 @@ pub struct RecordAdConversionRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct RecordAdConversionResponse {
     pub items: Vec<AdConversion>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub queued: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub rules_matched: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ResumeAdAudienceResponse {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
@@ -3671,12 +3953,24 @@ pub struct ResumeAdBuyResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -3690,6 +3984,12 @@ pub struct ResumeAdBuyResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -3840,10 +4140,19 @@ pub struct TrackedSite {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub events_24h: Option<i64>,
+
     pub id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub identified_30d: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub include_all_pages: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub kind: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_event_at: Option<String>,
@@ -3952,6 +4261,9 @@ pub struct UpdateAdAccountRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAdAccountResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub audience_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub authorize_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -3993,6 +4305,9 @@ pub struct UpdateAdAccountResponse {
 
     pub platform: String,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub spend_30d: Option<i64>,
+
     pub status: String,
 }
 
@@ -4032,6 +4347,9 @@ pub struct UpdateAdAudienceRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateAdAudienceResponse {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_basis: Option<String>,
@@ -4112,12 +4430,24 @@ pub struct UpdateAdBuyResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_by: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_contacts: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub holdout_percent: Option<i64>,
+
     pub id: String,
 
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub pacing_note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub purpose: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub recommendation: Option<String>,
 
     pub spec: AdBuySpec,
 
@@ -4131,6 +4461,12 @@ pub struct UpdateAdBuyResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub warm_up_for_campaign_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_for_campaign_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warm_up_send_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -4148,6 +4484,9 @@ pub struct UpdateAdLinkTagRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub enabled: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
@@ -4180,6 +4519,9 @@ pub struct UpdateAdLinkTagResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_campaign: Option<String>,
@@ -4387,6 +4729,12 @@ pub struct UpdateConversionRuleRequest {
     pub account_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -4419,6 +4767,9 @@ pub struct UpdateConversionRuleRequest {
     pub require_click: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -4431,6 +4782,12 @@ pub struct UpdateConversionRuleRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateConversionRuleResponse {
     pub account_id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub account_names: Option<Vec<String>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub consent_required: Option<bool>,
@@ -4466,6 +4823,9 @@ pub struct UpdateConversionRuleResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub require_click: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub require_click_param: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sent_30d: Option<i64>,
@@ -4565,6 +4925,9 @@ pub struct UpdateFormResponse {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -4590,6 +4953,9 @@ pub struct UpdateFormResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_ids: Option<Vec<String>>,
@@ -4796,6 +5162,9 @@ pub struct WebForm {
     pub on_submit: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub placement: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub public_url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -4821,6 +5190,9 @@ pub struct WebForm {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub utm_source_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub view_count_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub workflow_ids: Option<Vec<String>>,

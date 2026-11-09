@@ -11,12 +11,15 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // {
     //   "active": 1204,
     //   "completed": 8311,
+    //   "entered_total": 9515,
+    //   "failed": 4,
     //   "goal_reached": 1911,
     //   "steps": [
     //     {
     //       "branch_no": 0,
     //       "branch_yes": 0,
     //       "clicked": 1142,
+    //       "detail": "Welcome · day 0: what you can do today",
     //       "failed": 2,
     //       "kind": "ACTION",
     //       "label": "Send email",
@@ -30,6 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "branch_no": 0,
     //       "branch_yes": 0,
     //       "clicked": 0,
+    //       "detail": "",
     //       "failed": 0,
     //       "kind": "WAIT",
     //       "label": "Wait 2 days",
@@ -43,6 +47,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "branch_no": 3471,
     //       "branch_yes": 5640,
     //       "clicked": 0,
+    //       "detail": "engagement:opened:2",
     //       "failed": 0,
     //       "kind": "IF_ELSE",
     //       "label": "Opened the previous email?",
@@ -60,12 +65,15 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         r#"{
   "active": 1204,
   "completed": 8311,
+  "entered_total": 9515,
+  "failed": 4,
   "goal_reached": 1911,
   "steps": [
     {
       "branch_no": 0,
       "branch_yes": 0,
       "clicked": 1142,
+      "detail": "Welcome · day 0: what you can do today",
       "failed": 2,
       "kind": "ACTION",
       "label": "Send email",
@@ -79,6 +87,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "branch_no": 0,
       "branch_yes": 0,
       "clicked": 0,
+      "detail": "",
       "failed": 0,
       "kind": "WAIT",
       "label": "Wait 2 days",
@@ -92,6 +101,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "branch_no": 3471,
       "branch_yes": 5640,
       "clicked": 0,
+      "detail": "engagement:opened:2",
       "failed": 0,
       "kind": "IF_ELSE",
       "label": "Opened the previous email?",
@@ -114,6 +124,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        active: 1204,completed: 8311,goal_reached: Some(1911),steps: vec![serde_json::from_str::<serde_json::Value>(r#"{"branch_no":0,"branch_yes":0,"clicked":1142,"failed":2,"kind":"ACTION","label":"Send email","opened":5899,"passed":9515,"sent":9515,"step_id":"f1189b89-3e27-5826-bc93-e33f7450d394","waiting_now":0}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"branch_no":0,"branch_yes":0,"clicked":0,"failed":0,"kind":"WAIT","label":"Wait 2 days","opened":0,"passed":9513,"sent":0,"step_id":"6987f07d-c099-529a-bb28-e900ce5e5d00","waiting_now":402}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"branch_no":3471,"branch_yes":5640,"clicked":0,"failed":0,"kind":"IF_ELSE","label":"Opened the previous email?","opened":0,"passed":9111,"sent":0,"step_id":"94f0ecb3-8d57-54c0-937b-10c11b11cb2c","waiting_now":0}"#).unwrap_or(serde_json::Value::Null)],stopped: Some(89),workflow_id: "22e49987-c27c-538a-9688-56d9ca17a7ec".to_string(),
+        active: 1204,completed: 8311,entered_total: Some(9515),failed: Some(4),goal_reached: Some(1911),steps: vec![serde_json::from_str::<serde_json::Value>(r#"{"branch_no":0,"branch_yes":0,"clicked":1142,"detail":"Welcome · day 0: what you can do today","failed":2,"kind":"ACTION","label":"Send email","opened":5899,"passed":9515,"sent":9515,"step_id":"f1189b89-3e27-5826-bc93-e33f7450d394","waiting_now":0}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"branch_no":0,"branch_yes":0,"clicked":0,"detail":"","failed":0,"kind":"WAIT","label":"Wait 2 days","opened":0,"passed":9513,"sent":0,"step_id":"6987f07d-c099-529a-bb28-e900ce5e5d00","waiting_now":402}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"branch_no":3471,"branch_yes":5640,"clicked":0,"detail":"engagement:opened:2","failed":0,"kind":"IF_ELSE","label":"Opened the previous email?","opened":0,"passed":9111,"sent":0,"step_id":"94f0ecb3-8d57-54c0-937b-10c11b11cb2c","waiting_now":0}"#).unwrap_or(serde_json::Value::Null)],stopped: Some(89),workflow_id: "22e49987-c27c-538a-9688-56d9ca17a7ec".to_string(),
     })
 }

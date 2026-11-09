@@ -16,10 +16,6 @@ use std::convert::TryFrom;
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "assignee_id")]
-    pub assignee_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "automation")]
     pub automation: Option<AutomationHook>,
 
@@ -28,16 +24,20 @@ pub struct Request {
     pub completed: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "due_at")]
     pub due_at: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "note")]
+    pub note: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outcome_id")]
     pub outcome_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "owner_id")]
+    pub owner_id: Option<String>,
 
     #[serde(rename = "related_id")]
     pub related_id: String,
@@ -65,10 +65,6 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "assignee_id")]
-    pub assignee_id: Option<String>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "automation")]
     pub automation: Option<AutomationHook>,
@@ -105,15 +101,19 @@ pub struct Response {
     pub deal_title: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "description")]
-    pub description: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "due_at")]
     pub due_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "duration_minutes")]
+    pub duration_minutes: Option<i64>,
+
     #[serde(rename = "id")]
     pub id: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "note")]
+    pub note: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "outcome")]
@@ -130,6 +130,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "overdue")]
     pub overdue: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "owner_id")]
+    pub owner_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "owner_name")]

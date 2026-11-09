@@ -47,8 +47,16 @@ pub struct Response {
     #[serde(rename = "created_at")]
     pub created_at: Option<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "detail")]
+    pub detail: Option<String>,
+
     #[serde(rename = "events")]
     pub events: Vec<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "failures")]
+    pub failures: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "headers")]
@@ -78,6 +86,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "secret")]
     pub secret: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "status")]
+    pub status: Option<String>,
 
     #[serde(rename = "url")]
     pub url: String,

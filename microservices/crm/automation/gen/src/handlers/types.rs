@@ -165,12 +165,18 @@ pub struct ActivateWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -190,6 +196,15 @@ pub struct ActivateWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -273,12 +288,18 @@ pub struct BindWorkflowParametersResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -298,6 +319,15 @@ pub struct BindWorkflowParametersResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -597,12 +627,18 @@ pub struct CreateWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -622,6 +658,15 @@ pub struct CreateWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -733,12 +778,18 @@ pub struct DuplicateWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -758,6 +809,15 @@ pub struct DuplicateWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -802,6 +862,9 @@ pub struct EnrolContactsResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skipped: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -825,6 +888,9 @@ pub struct EnrolResult {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub skipped: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub workflow_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -835,7 +901,13 @@ pub struct Enrolment {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<String>,
@@ -1048,7 +1120,13 @@ pub struct GetEnrolmentResponse {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<String>,
@@ -1155,6 +1233,12 @@ pub struct GetWorkflowMapResponse {
     pub completed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub entered_total: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failed: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub goal_reached: Option<i64>,
 
     pub steps: Vec<serde_json::Value>,
@@ -1199,12 +1283,18 @@ pub struct GetWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -1224,6 +1314,15 @@ pub struct GetWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -1373,12 +1472,18 @@ pub struct InstantiateWorkflowRecipeResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -1398,6 +1503,15 @@ pub struct InstantiateWorkflowRecipeResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -1434,7 +1548,13 @@ pub struct JumpEnrolmentResponse {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<String>,
@@ -1658,12 +1778,18 @@ pub struct PatchWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -1683,6 +1809,15 @@ pub struct PatchWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -1740,12 +1875,18 @@ pub struct PauseWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -1765,6 +1906,15 @@ pub struct PauseWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -1864,7 +2014,13 @@ pub struct RetryEnrolmentResponse {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<String>,
@@ -2133,7 +2289,13 @@ pub struct StopEnrolmentResponse {
     pub contact_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    pub contact_name: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub current_step_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub current_step_label: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ended_at: Option<String>,
@@ -2528,12 +2690,18 @@ pub struct UpdateWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -2553,6 +2721,15 @@ pub struct UpdateWorkflowResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -2646,12 +2823,18 @@ pub struct Workflow {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub exit_rules: Option<ExitRules>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub goal_rate: Option<f64>,
+
     pub id: String,
 
     pub is_active: bool,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub last_run: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub messages_sent: Option<i64>,
 
     pub name: String,
 
@@ -2671,6 +2854,15 @@ pub struct Workflow {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub status: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub step_count: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_conversion_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop_on_unsubscribe: Option<bool>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tracking: Option<serde_json::Value>,
@@ -2710,6 +2902,12 @@ pub struct WorkflowMap {
     pub active: i64,
 
     pub completed: i64,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub entered_total: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub failed: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goal_reached: Option<i64>,

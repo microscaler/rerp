@@ -25,6 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         "MAID"
     //       ],
     //       "kind": "WALLED_GARDEN_API",
+    //       "label": "Meta",
     //       "minimums": {
     //         "audience_matched": 100
     //       },
@@ -43,6 +44,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         "gclid"
     //       ],
     //       "kind": "WALLED_GARDEN_API",
+    //       "label": "Google Ads",
     //       "minimums": {
     //         "audience_matched": 1000
     //       },
@@ -61,6 +63,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //         "company lists"
     //       ],
     //       "kind": "WALLED_GARDEN_API",
+    //       "label": "LinkedIn",
     //       "minimums": {},
     //       "notes": "No minimum · best B2B match",
     //       "platform": "LINKEDIN",
@@ -83,6 +86,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         "MAID"
       ],
       "kind": "WALLED_GARDEN_API",
+      "label": "Meta",
       "minimums": {
         "audience_matched": 100
       },
@@ -101,6 +105,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         "gclid"
       ],
       "kind": "WALLED_GARDEN_API",
+      "label": "Google Ads",
       "minimums": {
         "audience_matched": 1000
       },
@@ -119,6 +124,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         "company lists"
       ],
       "kind": "WALLED_GARDEN_API",
+      "label": "LinkedIn",
       "minimums": {},
       "notes": "No minimum · best B2B match",
       "platform": "LINKEDIN",
@@ -134,5 +140,5 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         }
     }
 
-    HttpJson::ok(Response(vec![serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","LOOKALIKES","CONVERSIONS"],"identity":["hashed email","phone","MAID"],"kind":"WALLED_GARDEN_API","minimums":{"audience_matched":100},"notes":"Audience ≥ ~100 matched","platform":"META","status":"SHIPPED"})).unwrap_or_default(), serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","CONVERSIONS","SPEND"],"identity":["hashed email (Customer Match)","gclid"],"kind":"WALLED_GARDEN_API","minimums":{"audience_matched":1000},"notes":"Customer Match ≥ 1,000 · developer token","platform":"GOOGLE_ADS","status":"SHIPPED"})).unwrap_or_default(), serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","CONVERSIONS","SPEND"],"identity":["hashed work email","company lists"],"kind":"WALLED_GARDEN_API","minimums":{},"notes":"No minimum · best B2B match","platform":"LINKEDIN","status":"SHIPPED"})).unwrap_or_default()]))
+    HttpJson::ok(Response(vec![serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","LOOKALIKES","CONVERSIONS"],"identity":["hashed email","phone","MAID"],"kind":"WALLED_GARDEN_API","label":"Meta","minimums":{"audience_matched":100},"notes":"Audience ≥ ~100 matched","platform":"META","status":"SHIPPED"})).unwrap_or_default(), serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","CONVERSIONS","SPEND"],"identity":["hashed email (Customer Match)","gclid"],"kind":"WALLED_GARDEN_API","label":"Google Ads","minimums":{"audience_matched":1000},"notes":"Customer Match ≥ 1,000 · developer token","platform":"GOOGLE_ADS","status":"SHIPPED"})).unwrap_or_default(), serde_json::from_value::<AdAdapter>(serde_json::json!({"capabilities":["AUDIENCES","CONVERSIONS","SPEND"],"identity":["hashed work email","company lists"],"kind":"WALLED_GARDEN_API","label":"LinkedIn","minimums":{},"notes":"No minimum · best B2B match","platform":"LINKEDIN","status":"SHIPPED"})).unwrap_or_default()]))
 }

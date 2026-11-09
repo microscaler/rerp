@@ -32,6 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // {
     //   "audience_count": 9870,
     //   "channel": "EMAIL",
+    //   "click_rate": 0.052,
     //   "completed_at": "2026-10-28T18:00:00Z",
     //   "created_at": "2026-10-25T16:00:00Z",
     //   "created_by": "alex",
@@ -42,7 +43,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "list_ids": [
     //     "09f5b2f9-2adc-5edd-a6fd-c20675680671"
     //   ],
+    //   "list_names": [
+    //     "Newsletter"
+    //   ],
     //   "name": "October product update",
+    //   "open_rate": 0.41,
     //   "preheader": "",
     //   "segment": {
     //     "items": [
@@ -59,10 +64,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "sent_count": 9870,
     //   "started_at": "2026-10-28T16:00:00Z",
     //   "status": "SENT",
+    //   "subject": "What shipped in October, and what is next",
     //   "template_id": "2f1c88b7-46a3-5aad-8049-40ebd0b66079",
+    //   "template_name": "October product update",
     //   "track_clicks": true,
     //   "track_opens": true,
     //   "track_replies": true,
+    //   "unsubscribed": 12,
     //   "updated_at": "2026-11-05T14:00:00Z",
     //   "utm_campaign_id": "d60cc555-1aa8-57d4-b917-88bbd0d5b437"
     // }
@@ -70,6 +78,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         r#"{
   "audience_count": 9870,
   "channel": "EMAIL",
+  "click_rate": 0.052,
   "completed_at": "2026-10-28T18:00:00Z",
   "created_at": "2026-10-25T16:00:00Z",
   "created_by": "alex",
@@ -80,7 +89,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "list_ids": [
     "09f5b2f9-2adc-5edd-a6fd-c20675680671"
   ],
+  "list_names": [
+    "Newsletter"
+  ],
   "name": "October product update",
+  "open_rate": 0.41,
   "preheader": "",
   "segment": {
     "items": [
@@ -97,10 +110,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sent_count": 9870,
   "started_at": "2026-10-28T16:00:00Z",
   "status": "SENT",
+  "subject": "What shipped in October, and what is next",
   "template_id": "2f1c88b7-46a3-5aad-8049-40ebd0b66079",
+  "template_name": "October product update",
   "track_clicks": true,
   "track_opens": true,
   "track_replies": true,
+  "unsubscribed": 12,
   "updated_at": "2026-11-05T14:00:00Z",
   "utm_campaign_id": "d60cc555-1aa8-57d4-b917-88bbd0d5b437"
 }"#,
@@ -113,6 +129,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        ab_test: Some(Default::default()),audience: Some(Default::default()),audience_count: Some(9870),channel: serde_json::from_value::<Channel>(serde_json::Value::String("EMAIL".to_string())).unwrap_or_default(),completed_at: Some("2026-10-28T18:00:00Z".to_string()),created_at: "2026-10-25T16:00:00Z".to_string(),created_by: Some("alex".to_string()),exclude_list_ids: Some(vec![]),folder: Some("Product".to_string()),id: "7de39bcc-4bc6-551b-a967-7b1629b846be".to_string(),kind: serde_json::from_value::<CampaignKind>(serde_json::Value::String("ONE_TIME".to_string())).unwrap_or_default(),links: Some(vec![]),list_ids: vec!["09f5b2f9-2adc-5edd-a6fd-c20675680671".to_string()],name: "October product update".to_string(),on_open_workflow_ids: Some(vec![]),postal_address_id: Some("example".to_string()),preheader: Some("".to_string()),public_archive: Some(true),readiness: Some(vec![]),recurrence: Some(Default::default()),reminder: Some(Default::default()),reply_to: Some("example".to_string()),segment: Some(serde_json::from_value::<ConditionGroup>(serde_json::json!({"items":[{"operator":"EQ","subject":"October product update"}],"op":"AND"})).unwrap_or_default()),send_at: Some("2026-10-28T16:00:00Z".to_string()),send_in_contact_timezone: Some(false),sender_id: Some("37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2".to_string()),sent_count: Some(9870),started_at: Some("2026-10-28T16:00:00Z".to_string()),status: serde_json::from_value::<CampaignStatus>(serde_json::Value::String("SENT".to_string())).unwrap_or_default(),template_id: Some("2f1c88b7-46a3-5aad-8049-40ebd0b66079".to_string()),track_clicks: Some(true),track_opens: Some(true),track_replies: Some(true),updated_at: Some("2026-11-05T14:00:00Z".to_string()),utm_campaign_id: Some("d60cc555-1aa8-57d4-b917-88bbd0d5b437".to_string()),variants: Some(vec![]),
+        ab_test: Some(Default::default()),audience: Some(Default::default()),audience_count: Some(9870),channel: serde_json::from_value::<Channel>(serde_json::Value::String("EMAIL".to_string())).unwrap_or_default(),click_rate: Some(0.052),completed_at: Some("2026-10-28T18:00:00Z".to_string()),created_at: "2026-10-25T16:00:00Z".to_string(),created_by: Some("alex".to_string()),exclude_list_ids: Some(vec![]),folder: Some("Product".to_string()),id: "7de39bcc-4bc6-551b-a967-7b1629b846be".to_string(),kind: serde_json::from_value::<CampaignKind>(serde_json::Value::String("ONE_TIME".to_string())).unwrap_or_default(),links: Some(vec![]),list_ids: vec!["09f5b2f9-2adc-5edd-a6fd-c20675680671".to_string()],list_names: Some(vec!["Newsletter".to_string()]),name: "October product update".to_string(),on_open_workflow_ids: Some(vec![]),open_rate: Some(0.41),postal_address_id: Some("example".to_string()),preheader: Some("".to_string()),public_archive: Some(true),readiness: Some(vec![]),recurrence: Some(Default::default()),reminder: Some(Default::default()),reply_to: Some("example".to_string()),segment: Some(serde_json::from_value::<ConditionGroup>(serde_json::json!({"items":[{"operator":"EQ","subject":"October product update"}],"op":"AND"})).unwrap_or_default()),send_at: Some("2026-10-28T16:00:00Z".to_string()),send_in_contact_timezone: Some(false),sender_id: Some("37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2".to_string()),sent_count: Some(9870),started_at: Some("2026-10-28T16:00:00Z".to_string()),status: serde_json::from_value::<CampaignStatus>(serde_json::Value::String("SENT".to_string())).unwrap_or_default(),subject: Some("What shipped in October, and what is next".to_string()),template_id: Some("2f1c88b7-46a3-5aad-8049-40ebd0b66079".to_string()),template_name: Some("October product update".to_string()),track_clicks: Some(true),track_opens: Some(true),track_replies: Some(true),unsubscribed: Some(12),updated_at: Some("2026-11-05T14:00:00Z".to_string()),utm_campaign_id: Some("d60cc555-1aa8-57d4-b917-88bbd0d5b437".to_string()),variants: Some(vec![]),
     })
 }

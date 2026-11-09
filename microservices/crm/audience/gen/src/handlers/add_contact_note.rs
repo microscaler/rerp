@@ -38,6 +38,10 @@ pub struct Response {
     #[serde(rename = "data")]
     pub data: Option<serde_json::Value>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "detail")]
+    pub detail: Option<String>,
+
     #[serde(rename = "id")]
     pub id: String,
 

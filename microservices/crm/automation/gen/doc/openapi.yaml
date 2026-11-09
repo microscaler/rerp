@@ -288,6 +288,8 @@ paths:
                     outcome: DONE
                   entered_at: '2026-11-03T16:00:00Z'
                   ended_at: '2026-11-05T16:00:00Z'
+                  contact_name: Priya Natarajan
+                  current_step_label: Wait 2 days
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -333,6 +335,7 @@ paths:
                   contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
                   status: WAITING
                   entered_at: '2026-11-02T16:00:00Z'
+                  current_step_label: 14 days no activity
                 total: 2
                 page: 1
                 limit: 25
@@ -393,6 +396,8 @@ paths:
                   outcome: DONE
                 entered_at: '2026-11-03T16:00:00Z'
                 ended_at: '2026-11-05T16:00:00Z'
+                contact_name: Priya Natarajan
+                current_step_label: Wait 2 days
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -459,6 +464,8 @@ paths:
                   outcome: DONE
                 entered_at: '2026-11-03T16:00:00Z'
                 ended_at: '2026-11-05T16:00:00Z'
+                contact_name: Priya Natarajan
+                current_step_label: Wait 2 days
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -516,6 +523,8 @@ paths:
                   outcome: DONE
                 entered_at: '2026-11-05T16:00:00Z'
                 ended_at: '2026-11-05T16:00:00Z'
+                contact_name: Contact name
+                current_step_label: Current step label
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -572,6 +581,8 @@ paths:
                   outcome: DONE
                 entered_at: '2026-11-03T16:00:00Z'
                 ended_at: '2026-11-05T16:00:00Z'
+                contact_name: Priya Natarajan
+                current_step_label: Wait 2 days
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -751,6 +762,7 @@ paths:
                 name: Welcome series
                 description: Five emails over seven days after a list subscription, ending early when the contact activates.
                 trigger_type: SUBSCRIBED_TO_LIST
+                step_count: 9
                 is_active: true
                 sequence: 1
                 created_at: '2026-11-05T16:00:00Z'
@@ -1503,6 +1515,11 @@ paths:
                   created_at: '2026-06-08T16:00:00Z'
                   updated_at: '2026-11-02T16:00:00Z'
                   last_run: '2026-11-05T15:58:00Z'
+                  stop_on_unsubscribe: true
+                  stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                  step_count: 9
+                  goal_rate: 0.23
+                  messages_sent: 31402
                   sequence: 1
                 - id: 1114e157-f1ec-5dda-9063-79abf0255ee3
                   name: Abandoned signup
@@ -1521,6 +1538,11 @@ paths:
                   created_at: '2026-06-18T16:00:00Z'
                   updated_at: '2026-11-02T16:00:00Z'
                   last_run: '2026-11-05T15:38:00Z'
+                  stop_on_unsubscribe: true
+                  stop_on_conversion_id: ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b
+                  step_count: 7
+                  goal_rate: 0.11
+                  messages_sent: 7110
                   sequence: 1
                 - id: b36c0bc7-7dae-56b4-af7f-9c1ef4673496
                   name: Re-engage · 90 days quiet
@@ -1539,6 +1561,11 @@ paths:
                   created_at: '2026-06-28T16:00:00Z'
                   updated_at: '2026-11-02T16:00:00Z'
                   last_run: '2026-11-05T15:18:00Z'
+                  stop_on_unsubscribe: true
+                  stop_on_conversion_id: ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b
+                  step_count: 5
+                  goal_rate: 0.06
+                  messages_sent: 4120
                   sequence: 1
                 total: 6
                 page: 1
@@ -1625,6 +1652,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1692,6 +1724,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '404':
           $ref: '#/components/responses/NotFound'
@@ -1786,6 +1823,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -1880,6 +1922,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -1973,6 +2020,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
@@ -2071,6 +2123,11 @@ paths:
                 updated_at: '2026-11-05T16:00:00Z'
                 run_count: 3
                 last_run: '2026-11-05T16:00:00Z'
+                stop_on_unsubscribe: false
+                stop_on_conversion_id: ced25f3a-4a64-5e5a-a072-4ee34c3d0b5b
+                step_count: 3
+                goal_rate: 12.5
+                messages_sent: 3
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2128,6 +2185,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -2194,6 +2256,8 @@ paths:
                     outcome: DONE
                   entered_at: '2026-11-03T16:00:00Z'
                   ended_at: '2026-11-05T16:00:00Z'
+                  contact_name: Priya Natarajan
+                  current_step_label: Wait 2 days
                 - id: 4a88513a-fb6e-56c4-a4d0-7ec3692b5d6d
                   workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
                   workflow_name: Welcome series (7 days)
@@ -2211,6 +2275,8 @@ paths:
                     outcome: DONE
                   entered_at: '2026-11-02T16:00:00Z'
                   ended_at: '2026-11-05T16:00:00Z'
+                  contact_name: Tom Okafor
+                  current_step_label: Send email
                 - id: af9f8ad1-8b8e-5dab-8831-9882125ee623
                   workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
                   workflow_name: Welcome series (7 days)
@@ -2228,6 +2294,8 @@ paths:
                     outcome: DONE
                   entered_at: '2026-11-01T16:00:00Z'
                   ended_at: '2026-11-05T16:00:00Z'
+                  contact_name: Lena Fischer
+                  current_step_label: Wait 5 days
                 total: 24
                 page: 1
                 limit: 100
@@ -2284,6 +2352,7 @@ paths:
                 enrolled: 0
                 skipped:
                 - {}
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
                 already_active: 3
                 excluded: 3
         '400':
@@ -2379,6 +2448,7 @@ paths:
                   opened: 5899
                   clicked: 1142
                   failed: 2
+                  detail: 'Welcome · day 0: what you can do today'
                 - step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
                   kind: WAIT
                   label: Wait 2 days
@@ -2390,6 +2460,7 @@ paths:
                   opened: 0
                   clicked: 0
                   failed: 0
+                  detail: ''
                 - step_id: 94f0ecb3-8d57-54c0-937b-10c11b11cb2c
                   kind: IF_ELSE
                   label: Opened the previous email?
@@ -2401,6 +2472,9 @@ paths:
                   opened: 0
                   clicked: 0
                   failed: 0
+                  detail: engagement:opened:2
+                entered_total: 9515
+                failed: 4
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2455,6 +2529,11 @@ paths:
                 created_at: '2026-06-08T16:00:00Z'
                 updated_at: '2026-11-02T16:00:00Z'
                 last_run: '2026-11-05T15:58:00Z'
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                step_count: 9
+                goal_rate: 0.23
+                messages_sent: 31402
                 sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
@@ -3246,6 +3325,10 @@ components:
           items:
             type: string
             format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+          readOnly: true
     Enrolment:
       type: object
       required:
@@ -3314,6 +3397,11 @@ components:
           type: string
           format: date-time
           readOnly: true
+        contact_name:
+          type: string
+          readOnly: true
+        current_step_label:
+          type: string
     EnrolmentPage:
       type: object
       required:
@@ -4233,6 +4321,22 @@ components:
           type: string
           format: date-time
           readOnly: true
+        stop_on_unsubscribe:
+          type: boolean
+        stop_on_conversion_id:
+          type: string
+          format: uuid
+        step_count:
+          type: integer
+          format: int64
+          readOnly: true
+        goal_rate:
+          type: number
+          format: double
+          readOnly: true
+        messages_sent:
+          type: integer
+          format: int64
       description: An automation workflow that defines business logic for lead processing
     WorkflowExecutionResult:
       type: object
@@ -4319,6 +4423,17 @@ components:
               failed:
                 type: integer
                 format: int64
+              detail:
+                type: string
+                readOnly: true
+        entered_total:
+          type: integer
+          format: int64
+          readOnly: true
+        failed:
+          type: integer
+          format: int64
+          readOnly: true
     WorkflowPage:
       type: object
       required:
@@ -4508,6 +4623,14 @@ components:
             extract?: PHONE|URL, operator?: ADD|SUBTRACT|MULTIPLY|DIVIDE, operand?, case?: SENTENCE|TITLE|UPPER|LOWER}.
 
             '
+          properties:
+            template_id:
+              type: string
+              format: uuid
+              readOnly: true
+            template_name:
+              type: string
+              readOnly: true
         wait:
           $ref: '#/components/schemas/WaitConfig'
         conditions:

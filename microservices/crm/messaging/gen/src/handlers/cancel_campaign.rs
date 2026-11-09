@@ -50,6 +50,10 @@ pub struct Response {
     pub channel: Channel,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "click_rate")]
+    pub click_rate: Option<f64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "completed_at")]
     pub completed_at: Option<String>,
 
@@ -81,12 +85,20 @@ pub struct Response {
     #[serde(rename = "list_ids")]
     pub list_ids: Vec<String>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "list_names")]
+    pub list_names: Option<Vec<String>>,
+
     #[serde(rename = "name")]
     pub name: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "on_open_workflow_ids")]
     pub on_open_workflow_ids: Option<Vec<String>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "open_rate")]
+    pub open_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "postal_address_id")]
@@ -144,8 +156,16 @@ pub struct Response {
     pub status: CampaignStatus,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "subject")]
+    pub subject: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "template_id")]
     pub template_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "template_name")]
+    pub template_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "track_clicks")]
@@ -158,6 +178,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "track_replies")]
     pub track_replies: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "unsubscribed")]
+    pub unsubscribed: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated_at")]

@@ -33,19 +33,22 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //       "client": "Gmail",
     //       "family": "WEBMAIL",
     //       "opens": 9840,
-    //       "share_pct": 40
+    //       "share_pct": 40,
+    //       "verified_pct": 98
     //     },
     //     {
     //       "client": "Apple Mail",
     //       "family": "DESKTOP",
     //       "opens": 5120,
-    //       "share_pct": 21
+    //       "share_pct": 21,
+    //       "verified_pct": 29
     //     },
     //     {
     //       "client": "iOS Mail",
     //       "family": "MOBILE",
     //       "opens": 3210,
-    //       "share_pct": 13
+    //       "share_pct": 13,
+    //       "verified_pct": 31
     //     }
     //   ],
     //   "total_opens": 24466
@@ -71,19 +74,22 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "client": "Gmail",
       "family": "WEBMAIL",
       "opens": 9840,
-      "share_pct": 40
+      "share_pct": 40,
+      "verified_pct": 98
     },
     {
       "client": "Apple Mail",
       "family": "DESKTOP",
       "opens": 5120,
-      "share_pct": 21
+      "share_pct": 21,
+      "verified_pct": 29
     },
     {
       "client": "iOS Mail",
       "family": "MOBILE",
       "opens": 3210,
-      "share_pct": 13
+      "share_pct": 13,
+      "verified_pct": 31
     }
   ],
   "total_opens": 24466
@@ -97,6 +103,6 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
-        by_family: Some(vec![serde_json::from_value::<NameCount>(serde_json::json!({"count":58,"name":"WEBMAIL"})).unwrap_or_default(), serde_json::from_value::<NameCount>(serde_json::json!({"count":31,"name":"MOBILE"})).unwrap_or_default(), serde_json::from_value::<NameCount>(serde_json::json!({"count":9,"name":"DESKTOP"})).unwrap_or_default()]),clients: vec![serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"Gmail","family":"WEBMAIL","opens":9840,"share_pct":40})).unwrap_or_default(), serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"Apple Mail","family":"DESKTOP","opens":5120,"share_pct":21})).unwrap_or_default(), serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"iOS Mail","family":"MOBILE","opens":3210,"share_pct":13})).unwrap_or_default()],total_opens: 24466,
+        by_family: Some(vec![serde_json::from_value::<NameCount>(serde_json::json!({"count":58,"name":"WEBMAIL"})).unwrap_or_default(), serde_json::from_value::<NameCount>(serde_json::json!({"count":31,"name":"MOBILE"})).unwrap_or_default(), serde_json::from_value::<NameCount>(serde_json::json!({"count":9,"name":"DESKTOP"})).unwrap_or_default()]),clients: vec![serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"Gmail","family":"WEBMAIL","opens":9840,"share_pct":40,"verified_pct":98})).unwrap_or_default(), serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"Apple Mail","family":"DESKTOP","opens":5120,"share_pct":21,"verified_pct":29})).unwrap_or_default(), serde_json::from_value::<EmailClientRow>(serde_json::json!({"client":"iOS Mail","family":"MOBILE","opens":3210,"share_pct":13,"verified_pct":31})).unwrap_or_default()],total_opens: 24466,
     })
 }

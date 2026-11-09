@@ -12,7 +12,10 @@
 | Piece | State |
 |---|---|
 | Contracts | Nine `openapi.yaml` (511 operations) and nine `asyncapi.yaml` (75 event types), all checked by `tools/check_specs.py`: conventions, valid examples on every request and response, events tied to operations. |
-| Generated crates | `microservices/crm/<service>/gen` for all nine, in the Cargo workspace, `cargo clippy -D warnings` clean. Each serves its spec's examples, so the portal can run against RERP mocks before any impl exists. |
+| Generated crates | `microservices/crm/<service>/gen` for all nine, in the Cargo workspace, `cargo clippy -D warnings` clean. |
+| Implementation crates | `microservices/crm/<service>/impl` for all nine (lib + binary, `services/`, `validators/`, `models/` with the Lifeguard registry) and `microservices/crm/runtime`; every operation has a stub that returns its contract example, so the portal can run against RERP before real handlers exist. The migrator has a `crm` suite. |
+| Data model | 128 tables in [14-data-model.md](14-data-model.md) (source `data-model/<service>.yaml`), applied to Postgres 16 with row-level security verified; LifeModels are the first story of each service. |
+| Stories | [docs/crm/](../../../docs/crm/README.md): 58 stories for a local coding model under supervision. |
 | Implemented today | `crm/pipeline` (leads, stages, conversion, against the website's Supabase), `crm/accounts` (customer master and conversion intake, ADR 003), `crm/conversion` (signed conversion contract and Pub/Sub). |
 | Portal | Every CRM screen built against the mock; moves per [12-portal-migration.md](12-portal-migration.md). |
 | Old folders | `contacts`, `outreach`, `social`, `platform`, `teams`, `tasks`, `marketing`, `reporting`, `intelligence`, `engagement`, `livechat`: deprecated, kept until the service that replaces each is implemented. |

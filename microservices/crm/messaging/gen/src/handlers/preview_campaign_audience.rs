@@ -28,6 +28,10 @@ pub struct Response {
     pub excluded_by_segment: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "excluded_duplicates")]
+    pub excluded_duplicates: Option<i64>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "excluded_suppressed")]
     pub excluded_suppressed: Option<i64>,
 
@@ -38,6 +42,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "sample")]
     pub sample: Option<Vec<serde_json::Value>>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "sms")]
+    pub sms: Option<serde_json::Value>,
 }
 
 impl TryFrom<HandlerRequest> for Request {

@@ -9,6 +9,7 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {
+    //   "audience_count": 4,
     //   "capabilities": [
     //     "AUDIENCES",
     //     "CONVERSIONS",
@@ -26,10 +27,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "match_rate_last": 0.61,
     //   "name": "Acme · Meta EU",
     //   "platform": "META",
+    //   "spend_30d": 2140,
     //   "status": "CONNECTED"
     // }
     match serde_json::from_str::<Response>(
         r#"{
+  "audience_count": 4,
   "capabilities": [
     "AUDIENCES",
     "CONVERSIONS",
@@ -47,6 +50,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "match_rate_last": 0.61,
   "name": "Acme · Meta EU",
   "platform": "META",
+  "spend_30d": 2140,
   "status": "CONNECTED"
 }"#,
     ) {
@@ -58,6 +62,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
 
     HttpJson::ok(Response {
+        audience_count: Some(4),
         authorize_url: Some("example".to_string()),
         capabilities: Some(vec![
             "AUDIENCES".to_string(),
@@ -77,6 +82,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         name: "Acme · Meta EU".to_string(),
         pixel_id: Some("example".to_string()),
         platform: "META".to_string(),
+        spend_30d: Some(2140),
         status: "CONNECTED".to_string(),
     })
 }

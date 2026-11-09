@@ -1,0 +1,33 @@
+[package]
+name = "rerp_crm_edge"
+version = "0.1.0"
+edition = "2021"
+description = "RERP CRM edge: the public surface (contract: openapi/crm/edge/openapi.yaml)"
+
+[lib]
+name = "rerp_crm_edge"
+path = "src/lib.rs"
+
+[[bin]]
+name = "edge"
+path = "src/main.rs"
+
+[features]
+default = []
+# jemalloc is opt-in: musl targets cannot link tikv-jemallocator.
+jemalloc = ["tikv-jemallocator"]
+
+[dependencies]
+rerp_crm_edge_gen = { path = "../gen" }
+rerp_crm_runtime = { path = "../../runtime" }
+
+brrtrouter = { workspace = true }
+brrtrouter_macros = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+may = { workspace = true }
+clap = { workspace = true }
+chrono = { workspace = true }
+uuid = { workspace = true }
+rust_decimal = { workspace = true }
+tikv-jemallocator = { workspace = true, optional = true }

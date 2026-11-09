@@ -30,11 +30,19 @@ pub struct Request {
 #[derive(Debug, Deserialize, Serialize)]
 
 pub struct Response {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "accuracy_last_3_months")]
+    pub accuracy_last_3_months: Option<f64>,
+
     #[serde(rename = "items")]
     pub items: Vec<ForecastEntry>,
 
     #[serde(rename = "limit")]
     pub limit: i32,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "no_close_date")]
+    pub no_close_date: Option<serde_json::Value>,
 
     #[serde(rename = "page")]
     pub page: i32,

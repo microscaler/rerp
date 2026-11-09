@@ -35,6 +35,10 @@ pub struct Response {
     #[serde(rename = "message_ids")]
     pub message_ids: Option<Vec<String>>,
 
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "queued")]
+    pub queued: Option<i64>,
+
     #[serde(rename = "sent_to")]
     pub sent_to: Vec<String>,
 }
