@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "addr2line"
-version = "0.27.1"
+version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e567177890eb1617b1f774005b66b26b2377afd138a2ca37aae7d8f0c81429d4"
+checksum = "1b5d307320b3181d6d7954e663bd7c774a838b8220fe0593c86d9fb09f498b4b"
 dependencies = [
  "gimli",
 ]
@@ -308,14 +308,14 @@ dependencies = [
 
 [[package]]
 name = "backtrace"
-version = "0.3.77"
+version = "0.3.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42f4220217f3288537b83684130f42fad43320b1c3b805f1910d683d52ded24f"
+checksum = "bb531853791a215d7c62a30daf0dde835f381ab5de4589cfe7c649d2cbe92bd6"
 dependencies = [
  "addr2line",
  "cfg-if",
  "libc",
- "miniz_oxide",
+ "miniz_oxide 0.8.9",
  "object",
  "rustc-demangle",
  "windows-link",
@@ -444,7 +444,6 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a#cb10df40d46c83811aa5a3016388e5b92af8df6a"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -500,7 +499,6 @@ dependencies = [
 [[package]]
 name = "brrtrouter_macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a#cb10df40d46c83811aa5a3016388e5b92af8df6a"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -1478,7 +1476,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
 dependencies = [
  "crc32fast",
- "miniz_oxide",
+ "miniz_oxide 0.9.1",
  "zlib-rs",
 ]
 
@@ -1661,9 +1659,9 @@ dependencies = [
 
 [[package]]
 name = "gimli"
-version = "0.34.0"
+version = "0.32.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1033caf0b349c518623b5396bfb2cf0bddf44f0306d543a250e5743297aafd10"
+checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
 name = "glob"
@@ -2346,7 +2344,6 @@ checksum = "2e126dda6f34391ab7b444f9922055facc83c07a910da3eb16f1e4d9c45dc777"
 [[package]]
 name = "lifeguard"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=44a2412232597d8b44c3b9f3d98689e7c9fa9547#44a2412232597d8b44c3b9f3d98689e7c9fa9547"
 dependencies = [
  "bytes",
  "chrono",
@@ -2359,7 +2356,7 @@ dependencies = [
  "log",
  "may",
  "may_minihttp",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
+ "may_postgres",
  "may_tracing",
  "microscaler-timing",
  "once_cell",
@@ -2384,7 +2381,6 @@ dependencies = [
 [[package]]
 name = "lifeguard-derive"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=44a2412232597d8b44c3b9f3d98689e7c9fa9547#44a2412232597d8b44c3b9f3d98689e7c9fa9547"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2394,7 +2390,6 @@ dependencies = [
 [[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=44a2412232597d8b44c3b9f3d98689e7c9fa9547#44a2412232597d8b44c3b9f3d98689e7c9fa9547"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2405,7 +2400,7 @@ dependencies = [
  "lifeguard",
  "lifeguard-derive",
  "log",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
+ "may_postgres",
  "pathdiff",
  "regex",
  "rust_decimal",
@@ -2534,7 +2529,6 @@ dependencies = [
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork#0f9df0e6ad7d8aa1ade256c2c4e85b6132027a59"
 dependencies = [
  "byteorder",
  "bytes",
@@ -2548,25 +2542,6 @@ dependencies = [
  "postgres-types",
  "rustls",
  "rustls-pemfile",
- "smallvec",
- "spin 0.9.9",
-]
-
-[[package]]
-name = "may_postgres"
-version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?branch=master#0f93c04ae2a372e7a909093255e967d370d2cfb2"
-dependencies = [
- "byteorder",
- "bytes",
- "crossbeam",
- "fallible-iterator",
- "log",
- "may",
- "percent-encoding",
- "phf",
- "postgres-protocol",
- "postgres-types",
  "smallvec",
  "spin 0.9.9",
 ]
@@ -2646,7 +2621,6 @@ checksum = "c2a86d3146ed3995b5913c414f6664344b9617457320782e64f0bb44afd49d74"
 [[package]]
 name = "microscaler-observability"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?rev=2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f#2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f"
 dependencies = [
  "backtrace",
  "base64 0.22.1",
@@ -2694,9 +2668,9 @@ checksum = "6877bb514081ee2a7ff5ef9de3281f14a4dd4bceac4c09388074a6b5df8a139a"
 
 [[package]]
 name = "minijinja"
-version = "3.1.0"
+version = "3.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "509eeb2603a84eccabb4d75f6ec8ba23b46bbf441aaeb863d6b83a5887fd51e4"
+checksum = "90086695417a271bc96e6cb50618555614ca48fa3bb0d9aa96e3468b0f84431e"
 dependencies = [
  "serde",
 ]
@@ -2706,6 +2680,15 @@ name = "minimal-lexical"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
+
+[[package]]
+name = "miniz_oxide"
+version = "0.8.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fa76a2c86f704bdb222d66965fb3d63269ce38518b83cb0575fca855ebb6316"
+dependencies = [
+ "adler2",
+]
 
 [[package]]
 name = "miniz_oxide"
@@ -2952,9 +2935,9 @@ dependencies = [
 
 [[package]]
 name = "object"
-version = "0.40.0"
+version = "0.37.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd229a0361b9d0d4396176e02d65897f487eebeab7caa6d443855ee152ca0b9c"
+checksum = "ff76201f031d8863c38aa7f905eca4f53abbfa15f609db4277d44cd8938f33fe"
 dependencies = [
  "memchr",
 ]
@@ -4590,7 +4573,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_acquisition_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4633,7 +4616,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_audience_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4676,7 +4659,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_automation_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4771,7 +4754,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_insights_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4814,7 +4797,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_intake_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4857,7 +4840,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_messaging_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4956,7 +4939,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_runtime",
  "rerp_crm_sales_gen",
  "rust_decimal",
@@ -4999,7 +4982,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_runtime",
  "rerp_crm_workspace_gen",
  "rust_decimal",
@@ -5220,15 +5203,15 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "1.1.6"
+version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5e76742e5294153d4dde1207dbec5bdd81eef6fabdc0d2118babadabfd858aa"
+checksum = "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d"
 dependencies = [
  "bitflags 2.13.2",
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5499,7 +5482,6 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=02ceb2bff70edb33fd5a98690aa7899fc0031f4e#02ceb2bff70edb33fd5a98690aa7899fc0031f4e"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",
@@ -5558,9 +5540,9 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 
 [[package]]
 name = "signal-hook"
-version = "0.4.6"
+version = "0.4.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49f7447afd772ca79ad17ae0a3972a6b0df0cb4b80990fd82707593e9e012a74"
+checksum = "b29ffa27d3d59a049bb328258de100f8012848d1b08d444e08bbc02ac468435e"
 dependencies = [
  "libc",
  "signal-hook-registry",
@@ -5821,10 +5803,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -6337,9 +6319,9 @@ checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
 name = "ureq"
-version = "3.5.1"
+version = "3.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7be76686bdf7198002062423ca0d8cf9b75a27c8e1de804513b97e97b555d9d"
+checksum = "cde93ff05758a36a851a398a772b0b79a82fbe3c186a46f2696baaeaf84c966b"
 dependencies = [
  "base64 0.23.1",
  "cookie_store",
@@ -6356,9 +6338,9 @@ dependencies = [
 
 [[package]]
 name = "ureq-proto"
-version = "0.7.1"
+version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "622dce33c252115466d83f63e9744a18f12b4406aae51a01c15ad8fcf1185eb3"
+checksum = "841583fc36089d7d59419568ae157f43a5a03a2e5a81ba87c77d1596ef46e922"
 dependencies = [
  "base64 0.23.1",
  "http 1.5.0",
