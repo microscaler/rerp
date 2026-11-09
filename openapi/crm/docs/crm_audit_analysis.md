@@ -1,5 +1,7 @@
 # CRM Gap Analysis: RERP vs Odoo CRM Ecosystem
 
+> **Historical (superseded 2026-11-09):** a May 2026 gap analysis of the first three specs against Odoo; it fed the 13-service design, which [08](08-service-decomposition.md) replaced. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Date:** 2026-05-10
 > **Scope:** High-level component comparison and gap analysis between RERP CRM and the Odoo CRM ecosystem (Community + Enterprise)
 

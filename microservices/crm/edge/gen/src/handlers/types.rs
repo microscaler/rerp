@@ -23,77 +23,6 @@ pub struct AdClickResult {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct AdConversion {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub account_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub click_id_param: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_name: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub currency: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub deal_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub error: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub event: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub external_event_name: Option<String>,
-
-    pub id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub identifiers_sent: Option<Vec<String>>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub occurred_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub platform: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub platform_response: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub rule_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub sent_at: Option<String>,
-
-    pub status: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct AdPlatformWebhookResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AdTouchpoint {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ad: Option<String>,
@@ -130,7 +59,7 @@ pub struct AdTouchpoint {
     pub url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -144,6 +73,8 @@ pub struct ErrorResponse {
     pub fields: Option<Vec<serde_json::Value>>,
 
     pub message: String,
+
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -355,7 +286,7 @@ pub struct GetFormConfigResponse {
     pub style: Option<FormStyle>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub submission_count: Option<i32>,
+    pub submission_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub team_id: Option<String>,
@@ -377,22 +308,6 @@ pub struct GetFormConfigResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct IngestProviderEventsResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct OauthCallbackResponse {
     pub code: i32,
 
@@ -403,6 +318,8 @@ pub struct OauthCallbackResponse {
     pub fields: Option<Vec<serde_json::Value>>,
 
     pub message: String,
+
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -454,6 +371,8 @@ pub struct PublicClickResponse {
 
     pub message: String,
 
+    pub reason: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
 }
@@ -501,22 +420,6 @@ pub struct PublicPreferencesUpdateResponse {
     pub email_masked: String,
 
     pub lists: Vec<serde_json::Value>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PublicUnsubscribeOneClickResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -581,7 +484,7 @@ pub struct RecordAdCallResponse {
     pub url: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -631,36 +534,6 @@ pub struct RecordAdClickResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub visitor_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct RecordAdConversionRequest {
-    pub contact_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub currency: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub deal_id: Option<String>,
-
-    pub event: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub occurred_at: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub payment_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub properties: Option<serde_json::Value>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct RecordAdConversionResponse {
-    pub items: Vec<AdConversion>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -987,7 +860,7 @@ pub struct WebForm {
     pub style: Option<FormStyle>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub submission_count: Option<i32>,
+    pub submission_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub team_id: Option<String>,

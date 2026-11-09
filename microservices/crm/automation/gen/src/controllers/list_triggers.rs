@@ -10,10 +10,45 @@ use crate::handlers::types::Trigger;
 
 #[handler(ListTriggersController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // Example response:
+    // {
+    //   "items": [
+    //     {
+    //       "enabled": true,
+    //       "entity": "Entity",
+    //       "id": "c9e18116-9fea-5e6e-ac32-52580d2450b8",
+    //       "type": "STAGE_CHANGE",
+    //       "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
+    //     }
+    //   ],
+    //   "limit": 25,
+    //   "page": 1,
+    //   "total": 2
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "items": [
+    {
+      "enabled": true,
+      "entity": "Entity",
+      "id": "c9e18116-9fea-5e6e-ac32-52580d2450b8",
+      "type": "STAGE_CHANGE",
+      "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
+    }
+  ],
+  "limit": 25,
+  "page": 1,
+  "total": 2
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
     HttpJson::ok(Response {
-        items: vec![],
-        limit: 42,
-        page: 42,
-        total: 42,
+        items: vec![serde_json::from_value::<Trigger>(serde_json::json!({"enabled":true,"entity":"Entity","id":"c9e18116-9fea-5e6e-ac32-52580d2450b8","type":"STAGE_CHANGE","workflow_id":"7008f5a1-8ead-5a4f-8cd3-a3deab21a548"})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

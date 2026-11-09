@@ -68,6 +68,35 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationAnalytics'
+              example:
+                items:
+                - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  name: Welcome series (7 days)
+                  entered_30d: 1640
+                  completed_30d: 1402
+                  goal_rate: 0.23
+                  messages_30d: 6120
+                  open_rate: 0.52
+                  deals_created: 0
+                  revenue: '0.00'
+                - workflow_id: 1114e157-f1ec-5dda-9063-79abf0255ee3
+                  name: Abandoned signup
+                  entered_30d: 902
+                  completed_30d: 611
+                  goal_rate: 0.11
+                  messages_30d: 2406
+                  open_rate: 0.34
+                  deals_created: 0
+                  revenue: '0.00'
+                - workflow_id: b36c0bc7-7dae-56b4-af7f-9c1ef4673496
+                  name: Re-engage · 90 days quiet
+                  entered_30d: 2077
+                  completed_30d: 1800
+                  goal_rate: 0.06
+                  messages_30d: 2077
+                  open_rate: 0.21
+                  deals_created: 0
+                  revenue: '0.00'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -95,6 +124,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Automations over the period. Query: `from`, `to`.'
   /analytics/conversion-rates:
     get:
       operationId: get_conversion_rates
@@ -113,47 +143,43 @@ paths:
           - QUARTER
           - YEAR
           default: MONTH
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
           format: date
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Conversion rates
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedConversionrate'
-              examples:
-                default:
-                  items:
-                  - period: monthly
-                    total_leads: 500
-                    converted: 62
-                    rate: 12.4
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/ConversionRatePage'
+              example:
+                items:
+                - period: Period
+                  leads_created: 3
+                  opportunities_created: 3
+                  opportunities_won: 3
+                  opportunities_lost: 3
+                  lead_to_opp_rate: 12.5
+                  opp_to_won_rate: 12.5
+                  overall_conversion_rate: 12.5
+                  total_won_revenue: '1250.00'
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -186,37 +212,29 @@ paths:
           - WEEK
           - MONTH
           - QUARTER
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Forecast accuracy
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
-              examples:
-                default:
-                  items:
-                  - period: monthly
-                    forecasted: 420000
-                    actual: 405000
-                    accuracy: 96.4
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/ForecastAccuracyEntryPage'
+              example:
+                items:
+                - period: Period
+                  expected: '1250.00'
+                  actual: '1250.00'
+                  variance: '1250.00'
+                  variance_pct: 12.5
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -246,36 +264,42 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Monthly forecast
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedForecastentry'
-              examples:
-                default:
-                  items:
-                  - period: monthly
-                    total_value: 420000
-                    confidence: 0.75
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/ForecastEntryPage'
+              example:
+                items:
+                - period: Period
+                  weighted_pipeline: '1250.00'
+                  expected_close_revenue: '1250.00'
+                  confidence: 12.5
+                  actual_close_revenue: '1250.00'
+                  variance: '1250.00'
+                - period: Period
+                  weighted_pipeline: '1250.00'
+                  expected_close_revenue: '1250.00'
+                  confidence: 12.5
+                  actual_close_revenue: '1250.00'
+                  variance: '1250.00'
+                - period: Period
+                  weighted_pipeline: '1250.00'
+                  expected_close_revenue: '1250.00'
+                  confidence: 12.5
+                  actual_close_revenue: '1250.00'
+                  variance: '1250.00'
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -304,30 +328,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedForecastentry'
-              examples:
-                default:
-                  items:
-                  - period: monthly
-                    total_value: 420000
-                    confidence: 0.75
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/ForecastEntryPage'
+              example:
+                items:
+                - period: Period
+                  weighted_pipeline: '1250.00'
+                  expected_close_revenue: '1250.00'
+                  confidence: 12.5
+                  actual_close_revenue: '1250.00'
+                  variance: '1250.00'
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -340,6 +356,8 @@ paths:
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       x-required-role:
       - owner
       - admin
@@ -363,12 +381,12 @@ paths:
           - MONTH
           - QUARTER
           - YEAR
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -380,29 +398,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FunnelData'
-              examples:
-                default:
-                  stages:
-                  - name: visitor
-                    count: 10000
-                  - name: lead
-                    count: 1250
-                  - name: qualified
-                    count: 450
-                  - name: customer
-                    count: 62
+              example:
+                stages:
+                - {}
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -431,31 +433,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedLeadSourceReport'
-              examples:
-                default:
-                  items:
-                  - total: 850
-                    by_source:
-                      website: 350
-                      referral: 200
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/LeadSourceReportPage'
+              example:
+                items:
+                - source_id: c709e57f-6f94-5c16-b15f-671d05f21521
+                  source_name: Source name
+                  lead_count: 3
+                  opportunities: 3
+                  won_deals: 3
+                  revenue: '1250.00'
+                  win_rate: 12.5
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -468,6 +462,8 @@ paths:
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       x-required-role:
       - owner
       - admin
@@ -505,37 +501,28 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: Leaderboard
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedLeaderboardEntry'
-              examples:
-                default:
-                  items:
-                  - rep_id: 00000000-0000-0000-0000-000000000010
-                    rep_name: Jane Smith
-                    deals_won: 12
-                    rank: 1
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/LeaderboardEntryPage'
+              example:
+                items:
+                - user_id: alex
+                  user_name: User name
+                  rank: 3
+                  value: 12.5
+                total: 2
+                page: 1
+                limit: 25
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -565,6 +552,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListGrowthReport'
+              example:
+                items:
+                - list_id: 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  list_name: Newsletter
+                  start: 9601
+                  subscribed: 612
+                  unsubscribed: 301
+                  bounced: 42
+                  end: 9870
+                  top_source: Website footer form
+                - list_id: f84269dd-7dba-5a82-ad63-986af03f39c1
+                  list_name: Customers
+                  start: 1780
+                  subscribed: 58
+                  unsubscribed: 16
+                  bounced: 2
+                  end: 1820
+                  top_source: Checkout
+                - list_id: 06b96791-3940-54b0-b719-717deb92aad3
+                  list_name: Webinars
+                  start: 2980
+                  subscribed: 418
+                  unsubscribed: 180
+                  bounced: 8
+                  end: 3210
+                  top_source: Webinar registration
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -592,6 +605,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'List growth over the period. Query: `from`, `to`.'
   /analytics/pipeline-summary:
     get:
       operationId: get_pipeline_summary
@@ -605,12 +619,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -621,34 +635,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedPipelinesummary'
-              examples:
-                default:
-                  items:
-                  - total_leads: 150
-                    stage_breakdown:
-                      discovery: 45
-                      qualified: 35
-                    weighted_value: 375000
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/PipelineSummaryReport'
+              example:
+                total_opportunities: 3
+                total_revenue: '1250.00'
+                total_weighted_revenue: '1250.00'
+                stages:
+                - {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
@@ -676,31 +675,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WeightedPipeline'
-              examples:
-                default:
-                  total_leads: 150
-                  stage_breakdown:
-                    discovery:
-                      count: 45
-                      value: 100000
-                      probability: 0.2
-                    qualified:
-                      count: 35
-                      value: 125000
-                      probability: 0.4
-                  weighted_value: 85000
+              example:
+                by_team:
+                - {}
+                by_user:
+                - {}
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -731,7 +714,8 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       - name: period
         in: query
         schema:
@@ -741,12 +725,12 @@ paths:
           - MONTH
           - QUARTER
           - YEAR
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -758,26 +742,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RepPerformance'
-              examples:
-                default:
-                  rep_id: 00000000-0000-0000-0000-000000000010
-                  rep_name: Jane Smith
-                  deals_won: 12
-                  deals_lost: 5
-                  revenue: 125000
-                  conversion_rate: 24.0
+              example:
+                user_id: alex
+                user_name: User name
+                team_id: 6ae2cdbd-063f-5ea8-bd10-82ddcee5cb31
+                period: Period
+                leads_created: 3
+                opportunities_active: 3
+                opportunities_won: 3
+                opportunities_lost: 3
+                revenue_expected: '1250.00'
+                revenue_won: '1250.00'
+                weighted_pipeline: '1250.00'
+                avg_deal_size: '1250.00'
+                avg_sales_cycle_days: 12.5
+                quota_attainment: 12.5
+                activity_count: 3
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -823,25 +807,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamPerformance'
-              examples:
-                default:
-                  team_id: 00000000-0000-0000-0000-000000000006
-                  team_name: Sales Team Alpha
-                  total_deals: 24
-                  total_revenue: 250000
-                  avg_deal_size: 10416
+              example:
+                team_id: 6ae2cdbd-063f-5ea8-bd10-82ddcee5cb31
+                team_name: Team name
+                member_count: 3
+                total_opportunities: 3
+                total_revenue: '1250.00'
+                weighted_revenue: '1250.00'
+                win_rate: 12.5
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -871,26 +848,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TimeToCloseAnalysis'
-              examples:
-                default:
-                  avg_days: 45
-                  median_days: 38
-                  by_stage:
-                    discovery: 10
-                    qualified: 15
-                    proposal: 12
+              example:
+                overall_avg_days: 12.5
+                by_stage:
+                - {}
+                by_source:
+                - {}
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -926,12 +893,12 @@ paths:
           - MONTH
           - QUARTER
           - YEAR
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -943,27 +910,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WinLossAnalysis'
-              examples:
-                default:
-                  won: 45
-                  lost: 30
-                  win_rate: 60.0
-                  by_reason:
-                    price: 12
-                    feature_gap: 8
-                    competitor: 6
+              example:
+                period: Period
+                total_closed: 3
+                won_count: 3
+                lost_count: 3
+                win_rate: 12.5
+                revenue_won: '1250.00'
+                lost_reasons:
+                - {}
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1001,12 +960,12 @@ paths:
           - ACTIVE
           - INACTIVE
           - ALL
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1028,7 +987,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAutomationListRow'
+                $ref: '#/components/schemas/AutomationListRowPage'
+              example:
+                items:
+                - workflow_id: 36523d6f-c5d7-562b-8bd5-7cb5480e5d2e
+                  name: Northwind Traders
+                  contacts_entered: 3
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1060,12 +1027,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1087,7 +1054,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedJumpToRow'
+                $ref: '#/components/schemas/JumpToRowPage'
+              example:
+                items:
+                - workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  step_id: 047a18d8-3dbe-5b48-8733-4d69800e8319
+                  goal_name: Activated the product
+                  contacts_jumped: 377
+                  contacts_passed: 1025
+                  jump_rate: 0.23
+                total: 1
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1161,7 +1140,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedOneToOneEmailRow'
+                $ref: '#/components/schemas/OneToOneEmailRowPage'
+              example:
+                items:
+                - workflow_id: 1b370767-8ad9-50d6-9a2f-1417e9310e08
+                  workflow_name: Renewal reminder · 30 days out
+                  step_id: 8a1d086c-a04f-53cd-90b2-95cc18ad7a86
+                  email_name: Quick question about your renewal
+                  sender_user_id: alex
+                  sent: 131
+                  unique_opens: 89
+                  unique_open_rate: 0.679
+                  unique_clicks: 24
+                  unique_click_rate: 0.183
+                  unique_replies: 17
+                  unique_reply_rate: 0.13
+                  bounces: 1
+                  bounce_rate: 0.008
+                total: 1
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1204,17 +1202,13 @@ paths:
           - ACTIVE
           - COMPLETED
           - EXITED
-      - name: q
-        in: query
-        schema:
-          type: string
-        description: Search name / email
-      - name: start_date
+      - $ref: '#/components/parameters/Search'
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1237,6 +1231,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationContactsReport'
+              example:
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                contacts_entered: 1640
+                completion_rate: 0.855
+                completion_rate_change_30d: 0.031
+                avg_seconds_to_complete: 622080
+                top_tags:
+                - name: webinar
+                  count: 94
+                - name: pricing-page
+                  count: 91
+                - name: trial
+                  count: 88
+                top_lists:
+                - name: Webinars
+                  count: 92
+                - name: Newsletter
+                  count: 86
+                - name: Product launch waitlist
+                  count: 79
+                completion_times:
+                - label: < 1 day
+                  min_seconds: 0
+                  max_seconds: 86400
+                  count: 112
+                - label: 1-3 days
+                  min_seconds: 86400
+                  max_seconds: 259200
+                  count: 240
+                - label: 3-7 days
+                  min_seconds: 259200
+                  max_seconds: 604800
+                  count: 806
+                contacts:
+                  items:
+                  - contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                    email: priya.natarajan@northwindtraders.example
+                    name: Priya Natarajan
+                    status: COMPLETED
+                    entered_at: '2026-10-28T16:00:00Z'
+                    completed_at: '2026-11-04T16:00:00Z'
+                  - contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                    email: tom.okafor@fabrikam.example
+                    name: Tom Okafor
+                    status: ACTIVE
+                    entered_at: '2026-11-02T16:00:00Z'
+                    completed_at: '2026-11-05T16:00:00Z'
+                  - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                    email: lena.fischer@contoso.example
+                    name: Lena Fischer
+                    status: EXITED
+                    entered_at: '2026-10-29T16:00:00Z'
+                    completed_at: '2026-11-05T16:00:00Z'
+                  total: 1640
+                  page: 1
+                  limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1270,12 +1320,12 @@ paths:
           type: string
           format: uuid
         description: workflow id
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1287,6 +1337,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationGoalsReport'
+              example:
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                goals:
+                - step_id: 047a18d8-3dbe-5b48-8733-4d69800e8319
+                  name: Activated the product
+                  contacts_achieved: 377
+                  contacts_skipped: 1025
+                  contacts_waiting: 238
+                  achieved_rate: 0.23
+                  avg_seconds_to_achieve: 207360
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1320,12 +1380,12 @@ paths:
           type: string
           format: uuid
         description: workflow id
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1345,6 +1405,75 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationOverviewReport'
+              example:
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                contacts_total: 1640
+                contacts_finished: 1402
+                completion_rate: 0.855
+                emails_sent: 6120
+                email_sent_rate: 0.992
+                unique_opens: 3182
+                open_rate: 0.52
+                unique_clicks: 557
+                click_rate: 0.091
+                revenue: '12400.00'
+                series:
+                - key: sends
+                  label: Sends
+                  points:
+                  - date: '2026-10-07'
+                    value: 204
+                  - date: '2026-10-08'
+                    value: 224
+                  - date: '2026-10-09'
+                    value: 242
+                - key: opens
+                  label: Opens
+                  points:
+                  - date: '2026-10-07'
+                    value: 106
+                  - date: '2026-10-08'
+                    value: 116
+                  - date: '2026-10-09'
+                    value: 126
+                - key: clicks
+                  label: Clicks
+                  points:
+                  - date: '2026-10-07'
+                    value: 18
+                  - date: '2026-10-08'
+                    value: 20
+                  - date: '2026-10-09'
+                    value: 21
+                messages:
+                - step_id: 23d73cc0-2fda-5946-a568-c94ed4a4b6fb
+                  name: Day 0 · Welcome
+                  last_sent_at: '2026-11-05T16:00:00Z'
+                  sends: 1640
+                  unique_opens: 1082
+                  unique_clicks: 211
+                  open_rate: 0.66
+                  click_rate: 0.129
+                  revenue: '0.00'
+                - step_id: ef70b030-e13c-5bc8-8e8b-8ed1237f31ea
+                  name: Day 1 · Getting started
+                  last_sent_at: '2026-11-05T16:00:00Z'
+                  sends: 1598
+                  unique_opens: 879
+                  unique_clicks: 164
+                  open_rate: 0.55
+                  click_rate: 0.103
+                  revenue: '0.00'
+                - step_id: 34840ea3-97fc-5c23-9cbc-94fdecf47898
+                  name: Day 3 · Tips for power users
+                  last_sent_at: '2026-11-05T16:00:00Z'
+                  sends: 1402
+                  unique_opens: 701
+                  unique_clicks: 122
+                  open_rate: 0.5
+                  click_rate: 0.087
+                  revenue: '1200.00'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1386,12 +1515,12 @@ paths:
           type: string
           format: uuid
         required: true
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1403,6 +1532,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FieldBreakdownReport'
+              example:
+                entity: CONTACT
+                field_id: 0bbefc02-42a4-5469-bb31-d1fba48fc38a
+                field_label: Plan
+                values:
+                - name: Free
+                  count: 7902
+                - name: Team
+                  count: 3114
+                - name: Business
+                  count: 2210
+                blank: 4204
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1483,7 +1624,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedNearbyContact'
+                $ref: '#/components/schemas/NearbyContactPage'
+              example:
+                items:
+                - contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  name: Priya Natarajan
+                  email: priya.natarajan@northwindtraders.example
+                  city: Sofia
+                  country: BG
+                  distance: 2.1
+                - contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  name: Tom Okafor
+                  email: tom.okafor@fabrikam.example
+                  city: Sofia
+                  country: BG
+                  distance: 6.8
+                - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                  name: Lena Fischer
+                  email: lena.fischer@contoso.example
+                  city: Sofia
+                  country: BG
+                  distance: 14.2
+                total: 3
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1532,12 +1696,12 @@ paths:
           - DAY
           - WEEK
           - MONTH
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1549,6 +1713,82 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContactPerformanceReport'
+              example:
+                current:
+                  total: 18420
+                  active: 16104
+                  inactive: 2316
+                previous:
+                  total: 17808
+                  active: 15564
+                  inactive: 2244
+                granularity: DAY
+                trend:
+                - key: total
+                  label: Total
+                  points:
+                  - date: '2026-10-07'
+                    value: 17808
+                  - date: '2026-10-08'
+                    value: 17829
+                  - date: '2026-10-09'
+                    value: 17850
+                - key: active
+                  label: Active
+                  points:
+                  - date: '2026-10-07'
+                    value: 15564
+                  - date: '2026-10-08'
+                    value: 15582
+                  - date: '2026-10-09'
+                    value: 15600
+                - key: inactive
+                  label: Inactive
+                  points:
+                  - date: '2026-10-07'
+                    value: 2244
+                  - date: '2026-10-08'
+                    value: 2247
+                  - date: '2026-10-09'
+                    value: 2250
+                top_lists:
+                - id: 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                  name: Newsletter
+                  total: 9870
+                  active: 9201
+                  inactive: 669
+                  growth_pct: 2.8
+                - id: f84269dd-7dba-5a82-ad63-986af03f39c1
+                  name: Customers
+                  total: 1820
+                  active: 1802
+                  inactive: 18
+                  growth_pct: 2.2
+                - id: 06b96791-3940-54b0-b719-717deb92aad3
+                  name: Webinars
+                  total: 3210
+                  active: 3022
+                  inactive: 188
+                  growth_pct: 7.7
+                top_tags:
+                - id: 9fcf4e9e-e339-5eef-8d3d-9086b582243e
+                  name: lead
+                  total: 6114
+                  active: 5804
+                  inactive: 310
+                  growth_pct: 5.1
+                - id: f088dbd4-36e8-50b1-be4c-5714acf532d6
+                  name: customer
+                  total: 1820
+                  active: 1802
+                  inactive: 18
+                  growth_pct: 2.2
+                - id: 9ea75ff5-0642-5599-9bf6-34f9bbcefd89
+                  name: trial
+                  total: 1412
+                  active: 1390
+                  inactive: 22
+                  growth_pct: 12.0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1590,12 +1830,12 @@ paths:
           - DAY
           - WEEK
           - MONTH
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1607,6 +1847,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TagTrendsReport'
+              example:
+                tags_applied: 2318
+                avg_per_day: 74.8
+                series:
+                - key: lead
+                  label: lead
+                  points:
+                  - date: '2026-10-07'
+                    value: 30
+                  - date: '2026-10-08'
+                    value: 37
+                  - date: '2026-10-09'
+                    value: 33
+                - key: trial
+                  label: trial
+                  points:
+                  - date: '2026-10-07'
+                    value: 14
+                  - date: '2026-10-08'
+                    value: 21
+                  - date: '2026-10-09'
+                    value: 17
+                - key: customer
+                  label: customer
+                  points:
+                  - date: '2026-10-07'
+                    value: 2
+                  - date: '2026-10-08'
+                    value: 9
+                  - date: '2026-10-09'
+                    value: 5
+                most_used_in_range:
+                - name: lead
+                  count: 1104
+                - name: trial
+                  count: 612
+                - name: pricing-page
+                  count: 301
+                most_used_overall:
+                - name: lead
+                  count: 6114
+                - name: customer
+                  count: 1820
+                - name: trial
+                  count: 1412
+                tags:
+                - tag_id: 9fcf4e9e-e339-5eef-8d3d-9086b582243e
+                  name: lead
+                  first_applied_at: '2026-01-02T00:00:00Z'
+                  last_applied_at: '2026-11-05T16:00:00Z'
+                  applied_in_range: 1104
+                  avg_per_day: 35.6
+                  total_contacts: 6114
+                - tag_id: 9ea75ff5-0642-5599-9bf6-34f9bbcefd89
+                  name: trial
+                  first_applied_at: '2026-02-14T00:00:00Z'
+                  last_applied_at: '2026-11-05T16:00:00Z'
+                  applied_in_range: 612
+                  avg_per_day: 19.7
+                  total_contacts: 1412
+                - tag_id: 83c2db54-32d0-50e6-a226-f6487560ac02
+                  name: pricing-page
+                  first_applied_at: '2026-03-03T00:00:00Z'
+                  last_applied_at: '2026-11-05T16:00:00Z'
+                  applied_in_range: 301
+                  avg_per_day: 9.7
+                  total_contacts: 902
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1650,7 +1957,49 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedDashboard'
+                $ref: '#/components/schemas/DashboardPage'
+              example:
+                items:
+                - id: d882d72a-b5af-5bb5-bd44-13bca206fd5b
+                  user_id: alex
+                  name: Alex's dashboard
+                  is_default: true
+                  widgets:
+                  - id: 91bbb6c0-47bc-562d-9ecb-6bd37b17b013
+                    title: Key email marketing metrics
+                    kind: NUMBERS
+                    query:
+                      metric: email_kpis
+                      range: LAST_30_DAYS
+                    position: 0
+                    width: 2
+                    refreshed_at: '2026-11-05T15:59:00Z'
+                  - id: c55b2ef3-e9dc-5b6f-8a2a-fd6ae58cd32b
+                    title: Contact growth over time
+                    kind: BAR
+                    query:
+                      metric: total_contacts
+                      range: LAST_12_MONTHS
+                      granularity: MONTH
+                    position: 1
+                    width: 1
+                    refreshed_at: '2026-11-05T15:59:00Z'
+                  - id: dd78f406-2156-5e00-9f58-1c3cc539fc33
+                    title: Most used automations by contacts entered
+                    kind: TABLE
+                    query:
+                      metric: automation_entries
+                      dimension: automation
+                      range: ALL_TIME
+                      limit: 5
+                    position: 2
+                    width: 1
+                    refreshed_at: '2026-11-05T15:59:00Z'
+                  created_at: '2026-10-26T16:00:00Z'
+                  updated_at: '2026-11-05T15:59:00Z'
+                total: 1
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1680,6 +2029,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DashboardRequest'
+            example:
+              name: Northwind Traders
+              is_default: true
       responses:
         '201':
           description: Created
@@ -1687,6 +2039,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+              example:
+                id: d882d72a-b5af-5bb5-bd44-13bca206fd5b
+                user_id: alex
+                name: Alex's dashboard
+                is_default: true
+                widgets:
+                - id: 91bbb6c0-47bc-562d-9ecb-6bd37b17b013
+                  title: Key email marketing metrics
+                  kind: NUMBERS
+                  query:
+                    metric: email_kpis
+                    range: LAST_30_DAYS
+                  position: 0
+                  width: 2
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: c55b2ef3-e9dc-5b6f-8a2a-fd6ae58cd32b
+                  title: Contact growth over time
+                  kind: BAR
+                  query:
+                    metric: total_contacts
+                    range: LAST_12_MONTHS
+                    granularity: MONTH
+                  position: 1
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: dd78f406-2156-5e00-9f58-1c3cc539fc33
+                  title: Most used automations by contacts entered
+                  kind: TABLE
+                  query:
+                    metric: automation_entries
+                    dimension: automation
+                    range: ALL_TIME
+                    limit: 5
+                  position: 2
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                created_at: '2026-10-26T16:00:00Z'
+                updated_at: '2026-11-05T15:59:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1730,6 +2120,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+              example:
+                id: d882d72a-b5af-5bb5-bd44-13bca206fd5b
+                user_id: alex
+                name: Alex's dashboard
+                is_default: true
+                widgets:
+                - id: 91bbb6c0-47bc-562d-9ecb-6bd37b17b013
+                  title: Key email marketing metrics
+                  kind: NUMBERS
+                  query:
+                    metric: email_kpis
+                    range: LAST_30_DAYS
+                  position: 0
+                  width: 2
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: c55b2ef3-e9dc-5b6f-8a2a-fd6ae58cd32b
+                  title: Contact growth over time
+                  kind: BAR
+                  query:
+                    metric: total_contacts
+                    range: LAST_12_MONTHS
+                    granularity: MONTH
+                  position: 1
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: dd78f406-2156-5e00-9f58-1c3cc539fc33
+                  title: Most used automations by contacts entered
+                  kind: TABLE
+                  query:
+                    metric: automation_entries
+                    dimension: automation
+                    range: ALL_TIME
+                    limit: 5
+                  position: 2
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                created_at: '2026-10-26T16:00:00Z'
+                updated_at: '2026-11-05T15:59:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1768,6 +2196,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/DashboardRequest'
+            example:
+              name: Northwind Traders
+              is_default: true
       responses:
         '200':
           description: Updated
@@ -1775,6 +2206,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+              example:
+                id: d882d72a-b5af-5bb5-bd44-13bca206fd5b
+                user_id: alex
+                name: Alex's dashboard
+                is_default: true
+                widgets:
+                - id: 91bbb6c0-47bc-562d-9ecb-6bd37b17b013
+                  title: Key email marketing metrics
+                  kind: NUMBERS
+                  query:
+                    metric: email_kpis
+                    range: LAST_30_DAYS
+                  position: 0
+                  width: 2
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: c55b2ef3-e9dc-5b6f-8a2a-fd6ae58cd32b
+                  title: Contact growth over time
+                  kind: BAR
+                  query:
+                    metric: total_contacts
+                    range: LAST_12_MONTHS
+                    granularity: MONTH
+                  position: 1
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                - id: dd78f406-2156-5e00-9f58-1c3cc539fc33
+                  title: Most used automations by contacts entered
+                  kind: TABLE
+                  query:
+                    metric: automation_entries
+                    dimension: automation
+                    range: ALL_TIME
+                    limit: 5
+                  position: 2
+                  width: 1
+                  refreshed_at: '2026-11-05T15:59:00Z'
+                created_at: '2026-10-26T16:00:00Z'
+                updated_at: '2026-11-05T15:59:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1849,6 +2318,21 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WidgetRequest'
+            example:
+              title: Northwind · 48 → 120 seats
+              kind: NUMBER
+              query:
+                metric: Metric
+                dimension: Dimension
+                range: LAST_7_DAYS
+                start_date: '2026-11-25'
+                end_date: '2026-11-25'
+                granularity: DAY
+                filters: {}
+                limit: 25
+              prompt: Prompt
+              position: 3
+              width: 1
       responses:
         '201':
           description: Added
@@ -1856,6 +2340,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DashboardWidget'
+              example:
+                id: 3d0b28d9-5ddf-5113-8e16-97b0bc878ccf
+                title: Contacts per list
+                kind: TABLE
+                query:
+                  metric: list_count
+                  dimension: list
+                  range: LAST_30_DAYS
+                position: 5
+                width: 1
+                refreshed_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1903,6 +2398,21 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WidgetRequest'
+            example:
+              title: Northwind · 48 → 120 seats
+              kind: NUMBER
+              query:
+                metric: Metric
+                dimension: Dimension
+                range: LAST_7_DAYS
+                start_date: '2026-11-25'
+                end_date: '2026-11-25'
+                granularity: DAY
+                filters: {}
+                limit: 25
+              prompt: Prompt
+              position: 3
+              width: 1
       responses:
         '200':
           description: Updated
@@ -1910,6 +2420,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DashboardWidget'
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                title: Northwind · 48 → 120 seats
+                kind: NUMBER
+                query:
+                  metric: Metric
+                  dimension: Dimension
+                  range: LAST_7_DAYS
+                  start_date: '2026-11-25'
+                  end_date: '2026-11-25'
+                  granularity: DAY
+                  filters: {}
+                  limit: 25
+                prompt: Prompt
+                position: 3
+                width: 1
+                schedule:
+                  id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                  report_id: 00daadeb-6175-5df5-b365-7a76ec2eaa99
+                  frequency: Frequency
+                  recipient_ids:
+                  - 74ac0043-87c0-5717-854d-594f606bbda7
+                  is_active: true
+                  last_sent: '2026-11-05T16:00:00Z'
+                refreshed_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2003,6 +2538,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WidgetData'
+              example:
+                widget_id: 1590c639-a479-5154-9846-191756192e74
+                refreshed_at: '2026-11-05T16:00:00Z'
+                values:
+                - name: Northwind Traders
+                  count: 3
+                series:
+                - key: snippet.signature
+                  points:
+                  - date: '2026-11-25'
+                    value: 12.5
+                rows:
+                - {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2049,6 +2597,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportScheduleRequest'
+            example:
+              frequency: DAILY
+              recipient_ids:
+              - 74ac0043-87c0-5717-854d-594f606bbda7
+              schedule: Schedule
       responses:
         '200':
           description: Scheduled
@@ -2056,6 +2609,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                report_id: 00daadeb-6175-5df5-b365-7a76ec2eaa99
+                frequency: Frequency
+                recipient_ids:
+                - 74ac0043-87c0-5717-854d-594f606bbda7
+                is_active: true
+                last_sent: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2092,7 +2653,8 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       - name: basis
         in: query
         schema:
@@ -2131,6 +2693,53 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DealForecastReport'
+              example:
+                pipeline_id: d9a2022e-96ff-53a3-a94d-2b169424fd31
+                currency: EUR
+                basis: STAGE_PROBABILITY
+                granularity: MONTH
+                periods:
+                - period: 2026-11
+                  open_count: 14
+                  open_value: '188400.00'
+                  weighted_value: '96100.00'
+                  won_value: '55200.00'
+                  forecast: '151300.00'
+                  quota: '200000.00'
+                  deals: []
+                - period: 2026-12
+                  open_count: 12
+                  open_value: '141200.00'
+                  weighted_value: '61800.00'
+                  won_value: '0.00'
+                  forecast: '61800.00'
+                  quota: '180000.00'
+                  deals: []
+                - period: 2027-01
+                  open_count: 9
+                  open_value: '82700.00'
+                  weighted_value: '24300.00'
+                  won_value: '0.00'
+                  forecast: '24300.00'
+                  quota: '150000.00'
+                  deals: []
+                accuracy:
+                - period: 2026-10
+                  expected: '92000.00'
+                  actual: '84100.00'
+                  variance: '-7900.00'
+                  variance_pct: -8.6
+                - period: 2026-09
+                  expected: '71500.00'
+                  actual: '78300.00'
+                  variance: '6800.00'
+                  variance_pct: 9.5
+                - period: 2026-08
+                  expected: '64000.00'
+                  actual: '58200.00'
+                  variance: '-5800.00'
+                  variance_pct: -9.1
+                generated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2168,15 +2777,16 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         description: Limit to deals owned by one user
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
         description: Inclusive; created_at for overview, close date for won/lost
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2194,6 +2804,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DealFunnelReport'
+              example:
+                pipeline_id: d9a2022e-96ff-53a3-a94d-2b169424fd31
+                currency: EUR
+                stages:
+                - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                  name: New
+                  sequence: 1
+                  entered: 122
+                  current: 9
+                  value: '41000.00'
+                  progressed: 84
+                  progression_pct: 0.69
+                  avg_days_in_stage: 3.1
+                  lost_from_stage: 9
+                - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                  name: Qualified
+                  sequence: 2
+                  entered: 84
+                  current: 8
+                  value: '96400.00'
+                  progressed: 51
+                  progression_pct: 0.61
+                  avg_days_in_stage: 6.4
+                  lost_from_stage: 12
+                - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                  name: Proposal
+                  sequence: 3
+                  entered: 51
+                  current: 7
+                  value: '118500.00'
+                  progressed: 39
+                  progression_pct: 0.76
+                  avg_days_in_stage: 9.8
+                  lost_from_stage: 4
+                won_count: 36
+                won_value: '186400.00'
+                lost_count: 28
+                overall_conversion_pct: 0.3
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2230,15 +2878,16 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         description: Limit to deals owned by one user
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
         description: Inclusive; created_at for overview, close date for won/lost
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2266,6 +2915,100 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DealOverviewReport'
+              example:
+                currency: EUR
+                totals:
+                  open_count: 38
+                  open_value: '412300.00'
+                  won_count: 25
+                  won_value: '186400.00'
+                  lost_count: 16
+                  lost_value: '98100.00'
+                  win_rate: 0.61
+                  avg_deal_value: '7456.00'
+                  avg_days_to_close: 34
+                value_brackets:
+                - label: < €1k
+                  min: '0.00'
+                  max: 1000
+                  count: 11
+                  value: '6200.00'
+                - label: €1k – €5k
+                  min: '1000.00'
+                  max: 5000
+                  count: 20
+                  value: '58400.00'
+                - label: €5k – €25k
+                  min: '5000.00'
+                  max: 25000
+                  count: 14
+                  value: '171600.00'
+                by_owner:
+                - user_id: alex
+                  name: Alex Morgan
+                  open_count: 16
+                  won_count: 12
+                  won_value: '96800.00'
+                  lost_count: 5
+                  win_rate: 0.71
+                  avg_deal_value: '8070.00'
+                  avg_days_to_close: 29
+                  deals_created: 31
+                  tasks_completed: 96
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                - user_id: sam
+                  name: Sam Lee
+                  open_count: 10
+                  won_count: 9
+                  won_value: '71200.00'
+                  lost_count: 8
+                  win_rate: 0.53
+                  avg_deal_value: '7910.00'
+                  avg_days_to_close: 38
+                  deals_created: 27
+                  tasks_completed: 64
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                - user_id: riya
+                  name: Riya Kapoor
+                  open_count: 3
+                  won_count: 4
+                  won_value: '18400.00'
+                  lost_count: 3
+                  win_rate: 0.57
+                  avg_deal_value: '4600.00'
+                  avg_days_to_close: 41
+                  deals_created: 12
+                  tasks_completed: 28
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                by_stage:
+                - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                  name: New
+                  count: 9
+                  value: '41000.00'
+                  weighted_value: '4100.00'
+                - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                  name: Qualified
+                  count: 8
+                  value: '96400.00'
+                  weighted_value: '24100.00'
+                - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                  name: Proposal
+                  count: 7
+                  value: '118500.00'
+                  weighted_value: '59250.00'
+                created_per_period:
+                - period: 2026-08
+                  count: 28
+                  value: 198000
+                - period: 2026-09
+                  count: 34
+                  value: 240100
+                - period: 2026-10
+                  count: 41
+                  value: 312400
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2302,15 +3045,16 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         description: Limit to deals owned by one user
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
         description: Inclusive; created_at for overview, close date for won/lost
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2333,6 +3077,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DealOwnerOverviewReport'
+              example:
+                currency: EUR
+                owners:
+                - user_id: alex
+                  name: Alex Morgan
+                  open_count: 16
+                  won_count: 12
+                  won_value: '96800.00'
+                  lost_count: 5
+                  win_rate: 0.71
+                  avg_deal_value: '8070.00'
+                  avg_days_to_close: 29
+                  deals_created: 31
+                  tasks_completed: 96
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                - user_id: sam
+                  name: Sam Lee
+                  open_count: 10
+                  won_count: 9
+                  won_value: '71200.00'
+                  lost_count: 8
+                  win_rate: 0.53
+                  avg_deal_value: '7910.00'
+                  avg_days_to_close: 38
+                  deals_created: 27
+                  tasks_completed: 64
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                - user_id: riya
+                  name: Riya Kapoor
+                  open_count: 3
+                  won_count: 4
+                  won_value: '18400.00'
+                  lost_count: 3
+                  win_rate: 0.57
+                  avg_deal_value: '4600.00'
+                  avg_days_to_close: 41
+                  deals_created: 12
+                  tasks_completed: 28
+                  open_value: '1250.00'
+                  lost_value: '1250.00'
+                period: QUARTER
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2378,15 +3165,16 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         description: Limit to deals owned by one user
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
         description: Inclusive; created_at for overview, close date for won/lost
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2404,6 +3192,78 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SalesPerformanceReport'
+              example:
+                pipeline_id: d9a2022e-96ff-53a3-a94d-2b169424fd31
+                currency: EUR
+                period: QUARTER
+                stages:
+                - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                  name: New
+                  count: 9
+                  value: '41000.00'
+                - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                  name: Qualified
+                  count: 8
+                  value: '96400.00'
+                - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                  name: Proposal
+                  count: 7
+                  value: '108500.00'
+                owners:
+                - user_id: alex
+                  name: Alex Morgan
+                  stages:
+                  - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                    name: New
+                    count: 3
+                    value: '14000.00'
+                  - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                    name: Qualified
+                    count: 4
+                    value: '52000.00'
+                  - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                    name: Proposal
+                    count: 5
+                    value: '88400.00'
+                  won_count: 12
+                  won_value: '96800.00'
+                  lost_count: 5
+                - user_id: sam
+                  name: Sam Lee
+                  stages:
+                  - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                    name: New
+                    count: 4
+                    value: '18000.00'
+                  - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                    name: Qualified
+                    count: 3
+                    value: '32400.00'
+                  - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                    name: Proposal
+                    count: 2
+                    value: '20100.00'
+                  won_count: 9
+                  won_value: '71200.00'
+                  lost_count: 8
+                - user_id: riya
+                  name: Riya Kapoor
+                  stages:
+                  - stage_id: 69eb8e38-4dda-5cd4-a12a-5ceefe3e043e
+                    name: New
+                    count: 2
+                    value: '9000.00'
+                  - stage_id: 8d4abc9c-648c-5dbe-8668-b73ce7d9a71e
+                    name: Qualified
+                    count: 1
+                    value: '12000.00'
+                  - stage_id: 0bb5ee42-c41b-52ee-9c0a-99dbc4008ce5
+                    name: Proposal
+                    count: 0
+                    value: '0.00'
+                  won_count: 4
+                  won_value: '18400.00'
+                  lost_count: 3
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2440,12 +3300,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2457,6 +3317,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmailClientTrendsReport'
+              example:
+                total_opens: 24466
+                clients:
+                - client: Gmail
+                  family: WEBMAIL
+                  opens: 9840
+                  share_pct: 40
+                - client: Apple Mail
+                  family: DESKTOP
+                  opens: 5120
+                  share_pct: 21
+                - client: iOS Mail
+                  family: MOBILE
+                  opens: 3210
+                  share_pct: 13
+                by_family:
+                - name: WEBMAIL
+                  count: 58
+                - name: MOBILE
+                  count: 31
+                - name: DESKTOP
+                  count: 9
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2497,12 +3379,12 @@ paths:
         in: query
         schema:
           type: string
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2514,6 +3396,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OpenTrendsReport'
+              example:
+                timezone: Europe/Sofia
+                by_weekday:
+                - weekday: 0
+                  opens: 6120
+                - weekday: 1
+                  opens: 7804
+                - weekday: 2
+                  opens: 7102
+                by_hour:
+                - hour: 0
+                  opens: 200
+                - hour: 1
+                  opens: 100
+                - hour: 2
+                  opens: 100
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2545,12 +3443,12 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2562,6 +3460,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PredictiveContentReport'
+              example:
+                total_sent: 12684
+                total_unique_clicks: 1208
+                click_to_open_rate: 0.241
+                sent_by_variant:
+                - name: A
+                  count: 6342
+                - name: B
+                  count: 6342
+                clicks_by_variant:
+                - name: A
+                  count: 650
+                - name: B
+                  count: 558
+                variants:
+                - campaign_id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                  campaign_name: October product update
+                  sent_at: '2026-10-28T16:00:00Z'
+                  variant_id: 2658de4b-a01f-55e5-bed6-e89621ad2615
+                  variant_name: A · "What's new"
+                  sent: 4935
+                  unique_opens: 2024
+                  unique_clicks: 512
+                  click_to_open_rate: 0.253
+                  benchmark_click_to_open_rate: 0.21
+                - campaign_id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                  campaign_name: October product update
+                  sent_at: '2026-10-28T16:00:00Z'
+                  variant_id: 07d19954-4b62-52e4-9524-44abfb643786
+                  variant_name: B · "3 things we shipped"
+                  sent: 4935
+                  unique_opens: 2019
+                  unique_clicks: 423
+                  click_to_open_rate: 0.21
+                  benchmark_click_to_open_rate: 0.21
+                - campaign_id: cd847d34-2090-5e40-afc2-06c94055cc85
+                  campaign_name: Webinar invite · pricing strategy
+                  sent_at: '2026-10-14T16:00:00Z'
+                  variant_id: ef2a8fba-f07c-50df-ac44-f2500352490a
+                  variant_name: A · benefit-led
+                  sent: 1407
+                  unique_opens: 512
+                  unique_clicks: 138
+                  click_to_open_rate: 0.27
+                  benchmark_click_to_open_rate: 0.224
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2592,11 +3535,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportBuildRequest'
-            examples:
-              default:
-                name: Monthly Pipeline Report
-                type: pipeline
-                schedule: monthly
+            example:
+              type: PIPELINE
+              filters: {}
+              group_by:
+              - Group by
+              saved: false
         description: Build a report with current filters and parameters
       responses:
         '200':
@@ -2613,25 +3557,14 @@ paths:
                     type: object
                   saved:
                     type: boolean
-              examples:
-                default:
-                  report_id: 00000000-0000-0000-0000-000000000019
-                  data:
-                    total_opportunities: 50
-                    total_revenue: 250000
-                  saved: true
+              example:
+                report_id: 00daadeb-6175-5df5-b365-7a76ec2eaa99
+                data: {}
+                saved: false
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '201':
           description: Resource created successfully
           content:
@@ -2642,13 +3575,8 @@ paths:
                   id:
                     type: string
                     format: uuid
-              examples:
-                default:
-                  report_id: 00000000-0000-0000-0000-000000000019
-                  data:
-                    total_opportunities: 50
-                    total_revenue: 250000
-                  saved: true
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -2693,6 +3621,9 @@ paths:
                   enum:
                   - CSV
                   - JSON
+            example:
+              report_id: 00daadeb-6175-5df5-b365-7a76ec2eaa99
+              format: CSV
         description: Export report data to a specified file format
       responses:
         '200':
@@ -2704,23 +3635,11 @@ paths:
             application/json:
               schema:
                 type: object
-              examples:
-                default:
-                  success: true
-                  format: csv
-                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
+              example: {}
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '201':
           description: Resource created successfully
           content:
@@ -2731,11 +3650,8 @@ paths:
                   id:
                     type: string
                     format: uuid
-              examples:
-                default:
-                  success: true
-                  format: csv
-                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -2781,27 +3697,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SavedReport'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000025
-                  name: Monthly Pipeline Report
-                  type: pipeline
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                name: Northwind Traders
+                type: Type
+                filters: {}
+                data: {}
+                created_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -2837,11 +3745,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ReportScheduleRequest'
-            examples:
-              default:
-                name: Monthly Pipeline Report
-                type: pipeline
-                schedule: monthly
+            example:
+              frequency: DAILY
+              recipient_ids:
+              - 74ac0043-87c0-5717-854d-594f606bbda7
+              schedule: Schedule
         description: Schedule a report to be generated periodically
       responses:
         '201':
@@ -2850,27 +3758,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportSchedule'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000031
-                  report_id: 00000000-0000-0000-0000-000000000025
-                  frequency: monthly
-                  next_run: '2024-02-01T00:00:00Z'
-                  enabled: true
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                report_id: 00daadeb-6175-5df5-b365-7a76ec2eaa99
+                frequency: Frequency
+                recipient_ids:
+                - 74ac0043-87c0-5717-854d-594f606bbda7
+                is_active: true
+                last_sent: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '409':
-          description: Conflict — resource version mismatch
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -2918,12 +3819,12 @@ paths:
           - DAY
           - WEEK
           - MONTH
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -2935,6 +3836,63 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MarketingRevenueReport'
+              example:
+                currency: EUR
+                attribution_window_days: 7
+                total_revenue: '68340.00'
+                from_campaigns: 27140
+                from_automation_messages: 41200
+                series:
+                - key: automation
+                  label: Automation emails
+                  points:
+                  - date: '2026-10-07'
+                    value: 800
+                  - date: '2026-10-08'
+                    value: 837
+                  - date: '2026-10-09'
+                    value: 874
+                - key: campaign
+                  label: Campaigns
+                  points:
+                  - date: '2026-10-07'
+                    value: 200
+                  - date: '2026-10-08'
+                    value: 253
+                  - date: '2026-10-09'
+                    value: 306
+                top_campaigns:
+                - kind: CAMPAIGN
+                  id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                  name: October product update
+                  revenue: '12240.00'
+                  conversions: 24
+                - kind: CAMPAIGN
+                  id: 9995e2f3-21b8-5df2-a824-716f6159c4f5
+                  name: 'Case study: Northwind'
+                  revenue: '8200.00'
+                  conversions: 3
+                - kind: CAMPAIGN
+                  id: cd847d34-2090-5e40-afc2-06c94055cc85
+                  name: Webinar invite · pricing strategy
+                  revenue: '4900.00'
+                  conversions: 18
+                top_automation_messages:
+                - kind: AUTOMATION_MESSAGE
+                  id: 7689139b-3292-5a4d-82f6-5e6728e5eb2e
+                  name: Day 7 · Upgrade offer
+                  revenue: '18600.00'
+                  conversions: 31
+                - kind: AUTOMATION_MESSAGE
+                  id: e9a85e92-da13-5077-90b2-942ce726419e
+                  name: Renewal in 30 days
+                  revenue: '14100.00'
+                  conversions: 22
+                - kind: AUTOMATION_MESSAGE
+                  id: 43187138-0f3a-56f8-94df-a8d0330ffb47
+                  name: Day 5 · Customer stories
+                  revenue: '4800.00'
+                  conversions: 19
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2966,6 +3924,129 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScorePage'
+              example:
+                items:
+                - id: cef670be-5b12-52e7-8232-19a36fb64702
+                  name: Engagement
+                  description: email + site + lifecycle
+                  entity: CONTACT
+                  status: ACTIVE
+                  thresholds:
+                    warm: 40
+                    hot: 70
+                  rules:
+                  - id: 5876ef17-a412-5e28-bf53-4b86e2f712d0
+                    label: Opened any email
+                    subject: engagement:opened:30
+                    operator: HAS
+                    value: ''
+                    points: 2
+                    decay_days: 30
+                    hits_30d: 23410
+                  - id: e5c78629-9b55-50f5-b029-293852d13941
+                    label: Clicked any email
+                    subject: engagement:clicked:30
+                    operator: HAS
+                    value: ''
+                    points: 5
+                    decay_days: 30
+                    hits_30d: 2804
+                  - id: 45d0c445-7fa8-5368-8120-32d4993f83b5
+                    label: Visited /pricing
+                    subject: site:visited:/pricing
+                    operator: HAS
+                    value: ''
+                    points: 15
+                    decay_days: 14
+                    hits_30d: 4019
+                  distribution:
+                  - 42
+                  - 30
+                  - 22
+                  counts:
+                    cold: 8920
+                    warm: 2644
+                    hot: 916
+                  created_at: '2026-07-28T16:00:00Z'
+                - id: 530ab6c1-e050-50d5-b714-96ac60fa8b94
+                  name: Website intent
+                  description: pricing and docs
+                  entity: CONTACT
+                  status: ACTIVE
+                  thresholds:
+                    warm: 40
+                    hot: 70
+                  rules:
+                  - id: df5dd74d-8987-55cd-8f0a-9e56429e57c4
+                    label: Visited /pricing
+                    subject: site:visited:/pricing
+                    operator: HAS
+                    value: ''
+                    points: 10
+                    decay_days: 14
+                    hits_30d: 4019
+                  - id: 4bf6fdd9-1e85-5f56-b83a-ce6f7049d29e
+                    label: Visited docs
+                    subject: site:visited:/docs/
+                    operator: CONTAINS
+                    value: ''
+                    points: 3
+                    decay_days: 14
+                    hits_30d: 7118
+                  distribution:
+                  - 42
+                  - 30
+                  - 22
+                  counts:
+                    cold: 8920
+                    warm: 2644
+                    hot: 916
+                  created_at: '2026-07-28T16:00:00Z'
+                - id: 84cd7599-be34-5553-9d3c-e5e16028b7da
+                  name: Deal health
+                  description: stage and activity
+                  entity: DEAL
+                  status: ACTIVE
+                  thresholds:
+                    warm: 40
+                    hot: 70
+                  rules:
+                  - id: ca5ada16-e031-5ad5-81c1-599ebc84fa1c
+                    label: Stage Proposal
+                    subject: deal:stage
+                    operator: EQ
+                    value: Proposal
+                    points: 20
+                    decay_days: 0
+                    hits_30d: 7
+                  - id: a98a2826-9aea-5c82-94e5-41e4aeb3a94f
+                    label: Stage Negotiation
+                    subject: deal:stage
+                    operator: EQ
+                    value: Negotiation
+                    points: 40
+                    decay_days: 0
+                    hits_30d: 5
+                  - id: 39fbcb83-e56a-5a92-86df-e2f2ec9c6118
+                    label: No activity 14 d
+                    subject: last_activity_at
+                    operator: NOT_WITHIN_DAYS
+                    value: '14'
+                    points: -15
+                    decay_days: 0
+                    hits_30d: 6
+                  distribution:
+                  - 42
+                  - 30
+                  - 22
+                  counts:
+                    cold: 8920
+                    warm: 2644
+                    hot: 916
+                  created_at: '2026-07-28T16:00:00Z'
+                total: 4
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2992,6 +4073,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Named scores. Paged (`page`, `limit` ≤ 100). Filters: `entity`.'
     post:
       operationId: create_score
       summary: Create a score
@@ -3004,6 +4086,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Score'
+              example:
+                id: cef670be-5b12-52e7-8232-19a36fb64702
+                name: Engagement
+                description: email + site + lifecycle
+                entity: CONTACT
+                status: ACTIVE
+                thresholds:
+                  warm: 40
+                  hot: 70
+                rules:
+                - id: 5876ef17-a412-5e28-bf53-4b86e2f712d0
+                  label: Opened any email
+                  subject: engagement:opened:30
+                  operator: HAS
+                  value: ''
+                  points: 2
+                  decay_days: 30
+                  hits_30d: 23410
+                - id: e5c78629-9b55-50f5-b029-293852d13941
+                  label: Clicked any email
+                  subject: engagement:clicked:30
+                  operator: HAS
+                  value: ''
+                  points: 5
+                  decay_days: 30
+                  hits_30d: 2804
+                - id: 45d0c445-7fa8-5368-8120-32d4993f83b5
+                  label: Visited /pricing
+                  subject: site:visited:/pricing
+                  operator: HAS
+                  value: ''
+                  points: 15
+                  decay_days: 14
+                  hits_30d: 4019
+                distribution:
+                - 42
+                - 30
+                - 22
+                counts:
+                  cold: 8920
+                  warm: 2644
+                  hot: 916
+                created_at: '2026-07-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3018,6 +4143,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScoreRequest'
+            example:
+              name: Northwind Traders
+              description: Example
+              entity: CONTACT
+              thresholds:
+                warm: 3
+                hot: 3
+              rules:
+              - subject: October product update
+                operator: Operator
+                points: 3
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -3027,7 +4163,7 @@ paths:
       - owner
       - admin
       - marketer
-      - sales
+      description: Create a score. Audited.
   /scores/{id}:
     get:
       operationId: get_score
@@ -3041,6 +4177,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Score'
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                name: Northwind Traders
+                description: Example
+                entity: CONTACT
+                status: DRAFT
+                thresholds:
+                  warm: 3
+                  hot: 3
+                rules:
+                - subject: October product update
+                  operator: Operator
+                  points: 3
+                distribution:
+                - 3
+                counts:
+                  cold: 3
+                  warm: 3
+                  hot: 3
+                created_at: '2026-11-05T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3061,6 +4218,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: A score with its rules and distribution. 404 when the record does not exist in this workspace.
     patch:
       operationId: update_score
       summary: Change a score's thresholds or rules
@@ -3073,6 +4231,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Score'
+              example:
+                id: cef670be-5b12-52e7-8232-19a36fb64702
+                name: Engagement
+                description: email + site + lifecycle
+                entity: CONTACT
+                status: ACTIVE
+                thresholds:
+                  warm: 40
+                  hot: 70
+                rules:
+                - id: 5876ef17-a412-5e28-bf53-4b86e2f712d0
+                  label: Opened any email
+                  subject: engagement:opened:30
+                  operator: HAS
+                  value: ''
+                  points: 2
+                  decay_days: 30
+                  hits_30d: 23410
+                - id: e5c78629-9b55-50f5-b029-293852d13941
+                  label: Clicked any email
+                  subject: engagement:clicked:30
+                  operator: HAS
+                  value: ''
+                  points: 5
+                  decay_days: 30
+                  hits_30d: 2804
+                - id: 45d0c445-7fa8-5368-8120-32d4993f83b5
+                  label: Visited /pricing
+                  subject: site:visited:/pricing
+                  operator: HAS
+                  value: ''
+                  points: 15
+                  decay_days: 14
+                  hits_30d: 4019
+                distribution:
+                - 42
+                - 30
+                - 22
+                counts:
+                  cold: 8920
+                  warm: 2644
+                  hot: 916
+                created_at: '2026-07-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3089,6 +4290,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScoreRequest'
+            example:
+              name: Northwind Traders
+              description: Example
+              entity: CONTACT
+              thresholds:
+                warm: 3
+                hot: 3
+              rules:
+              - subject: October product update
+                operator: Operator
+                points: 3
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -3099,7 +4311,8 @@ paths:
       - owner
       - admin
       - marketer
-      - sales
+      description: Change a score's thresholds or rules. Changes only the fields sent; the change is audited with before and
+        after values. 404 when the record does not exist in this workspace.
   /scores/{id}/activate:
     post:
       operationId: activate_score
@@ -3113,6 +4326,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Score'
+              example:
+                id: aa70dbe4-37c6-567e-b827-49d9e6bcd18c
+                name: Northwind Traders
+                description: Example
+                entity: CONTACT
+                status: DRAFT
+                thresholds:
+                  warm: 3
+                  hot: 3
+                rules:
+                - subject: October product update
+                  operator: Operator
+                  points: 3
+                distribution:
+                - 3
+                counts:
+                  cold: 3
+                  warm: 3
+                  hot: 3
+                created_at: '2026-11-05T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3135,7 +4369,6 @@ paths:
       - owner
       - admin
       - marketer
-      - sales
   /scores/{id}/explain:
     get:
       operationId: explain_score
@@ -3149,6 +4382,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoreExplanation'
+              example:
+                score_id: cef670be-5b12-52e7-8232-19a36fb64702
+                score: 86
+                factors:
+                - label: 'Event: activated'
+                  points: 25
+                - label: Plan is Business
+                  points: 20
+                - label: Visited /pricing
+                  points: 30
+                entity_id: d7976b34-ac30-5901-8042-56e3d81193ab
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3179,6 +4423,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Why a contact or deal has its score. Query: `contact_id`, `deal_id`. 404 when the record does not exist
+        in this workspace.'
   /scores/{id}/recalculate:
     post:
       operationId: recalculate_score
@@ -3192,6 +4438,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScoreRecalculation'
+              example:
+                status: QUEUED
+                score_id: 9e979219-1db4-56a0-b42a-37095e08f504
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3213,7 +4462,13 @@ paths:
       - owner
       - admin
       - marketer
-      - sales
+      description: 'Recompute the score for every contact or deal. A state change on one resource; audited. 404 when the record
+        does not exist in this workspace.
+
+
+        Publishes `score.changed` on `crm.insights.v1`.'
+      x-events:
+      - score.changed
   /tasks/overview:
     get:
       operationId: get_task_overview
@@ -3226,7 +4481,8 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       - name: team_id
         in: query
         schema:
@@ -3245,12 +4501,12 @@ paths:
           - CONTACT
           - DEAL
           - ACCOUNT
-      - name: start_date
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -3262,6 +4518,77 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TaskOverviewReport'
+              example:
+                totals:
+                  open: 42
+                  overdue: 6
+                  due_today: 4
+                  completed: 188
+                  completion_rate: 0.82
+                  avg_hours_to_complete: 31
+                by_owner:
+                - user_id: alex
+                  name: Alex Morgan
+                  open: 18
+                  overdue: 2
+                  completed: 96
+                  completion_rate: 0.84
+                  outcomes:
+                    positive: 61
+                    neutral: 24
+                    negative: 11
+                - user_id: sam
+                  name: Sam Lee
+                  open: 16
+                  overdue: 0
+                  completed: 64
+                  completion_rate: 0.8
+                  outcomes:
+                    positive: 30
+                    neutral: 22
+                    negative: 12
+                - user_id: riya
+                  name: Riya Kapoor
+                  open: 8
+                  overdue: 4
+                  completed: 28
+                  completion_rate: 0.78
+                  outcomes:
+                    positive: 15
+                    neutral: 9
+                    negative: 4
+                by_type:
+                - task_type_id: 4eec3526-5869-5e76-820f-ac2358c6b899
+                  name: Call
+                  open: 18
+                  overdue: 2
+                  completed: 84
+                  completion_rate: 0.82
+                - task_type_id: 099104fc-dcee-57bf-b906-d2b826beb51d
+                  name: Email
+                  open: 12
+                  overdue: 1
+                  completed: 61
+                  completion_rate: 0.85
+                - task_type_id: 645bfe17-69c3-558e-82cd-9594c3609fa2
+                  name: Meeting
+                  open: 7
+                  overdue: 2
+                  completed: 29
+                  completion_rate: 0.81
+                by_outcome:
+                - outcome_id: 0a7437f6-0e3e-51ae-a9fd-4a44b900f91e
+                  label: Reached
+                  sentiment: POSITIVE
+                  count: 44
+                - outcome_id: ca29541d-dde8-5a9e-818d-b0717df850c9
+                  label: Replied
+                  sentiment: POSITIVE
+                  count: 23
+                - outcome_id: 822890d5-c8b4-5558-a84c-60e98767732f
+                  label: Held
+                  sentiment: POSITIVE
+                  count: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3318,8 +4645,10 @@ components:
                 type: integer
                 format: int64
               revenue:
-                type: number
+                type: string
                 format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
       required:
       - items
     AutomationContactRow:
@@ -3383,7 +4712,7 @@ components:
           items:
             $ref: '#/components/schemas/CompletionBucket'
         contacts:
-          $ref: '#/components/schemas/PaginatedAutomationContactRow'
+          $ref: '#/components/schemas/AutomationContactRowPage'
       required:
       - workflow_id
       - contacts_entered
@@ -3484,8 +4813,10 @@ components:
           format: float
           description: 0-100
         revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - step_id
       - name
@@ -3525,8 +4856,10 @@ components:
           format: float
           description: 0-100
         revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         series:
           type: array
           items:
@@ -3658,8 +4991,10 @@ components:
           type: number
           format: float
         total_won_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - period
       - leads_created
@@ -3679,7 +5014,8 @@ components:
           format: uuid
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         is_default:
@@ -3793,8 +5129,10 @@ components:
         won_count:
           type: integer
         won_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         lost_count:
           type: integer
         overall_conversion_pct:
@@ -3858,31 +5196,40 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         open_count:
           type: integer
         open_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         won_count:
           type: integer
         won_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         lost_count:
           type: integer
         lost_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         win_rate:
           type: number
           format: float
           description: 0-100
         avg_deal_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         avg_days_to_close:
           type: number
           format: float
@@ -3914,11 +5261,15 @@ components:
         count:
           type: integer
         value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         weighted_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - stage_id
       - name
@@ -3930,25 +5281,33 @@ components:
         open_count:
           type: integer
         open_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         won_count:
           type: integer
         won_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         lost_count:
           type: integer
         lost_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         win_rate:
           type: number
           format: float
           description: 0-100
         avg_deal_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         avg_days_to_close:
           type: number
           format: float
@@ -3968,8 +5327,10 @@ components:
           examples:
           - $1k - $5k
         min:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         max:
           oneOf:
           - type: number
@@ -3979,8 +5340,10 @@ components:
         count:
           type: integer
         value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - label
       - count
@@ -4064,14 +5427,20 @@ components:
         period:
           type: string
         expected:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         actual:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         variance:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         variance_pct:
           type: number
           format: float
@@ -4094,20 +5463,25 @@ components:
           type: string
         owner_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         stage_id:
           type: string
           format: uuid
         value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         probability:
           type: number
           format: float
           description: 0-100
         weighted_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         expected_close_date:
           type: string
           format: date
@@ -4124,22 +5498,30 @@ components:
           type: string
           description: Month/quarter string (e.g., "2026-06")
         weighted_pipeline:
-          type: number
-          format: double
-        expected_close_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
+        expected_close_revenue:
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         confidence:
           type: number
           format: float
           minimum: 0
           maximum: 100
         actual_close_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         variance:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - period
       - weighted_pipeline
@@ -4156,20 +5538,30 @@ components:
         open_count:
           type: integer
         open_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         weighted_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         won_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         forecast:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         quota:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         deals:
           type: array
           items:
@@ -4195,8 +5587,10 @@ components:
                 type: integer
                 format: int32
               revenue:
-                type: number
+                type: string
                 format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
               conversion_from_previous:
                 type: number
                 format: float
@@ -4220,8 +5614,10 @@ components:
           type: integer
           description: Deals in the stage now
         value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         progressed:
           type: integer
           description: Entered deals that moved to a later stage or won
@@ -4294,8 +5690,10 @@ components:
           type: integer
           format: int32
         revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         win_rate:
           type: number
           format: float
@@ -4310,7 +5708,8 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         user_name:
           type: string
         rank:
@@ -4360,8 +5759,10 @@ components:
         attribution_window_days:
           type: integer
         total_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         from_campaigns:
           type: number
           format: double
@@ -4450,7 +5851,8 @@ components:
           type: string
         sender_user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         sent:
           type: integer
         unique_opens:
@@ -4514,282 +5916,6 @@ components:
       - by_weekday
       - by_hour
       description: 'When contacts open mail: counts per weekday and per hour of day, in the chosen timezone.'
-    PaginatedAutomationContactRow:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/AutomationContactRow'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedAutomationListRow:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/AutomationListRow'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedConversionrate:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConversionRate'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of ConversionRate records
-    PaginatedDashboard:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Dashboard'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedForecastAccuracyEntry:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ForecastAccuracyEntry'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of ForecastAccuracyEntry records
-    PaginatedForecastentry:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ForecastEntry'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of ForecastEntry records
-    PaginatedJumpToRow:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/JumpToRow'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedLeadSourceReport:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/LeadSourceReport'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of LeadSourceReport records
-    PaginatedLeaderboardEntry:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/LeaderboardEntry'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of LeaderboardEntry records
-    PaginatedNearbyContact:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/NearbyContact'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedOneToOneEmailRow:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/OneToOneEmailRow'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedPipelinesummary:
-      type: object
-      required:
-      - total_opportunities
-      - total_revenue
-      - total_weighted_revenue
-      - stages
-      properties:
-        total_opportunities:
-          type: integer
-          format: int32
-        total_revenue:
-          type: number
-          format: decimal
-        total_weighted_revenue:
-          type: number
-          format: decimal
-        stages:
-          type: array
-          items:
-            type: object
-            properties:
-              stage_id:
-                type: string
-                format: uuid
-              stage_name:
-                type: string
-              count:
-                type: integer
-                format: int32
-              total_revenue:
-                type: number
-                format: decimal
-              weighted_revenue:
-                type: number
-                format: decimal
-              avg_days_in_stage:
-                type: number
-                format: float
-      description: Paginated list of PipelineSummary records
     PeriodCount:
       type: object
       properties:
@@ -4849,7 +5975,8 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         user_name:
           type: string
         team_id:
@@ -4870,17 +5997,25 @@ components:
           type: integer
           format: int32
         revenue_expected:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         revenue_won:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         weighted_pipeline:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         avg_deal_size:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         avg_sales_cycle_days:
           type: number
           format: float
@@ -4995,8 +6130,10 @@ components:
         name:
           type: string
         revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         conversions:
           type: integer
       required:
@@ -5032,7 +6169,8 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         stages:
@@ -5042,8 +6180,10 @@ components:
         won_count:
           type: integer
         won_value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         lost_count:
           type: integer
       required:
@@ -5401,7 +6541,8 @@ components:
       properties:
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         open:
@@ -5495,11 +6636,15 @@ components:
           type: integer
           format: int32
         total_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         weighted_revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         win_rate:
           type: number
           format: float
@@ -5594,8 +6739,10 @@ components:
                 type: integer
                 format: int32
               weighted_revenue:
-                type: number
+                type: string
                 format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
         by_user:
           type: array
           items:
@@ -5603,12 +6750,15 @@ components:
             properties:
               user_id:
                 type: string
-                format: uuid
+                maxLength: 64
+                description: Sesame user id (the sub claim of the access token)
               user_name:
                 type: string
               weighted_revenue:
-                type: number
+                type: string
                 format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
       required:
       - by_team
       - by_user
@@ -5725,8 +6875,10 @@ components:
           type: number
           format: float
         revenue_won:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         lost_reasons:
           type: array
           items:
@@ -5741,8 +6893,10 @@ components:
                 type: number
                 format: float
               revenue_impact:
-                type: number
+                type: string
                 format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
       required:
       - period
       - total_closed
@@ -5756,6 +6910,7 @@ components:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -5763,6 +6918,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -5785,6 +6945,295 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
+    AutomationContactRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationContactRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    AutomationListRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationListRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    ConversionRatePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversionRate'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ConversionRate records
+    DashboardPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dashboard'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    ForecastAccuracyEntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastAccuracyEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ForecastAccuracyEntry records
+    ForecastEntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ForecastEntry records
+    JumpToRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JumpToRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    LeadSourceReportPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeadSourceReport'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of LeadSourceReport records
+    LeaderboardEntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaderboardEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of LeaderboardEntry records
+    NearbyContactPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NearbyContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    OneToOneEmailRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OneToOneEmailRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PipelineSummaryReport:
+      type: object
+      required:
+      - total_opportunities
+      - total_revenue
+      - total_weighted_revenue
+      - stages
+      properties:
+        total_opportunities:
+          type: integer
+          format: int32
+        total_revenue:
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
+        total_weighted_revenue:
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+                format: uuid
+              stage_name:
+                type: string
+              count:
+                type: integer
+                format: int32
+              total_revenue:
+                type: string
+                format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
+              weighted_revenue:
+                type: string
+                format: decimal
+                pattern: ^-?\d{1,15}(\.\d{1,4})?$
+                description: Decimal string in the currency of the record.
+              avg_days_in_stage:
+                type: number
+                format: float
+      description: Paginated list of PipelineSummary records
   parameters:
     Page:
       name: page
@@ -5805,6 +7254,12 @@ components:
         minimum: 1
         maximum: 100
         default: 20
+    Search:
+      name: search
+      in: query
+      description: Free-text search
+      schema:
+        type: string
     Id:
       name: id
       in: path
@@ -5867,6 +7322,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicts with the current state
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Unprocessable:
       description: Validation failed; see fields
       headers:
@@ -5883,6 +7347,15 @@ components:
           $ref: '#/components/headers/RequestId'
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected failure; retry with the same Idempotency-Key where there is one
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
       content:
         application/json:
           schema:

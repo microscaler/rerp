@@ -1,5 +1,7 @@
 # CRM Entity Relationships
 
+> **Historical (superseded 2026-11-09):** entities are now owned per service as in [08 §6](08-service-decomposition.md); the contracts are the source of the schemas. Still useful: the Odoo-derived field detail on leads, pipelines and teams (sales). Current design: [DESIGN.md](../DESIGN.md).
+
 > **Version:** 1.0.0
 > **Scope:** Complete entity relationship diagrams for all 11 CRM services
 > **Status:** Active design spec

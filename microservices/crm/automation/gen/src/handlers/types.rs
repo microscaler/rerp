@@ -143,16 +143,16 @@ pub struct ActivateWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -251,16 +251,16 @@ pub struct BindWorkflowParametersResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -340,6 +340,23 @@ pub struct CatalogEntry {
     pub r#type: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Condition {
+    pub operator: String,
+
+    pub subject: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConditionGroup {
+    pub items: Vec<serde_json::Value>,
+
+    pub op: String,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum ConditionOperator {
     #[default]
@@ -372,6 +389,13 @@ pub enum ConditionOperator {
 
     #[serde(rename = "NOT_IN")]
     NotIn,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConditionSubgroup {
+    pub items: Vec<Condition>,
+
+    pub op: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -507,7 +531,7 @@ pub struct CreateWorkflowRequest {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -551,16 +575,16 @@ pub struct CreateWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -676,54 +700,6 @@ pub struct CreateWorkflowRuleResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteRuleResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteTriggerResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteWorkflowResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DuplicateWorkflowResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub access_group_ids: Option<Vec<String>>,
@@ -735,16 +711,16 @@ pub struct DuplicateWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -911,7 +887,7 @@ pub struct EnrolmentPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -979,6 +955,8 @@ pub struct ErrorResponse {
     pub fields: Option<Vec<serde_json::Value>>,
 
     pub message: String,
+
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -1172,17 +1150,17 @@ pub struct GetTriggerResponse {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetWorkflowMapResponse {
-    pub active: i32,
+    pub active: i64,
 
-    pub completed: i32,
+    pub completed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub goal_reached: Option<i32>,
+    pub goal_reached: Option<i64>,
 
     pub steps: Vec<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stopped: Option<i32>,
+    pub stopped: Option<i64>,
 
     pub workflow_id: String,
 }
@@ -1199,16 +1177,16 @@ pub struct GetWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -1373,16 +1351,16 @@ pub struct InstantiateWorkflowRecipeResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -1513,7 +1491,7 @@ pub struct ListDealEnrolmentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1524,7 +1502,7 @@ pub struct ListRulesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1535,7 +1513,7 @@ pub struct ListTriggersResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1546,7 +1524,7 @@ pub struct ListUpcomingActionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1557,7 +1535,7 @@ pub struct ListWorkflowEnrolmentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1573,7 +1551,7 @@ pub struct ListWorkflowRulesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1584,7 +1562,7 @@ pub struct ListWorkflowRunHistoryResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1595,18 +1573,7 @@ pub struct ListWorkflowsResponse {
 
     pub page: i32,
 
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedEnrolment {
-    pub items: Vec<Enrolment>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1621,7 +1588,7 @@ pub struct PatchWorkflowRequest {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -1669,16 +1636,16 @@ pub struct PatchWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -1751,16 +1718,16 @@ pub struct PauseWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -1979,7 +1946,7 @@ pub struct RulePage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2095,7 +2062,7 @@ pub struct ScheduledActionPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2264,7 +2231,7 @@ pub struct TriggerPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -2491,7 +2458,7 @@ pub struct UpdateWorkflowRequest {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub description: Option<String>,
@@ -2539,16 +2506,16 @@ pub struct UpdateWorkflowResponse {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -2612,7 +2579,7 @@ pub struct UpdateWorkflowResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct WaitConfig {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub date_field: Option<String>,
@@ -2624,19 +2591,19 @@ pub struct WaitConfig {
     pub mode: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub offset_seconds: Option<i32>,
+    pub offset_seconds: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub relation: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub seconds: Option<i32>,
+    pub seconds: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub send_window: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub timeout_seconds: Option<i32>,
+    pub timeout_seconds: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub until: Option<String>,
@@ -2657,16 +2624,16 @@ pub struct Workflow {
     pub action_type: Option<ActionType>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub active_enrolments: Option<i32>,
+    pub active_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub bindings: Option<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub completed_enrolments: Option<i32>,
+    pub completed_enrolments: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     pub created_at: String,
 
@@ -2740,17 +2707,17 @@ pub struct WorkflowExecutionResult {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct WorkflowMap {
-    pub active: i32,
+    pub active: i64,
 
-    pub completed: i32,
+    pub completed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub goal_reached: Option<i32>,
+    pub goal_reached: Option<i64>,
 
     pub steps: Vec<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub stopped: Option<i32>,
+    pub stopped: Option<i64>,
 
     pub workflow_id: String,
 }
@@ -2763,7 +2730,7 @@ pub struct WorkflowPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2831,7 +2798,7 @@ pub struct WorkflowRunPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2846,7 +2813,7 @@ pub struct WorkflowStep {
     pub branches: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub conditions: Option<serde_json::Value>,
+    pub conditions: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub goal: Option<GoalConfig>,
@@ -2910,7 +2877,7 @@ pub struct WorkflowTrigger {
     pub runs: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub segment: Option<serde_json::Value>,
+    pub segment: Option<ConditionGroup>,
 
     #[serde(rename = "type")]
     pub r#type: TriggerType,

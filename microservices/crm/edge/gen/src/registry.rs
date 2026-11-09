@@ -30,12 +30,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
-        "record_ad_conversion",
-        crate::controllers::record_ad_conversion::RecordAdConversionController,
-        16384,
-    );
-
-    dispatcher.register_typed_with_stack_size(
         "public_click",
         crate::controllers::public_click::PublicClickController,
         20480,
@@ -163,14 +157,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "record_ad_click" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::record_ad_click::RecordAdClickController,
-                    16384,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "record_ad_conversion" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::record_ad_conversion::RecordAdConversionController,
                     16384,
                     Some(route.handler_name.as_ref()),
                 );

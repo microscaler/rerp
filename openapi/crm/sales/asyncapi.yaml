@@ -1,0 +1,981 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Sales events
+  version: 1.0.0
+  description: 'Events crm/sales publishes on Pub/Sub topic `crm.sales.v1` and the events it consumes from other CRM services.
+    Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once: consumers
+    are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.sales.v1
+    title: crm.sales.v1
+    description: Everything crm/sales publishes.
+    messages:
+      leadCreated:
+        $ref: '#/components/messages/leadCreated'
+      leadStageChanged:
+        $ref: '#/components/messages/leadStageChanged'
+      leadConverted:
+        $ref: '#/components/messages/leadConverted'
+      dealCreated:
+        $ref: '#/components/messages/dealCreated'
+      dealUpdated:
+        $ref: '#/components/messages/dealUpdated'
+      dealStageChanged:
+        $ref: '#/components/messages/dealStageChanged'
+      dealWon:
+        $ref: '#/components/messages/dealWon'
+      dealLost:
+        $ref: '#/components/messages/dealLost'
+      dealReopened:
+        $ref: '#/components/messages/dealReopened'
+      taskCreated:
+        $ref: '#/components/messages/taskCreated'
+      taskCompleted:
+        $ref: '#/components/messages/taskCompleted'
+      taskReopened:
+        $ref: '#/components/messages/taskReopened'
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+  from_audience:
+    address: crm.audience.v1
+    title: crm.audience.v1
+    description: Subscription `sales-audience` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      contactCreated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactCreated
+      contactUpdated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactUpdated
+      contactMerged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactMerged
+      contactErased:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactErased
+      organisationCreated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/organisationCreated
+      organisationUpdated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/organisationUpdated
+  from_intake:
+    address: crm.intake.v1
+    title: crm.intake.v1
+    description: Subscription `sales-intake` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      intakeAdmitted:
+        $ref: ../intake/asyncapi.yaml#/components/messages/intakeAdmitted
+  from_messaging:
+    address: crm.messaging.v1
+    title: crm.messaging.v1
+    description: Subscription `sales-messaging` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      messageReplied:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageReplied
+  from_workspace:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Subscription `sales-workspace` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      fieldDefined:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldDefined
+      fieldChanged:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldChanged
+      erasureRequested:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/erasureRequested
+      workspaceCreated:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/workspaceCreated
+      memberChanged:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/memberChanged
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/sales publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/leadCreated'
+    - $ref: '#/channels/published/messages/leadStageChanged'
+    - $ref: '#/channels/published/messages/leadConverted'
+    - $ref: '#/channels/published/messages/dealCreated'
+    - $ref: '#/channels/published/messages/dealUpdated'
+    - $ref: '#/channels/published/messages/dealStageChanged'
+    - $ref: '#/channels/published/messages/dealWon'
+    - $ref: '#/channels/published/messages/dealLost'
+    - $ref: '#/channels/published/messages/dealReopened'
+    - $ref: '#/channels/published/messages/taskCreated'
+    - $ref: '#/channels/published/messages/taskCompleted'
+    - $ref: '#/channels/published/messages/taskReopened'
+    - $ref: '#/channels/published/messages/erasureCompleted'
+  consume_audience:
+    action: receive
+    channel:
+      $ref: '#/channels/from_audience'
+    summary: crm/sales consumes contact.created, contact.updated, contact.merged, contact.erased, organisation.created, organisation.updated
+    messages:
+    - $ref: '#/channels/from_audience/messages/contactCreated'
+    - $ref: '#/channels/from_audience/messages/contactUpdated'
+    - $ref: '#/channels/from_audience/messages/contactMerged'
+    - $ref: '#/channels/from_audience/messages/contactErased'
+    - $ref: '#/channels/from_audience/messages/organisationCreated'
+    - $ref: '#/channels/from_audience/messages/organisationUpdated'
+  consume_intake:
+    action: receive
+    channel:
+      $ref: '#/channels/from_intake'
+    summary: crm/sales consumes intake.admitted
+    messages:
+    - $ref: '#/channels/from_intake/messages/intakeAdmitted'
+  consume_messaging:
+    action: receive
+    channel:
+      $ref: '#/channels/from_messaging'
+    summary: crm/sales consumes message.replied
+    messages:
+    - $ref: '#/channels/from_messaging/messages/messageReplied'
+  consume_workspace:
+    action: receive
+    channel:
+      $ref: '#/channels/from_workspace'
+    summary: crm/sales consumes field.defined, field.changed, erasure.requested, workspace.created, member.changed
+    messages:
+    - $ref: '#/channels/from_workspace/messages/fieldDefined'
+    - $ref: '#/channels/from_workspace/messages/fieldChanged'
+    - $ref: '#/channels/from_workspace/messages/erasureRequested'
+    - $ref: '#/channels/from_workspace/messages/workspaceCreated'
+    - $ref: '#/channels/from_workspace/messages/memberChanged'
+components:
+  messages:
+    leadCreated:
+      name: lead.created
+      title: lead.created
+      summary: A lead was created (staff, an admitted enquiry, or a social lead).
+      description: 'A lead was created (staff, an admitted enquiry, or a social lead).
+
+
+        Published by: `POST /leads`
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: lead.created
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Lead
+    leadStageChanged:
+      name: lead.stage_changed
+      title: lead.stage_changed
+      summary: A lead moved stage.
+      description: 'A lead moved stage.
+
+
+        Published by: `PATCH /leads/{id}/stage`
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: lead.stage_changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Lead
+    leadConverted:
+      name: lead.converted
+      title: lead.converted
+      summary: A lead became an opportunity (and a contact and organisation where needed).
+      description: 'A lead became an opportunity (and a contact and organisation where needed).
+
+
+        Published by: `POST /leads/{id}/convert`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: lead.converted
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Lead
+    dealCreated:
+      name: deal.created
+      title: deal.created
+      summary: A deal was opened.
+      description: 'A deal was opened.
+
+
+        Published by: `POST /deals`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.created
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    dealUpdated:
+      name: deal.updated
+      title: deal.updated
+      summary: Deal fields changed.
+      description: 'Deal fields changed.
+
+
+        Published by: `PUT /deals/{id}`, `PATCH /deals/{id}`, `POST /deals/bulk`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.updated
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    dealStageChanged:
+      name: deal.stage_changed
+      title: deal.stage_changed
+      summary: A deal moved stage.
+      description: 'A deal moved stage.
+
+
+        Published by: `PATCH /deals/{id}/stage`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.stage_changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    dealWon:
+      name: deal.won
+      title: deal.won
+      summary: A deal was won. Sales also emits the signed conversion on crm-conversions (ADR 003).
+      description: 'A deal was won. Sales also emits the signed conversion on crm-conversions (ADR 003).
+
+
+        Published by: `PATCH /deals/{id}/status`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience, crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.won
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    dealLost:
+      name: deal.lost
+      title: deal.lost
+      summary: A deal was lost, with its reason.
+      description: 'A deal was lost, with its reason.
+
+
+        Published by: `PATCH /deals/{id}/status`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.lost
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    dealReopened:
+      name: deal.reopened
+      title: deal.reopened
+      summary: A won or lost deal was reopened.
+      description: 'A won or lost deal was reopened.
+
+
+        Published by: `PATCH /deals/{id}/status`
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: deal.reopened
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Deal
+    taskCreated:
+      name: task.created
+      title: task.created
+      summary: A task was created.
+      description: 'A task was created.
+
+
+        Published by: `POST /tasks`, `POST /tasks/bulk`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: task.created
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Task
+    taskCompleted:
+      name: task.completed
+      title: task.completed
+      summary: A task was completed with its outcome.
+      description: 'A task was completed with its outcome.
+
+
+        Published by: `POST /tasks/{id}/complete`
+
+
+        Consumed by: crm/automation, crm/insights, crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: task.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Task
+    taskReopened:
+      name: task.reopened
+      title: task.reopened
+      summary: A completed task was reopened.
+      description: 'A completed task was reopened.
+
+
+        Published by: `POST /tasks/{id}/reopen`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: task.reopened
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/sales
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Task
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      description: 'A service erased its copy for a data request.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/workspace.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+  schemas:
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

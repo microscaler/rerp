@@ -282,6 +282,12 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     );
 
     dispatcher.register_typed_with_stack_size(
+        "record_ad_conversion",
+        crate::controllers::record_ad_conversion::RecordAdConversionController,
+        20480,
+    );
+
+    dispatcher.register_typed_with_stack_size(
         "retry_ad_conversion",
         crate::controllers::retry_ad_conversion::RetryAdConversionController,
         20480,
@@ -458,12 +464,6 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "update_form",
         crate::controllers::update_form::UpdateFormController,
-        20480,
-    );
-
-    dispatcher.register_typed_with_stack_size(
-        "submit_form",
-        crate::controllers::submit_form::SubmitFormController,
         20480,
     );
 
@@ -960,6 +960,14 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
                 );
                 dispatcher.add_route(route.clone(), tx);
             }
+            "record_ad_conversion" => {
+                let tx = spawn_typed_with_stack_size_and_name(
+                    crate::controllers::record_ad_conversion::RecordAdConversionController,
+                    20480,
+                    Some(route.handler_name.as_ref()),
+                );
+                dispatcher.add_route(route.clone(), tx);
+            }
             "retry_ad_conversion" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::retry_ad_conversion::RetryAdConversionController,
@@ -1195,14 +1203,6 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "update_form" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::update_form::UpdateFormController,
-                    20480,
-                    Some(route.handler_name.as_ref()),
-                );
-                dispatcher.add_route(route.clone(), tx);
-            }
-            "submit_form" => {
-                let tx = spawn_typed_with_stack_size_and_name(
-                    crate::controllers::submit_form::SubmitFormController,
                     20480,
                     Some(route.handler_name.as_ref()),
                 );

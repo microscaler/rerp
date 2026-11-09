@@ -38,7 +38,7 @@ pub struct Response {
     pub bounce_rate: Option<f64>,
 
     #[serde(rename = "campaigns_sent")]
-    pub campaigns_sent: i32,
+    pub campaigns_sent: i64,
 
     #[serde(rename = "click_rate")]
     pub click_rate: f64,
@@ -48,17 +48,17 @@ pub struct Response {
     pub click_to_open_rate: Option<f64>,
 
     #[serde(rename = "messages_sent")]
-    pub messages_sent: i32,
+    pub messages_sent: i64,
 
     #[serde(rename = "open_rate")]
     pub open_rate: f64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "subscribed_contacts")]
-    pub subscribed_contacts: Option<i32>,
+    pub subscribed_contacts: Option<i64>,
 
     #[serde(rename = "total_contacts")]
-    pub total_contacts: i32,
+    pub total_contacts: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "unsubscribe_rate")]
@@ -74,14 +74,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
@@ -90,14 +88,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("from") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
             data_map.insert(
                 "from".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -105,14 +101,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("to") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
             data_map.insert(
                 "to".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -120,14 +114,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("list_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "list_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 

@@ -65,6 +65,17 @@ pub struct ApiKey {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ApiKeyPage {
+    pub items: Vec<ApiKey>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ApproveDataRequestResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<String>,
@@ -143,6 +154,32 @@ pub struct AuditLogEntry {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AuditLogEntryPage {
+    pub items: Vec<AuditLogEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct BrandColors {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub accent: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ground: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ink: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub positive: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct BrandKit {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub body_font: Option<String>,
@@ -151,7 +188,7 @@ pub struct BrandKit {
     pub button_style: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub colors: Option<serde_json::Value>,
+    pub colors: Option<BrandColors>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heading_font: Option<String>,
@@ -174,7 +211,7 @@ pub struct BrandKitInput {
     pub button_style: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub colors: Option<serde_json::Value>,
+    pub colors: Option<BrandColors>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heading_font: Option<String>,
@@ -280,6 +317,30 @@ pub struct ComplianceSettings {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct Condition {
+    pub operator: String,
+
+    pub subject: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub value: Option<Vec<String>>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConditionGroup {
+    pub items: Vec<serde_json::Value>,
+
+    pub op: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConditionSubgroup {
+    pub items: Vec<Condition>,
+
+    pub op: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -686,6 +747,17 @@ pub struct CustomField {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct CustomFieldPage {
+    pub items: Vec<CustomField>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DataRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub completed_at: Option<String>,
@@ -725,39 +797,7 @@ pub struct DataRequestPage {
 
     pub page: i32,
 
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteCustomFieldResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteWebhookResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -771,6 +811,8 @@ pub struct ErrorResponse {
     pub fields: Option<Vec<serde_json::Value>>,
 
     pub message: String,
+
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -807,7 +849,7 @@ pub struct FieldGroupPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -884,7 +926,7 @@ pub struct GetBrandKitResponse {
     pub button_style: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub colors: Option<serde_json::Value>,
+    pub colors: Option<BrandColors>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heading_font: Option<String>,
@@ -981,7 +1023,7 @@ pub struct GetEntityAuditLogResponse {
     pub items: Vec<AuditLogEntry>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total: Option<i32>,
+    pub total: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1161,6 +1203,17 @@ pub struct Integration {
     pub r#type: IntegrationType,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct IntegrationPage {
+    pub items: Vec<Integration>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum IntegrationType {
     #[default]
@@ -1283,6 +1336,17 @@ pub struct JobError {
     pub row: i32,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JobErrorPage {
+    pub items: Vec<JobError>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum JobKind {
     #[default]
@@ -1302,7 +1366,7 @@ pub struct JobOptions {
     pub dedupe_on: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub filter: Option<serde_json::Value>,
+    pub filter: Option<ConditionGroup>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub format: Option<String>,
@@ -1327,6 +1391,17 @@ pub struct JobOptions {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub update_existing: Option<bool>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JobPage {
+    pub items: Vec<Job>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -1359,7 +1434,7 @@ pub struct ListApiKeysResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1370,7 +1445,7 @@ pub struct ListAuditLogResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1381,7 +1456,7 @@ pub struct ListCustomFieldsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1392,7 +1467,7 @@ pub struct ListDataRequestsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1403,7 +1478,7 @@ pub struct ListEntityCustomFieldsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1414,7 +1489,7 @@ pub struct ListFieldGroupsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1425,7 +1500,7 @@ pub struct ListIntegrationsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1436,7 +1511,7 @@ pub struct ListJobErrorsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1447,7 +1522,7 @@ pub struct ListJobsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1458,7 +1533,7 @@ pub struct ListMembersResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1469,7 +1544,7 @@ pub struct ListNotificationRulesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1480,7 +1555,7 @@ pub struct ListTeamResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1491,7 +1566,7 @@ pub struct ListWebhookLogsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1502,7 +1577,7 @@ pub struct ListWebhooksResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1513,7 +1588,7 @@ pub struct ListWorkspacesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1543,7 +1618,7 @@ pub struct MembershipPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1581,7 +1656,7 @@ pub struct NotificationRulePage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1600,94 +1675,6 @@ pub struct NotificationRuleRequest {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub recipients: Option<serde_json::Value>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedApiKey {
-    pub items: Vec<ApiKey>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedAuditLogEntry {
-    pub items: Vec<AuditLogEntry>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedCustomField {
-    pub items: Vec<CustomField>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedIntegration {
-    pub items: Vec<Integration>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedJob {
-    pub items: Vec<Job>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedJobError {
-    pub items: Vec<JobError>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedWebhook {
-    pub items: Vec<Webhook>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedWebhookDeliveryLog {
-    pub items: Vec<WebhookDeliveryLog>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1764,22 +1751,6 @@ pub struct PatchCustomFieldResponse {
     pub show_on_card: Option<bool>,
 
     pub visible: bool,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct RemoveMemberResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1912,7 +1883,7 @@ pub struct TeamMemberPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1942,7 +1913,7 @@ pub struct UpdateBrandKitRequest {
     pub button_style: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub colors: Option<serde_json::Value>,
+    pub colors: Option<BrandColors>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heading_font: Option<String>,
@@ -1963,7 +1934,7 @@ pub struct UpdateBrandKitResponse {
     pub button_style: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub colors: Option<serde_json::Value>,
+    pub colors: Option<BrandColors>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub heading_font: Option<String>,
@@ -2350,6 +2321,17 @@ pub struct WebhookDeliveryLog {
     pub webhook_id: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct WebhookDeliveryLogPage {
+    pub items: Vec<WebhookDeliveryLog>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum WebhookDeliveryStatus {
     #[default]
@@ -2364,6 +2346,17 @@ pub enum WebhookDeliveryStatus {
 
     #[serde(rename = "RETRYING")]
     Retrying,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct WebhookPage {
+    pub items: Vec<Webhook>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2401,7 +2394,7 @@ pub struct WorkspacePage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]

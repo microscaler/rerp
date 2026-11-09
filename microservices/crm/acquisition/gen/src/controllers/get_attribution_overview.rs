@@ -7,5 +7,67 @@ use brrtrouter_macros::handler;
 
 #[handler(GetAttributionOverviewController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    HttpJson::ok(Response { rows: vec![] })
+    // Example response:
+    // {
+    //   "rows": [
+    //     {
+    //       "contacts": 1104,
+    //       "converted": 9,
+    //       "key": "google / cpc",
+    //       "leads": 612,
+    //       "revenue": "38400.00"
+    //     },
+    //     {
+    //       "contacts": 902,
+    //       "converted": 6,
+    //       "key": "linkedin / social",
+    //       "leads": 418,
+    //       "revenue": "41000.00"
+    //     },
+    //     {
+    //       "contacts": 0,
+    //       "converted": 7,
+    //       "key": "newsletter / email",
+    //       "leads": 301,
+    //       "revenue": "12140.00"
+    //     }
+    //   ]
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "rows": [
+    {
+      "contacts": 1104,
+      "converted": 9,
+      "key": "google / cpc",
+      "leads": 612,
+      "revenue": "38400.00"
+    },
+    {
+      "contacts": 902,
+      "converted": 6,
+      "key": "linkedin / social",
+      "leads": 418,
+      "revenue": "41000.00"
+    },
+    {
+      "contacts": 0,
+      "converted": 7,
+      "key": "newsletter / email",
+      "leads": 301,
+      "revenue": "12140.00"
+    }
+  ]
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
+    HttpJson::ok(Response {
+        rows: vec![serde_json::from_str::<serde_json::Value>(r#"{"contacts":1104,"converted":9,"key":"google / cpc","leads":612,"revenue":"38400.00"}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"contacts":902,"converted":6,"key":"linkedin / social","leads":418,"revenue":"41000.00"}"#).unwrap_or(serde_json::Value::Null), serde_json::from_str::<serde_json::Value>(r#"{"contacts":0,"converted":7,"key":"newsletter / email","leads":301,"revenue":"12140.00"}"#).unwrap_or(serde_json::Value::Null)],
+    })
 }

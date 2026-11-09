@@ -10,5 +10,32 @@ use crate::handlers::types::AdLinkTagRule;
 
 #[handler(ListAdLinkTagsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    HttpJson::ok(Response(vec![]))
+    // Example response:
+    // {
+    //   "items": [
+    //     {
+    //       "applies_to": "CAMPAIGN_EMAIL"
+    //     }
+    //   ]
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "items": [
+    {
+      "applies_to": "CAMPAIGN_EMAIL"
+    }
+  ]
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
+    HttpJson::ok(Response(vec![serde_json::from_value::<AdLinkTagRule>(
+        serde_json::json!({"applies_to":"CAMPAIGN_EMAIL"}),
+    )
+    .unwrap_or_default()]))
 }

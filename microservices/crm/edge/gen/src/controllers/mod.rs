@@ -7,8 +7,6 @@ pub mod record_ad_call;
 
 pub mod record_ad_click;
 
-pub mod record_ad_conversion;
-
 pub mod public_click;
 
 pub mod get_calendar_ics;

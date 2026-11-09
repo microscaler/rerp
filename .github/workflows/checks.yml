@@ -76,6 +76,8 @@ jobs:
           tooling/.venv/bin/pip install -e ./tooling
       - name: Validate OpenAPI specs
         run: tooling/.venv/bin/rerp openapi validate
+      - name: CRM contracts (conventions, examples, events)
+        run: tooling/.venv/bin/python openapi/crm/tools/check_specs.py
       - name: Generate BFF specs
         run: tooling/.venv/bin/rerp bff generate-system
       - name: Validate port assignments

@@ -32,25 +32,25 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "list_campaigns",
         crate::controllers::list_campaigns::ListCampaignsController,
-        24576,
+        28672,
     );
 
     dispatcher.register_typed_with_stack_size(
         "create_campaign",
         crate::controllers::create_campaign::CreateCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "get_campaign",
         crate::controllers::get_campaign::GetCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "update_campaign",
         crate::controllers::update_campaign::UpdateCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -68,13 +68,13 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "cancel_campaign",
         crate::controllers::cancel_campaign::CancelCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "duplicate_campaign",
         crate::controllers::duplicate_campaign::DuplicateCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -92,7 +92,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "schedule_campaign",
         crate::controllers::schedule_campaign::ScheduleCampaignController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -519,7 +519,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_campaigns" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_campaigns::ListCampaignsController,
-                    24576,
+                    28672,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -527,7 +527,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "create_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_campaign::CreateCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -535,7 +535,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_campaign::GetCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -543,7 +543,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "update_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::update_campaign::UpdateCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -567,7 +567,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "cancel_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::cancel_campaign::CancelCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -575,7 +575,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "duplicate_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::duplicate_campaign::DuplicateCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -599,7 +599,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "schedule_campaign" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::schedule_campaign::ScheduleCampaignController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

@@ -12,6 +12,14 @@ use std::convert::TryFrom;
 pub struct Request {
     #[serde(rename = "token")]
     pub token: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "page")]
+    pub page: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "limit")]
+    pub limit: Option<i32>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -33,17 +41,43 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("token") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"maxLength":128,"type":"string"}));
             data_map.insert(
                 "token".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"maxLength":128,"type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'token'"));
+        }
+
+        if let Some(v) = req.get_query_param("page") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":1,"format":"int32","minimum":1,"type":"integer"}),
+            );
+            data_map.insert(
+                "page".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
+        }
+
+        if let Some(v) = req.get_query_param("limit") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"default":20,"format":"int32","maximum":100,"minimum":1,"type":"integer"}),
+            );
+            data_map.insert(
+                "limit".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
+            );
+        } else {
+
+            // optional parameter
         }
 
         if let Some(body) = req.body {

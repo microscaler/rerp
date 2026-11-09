@@ -1,0 +1,499 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Workspace events
+  version: 1.0.0
+  description: 'Events crm/workspace publishes on Pub/Sub topic `crm.workspace.v1` and the events it consumes from other CRM
+    services. Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once:
+    consumers are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Everything crm/workspace publishes.
+    messages:
+      fieldDefined:
+        $ref: '#/components/messages/fieldDefined'
+      fieldChanged:
+        $ref: '#/components/messages/fieldChanged'
+      erasureRequested:
+        $ref: '#/components/messages/erasureRequested'
+      workspaceCreated:
+        $ref: '#/components/messages/workspaceCreated'
+      memberChanged:
+        $ref: '#/components/messages/memberChanged'
+  from_every_service:
+    address: crm.<service>.v1
+    title: crm.<service>.v1
+    description: Subscription `workspace-all` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/workspace publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/fieldDefined'
+    - $ref: '#/channels/published/messages/fieldChanged'
+    - $ref: '#/channels/published/messages/erasureRequested'
+    - $ref: '#/channels/published/messages/workspaceCreated'
+    - $ref: '#/channels/published/messages/memberChanged'
+  consume_erasure_confirmations:
+    action: receive
+    channel:
+      $ref: '#/channels/from_every_service'
+    summary: crm/workspace consumes erasure.completed
+    messages:
+    - $ref: '#/channels/from_every_service/messages/erasureCompleted'
+components:
+  messages:
+    fieldDefined:
+      name: field.defined
+      title: field.defined
+      summary: A custom field was defined.
+      description: 'A custom field was defined.
+
+
+        Published by: `POST /custom-fields`
+
+
+        Consumed by: crm/audience, crm/sales, crm/acquisition, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: field.defined
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/workspace
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/CustomField
+    fieldChanged:
+      name: field.changed
+      title: field.changed
+      summary: A custom field definition changed or was removed.
+      description: 'A custom field definition changed or was removed.
+
+
+        Published by: `PUT /custom-fields/{id}`, `PATCH /custom-fields/{id}`, `DELETE /custom-fields/{id}`
+
+
+        Consumed by: crm/audience, crm/sales, crm/acquisition, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: field.changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/workspace
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/CustomField
+    erasureRequested:
+      name: erasure.requested
+      title: erasure.requested
+      summary: An approved erasure; every service erases and confirms.
+      description: 'An approved erasure; every service erases and confirms.
+
+
+        Published by: `POST /data-requests/{id}/approve`
+
+
+        Consumed by: crm/audience, crm/messaging, crm/automation, crm/sales, crm/acquisition, crm/insights, crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.requested
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/workspace
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureRequested'
+    workspaceCreated:
+      name: workspace.created
+      title: workspace.created
+      summary: A workspace (brand) was created; services seed their defaults.
+      description: 'A workspace (brand) was created; services seed their defaults.
+
+
+        Published by: `POST /workspaces`
+
+
+        Consumed by: crm/audience, crm/messaging, crm/automation, crm/sales, crm/acquisition, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: workspace.created
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/workspace
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Workspace
+    memberChanged:
+      name: member.changed
+      title: member.changed
+      summary: A member was added, removed or given another role (the gateway also drops its cached memberships).
+      description: 'A member was added, removed or given another role (the gateway also drops its cached memberships).
+
+
+        Published by: `POST /workspaces/{id}/members`, `PATCH /workspaces/{id}/members/{user_id}`, `DELETE /workspaces/{id}/members/{user_id}`
+
+
+        Consumed by: crm/sales, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: member.changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/workspace
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/MemberChange'
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+  schemas:
+    ErasureRequested:
+      type: object
+      required:
+      - data_request_id
+      - subject_hash
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        subject_hash:
+          type: string
+          description: SHA-256 of the normalised email
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    MemberChange:
+      type: object
+      required:
+      - workspace_id
+      - user_id
+      properties:
+        workspace_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          maxLength: 64
+        role:
+          type: string
+          enum:
+          - owner
+          - admin
+          - marketer
+          - sales
+          - read-only
+        previous_role:
+          type: string
+          enum:
+          - owner
+          - admin
+          - marketer
+          - sales
+          - read-only
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

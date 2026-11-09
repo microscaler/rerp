@@ -7,6 +7,22 @@ use brrtrouter_macros::handler;
 
 #[handler(GetAdBuyDeliveryController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // Example response:
+    // {
+    //   "days": []
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "days": []
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
     HttpJson::ok(Response {
         buy_id: Some("example".to_string()),
         days: Some(vec![]),

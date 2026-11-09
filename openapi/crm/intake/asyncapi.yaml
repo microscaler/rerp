@@ -1,0 +1,383 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Intake events
+  version: 1.0.0
+  description: 'Events crm/intake publishes on Pub/Sub topic `crm.intake.v1` and the events it consumes from other CRM services.
+    Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once: consumers
+    are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.intake.v1
+    title: crm.intake.v1
+    description: Everything crm/intake publishes.
+    messages:
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+      intakeConfirmationRequested:
+        $ref: '#/components/messages/intakeConfirmationRequested'
+      intakeAdmitted:
+        $ref: '#/components/messages/intakeAdmitted'
+  from_edge:
+    address: crm.edge.v1
+    title: crm.edge.v1
+    description: Subscription `intake-edge` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      formSubmissionReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/formSubmissionReceived
+      surveyReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/surveyReceived
+      eventRegistrationReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/eventRegistrationReceived
+      confirmationReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/confirmationReceived
+      adWebhookReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/adWebhookReceived
+  from_workspace:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Subscription `intake-workspace` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      erasureRequested:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/erasureRequested
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/intake publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/erasureCompleted'
+    - $ref: '#/channels/published/messages/intakeConfirmationRequested'
+    - $ref: '#/channels/published/messages/intakeAdmitted'
+  consume_edge:
+    action: receive
+    channel:
+      $ref: '#/channels/from_edge'
+    summary: crm/intake consumes form_submission.received, survey.received, event_registration.received, confirmation.received,
+      ad_webhook.received
+    messages:
+    - $ref: '#/channels/from_edge/messages/formSubmissionReceived'
+    - $ref: '#/channels/from_edge/messages/surveyReceived'
+    - $ref: '#/channels/from_edge/messages/eventRegistrationReceived'
+    - $ref: '#/channels/from_edge/messages/confirmationReceived'
+    - $ref: '#/channels/from_edge/messages/adWebhookReceived'
+  consume_workspace:
+    action: receive
+    channel:
+      $ref: '#/channels/from_workspace'
+    summary: crm/intake consumes erasure.requested
+    messages:
+    - $ref: '#/channels/from_workspace/messages/erasureRequested'
+components:
+  messages:
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      description: 'A service erased its copy for a data request.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/workspace.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+    intakeConfirmationRequested:
+      name: intake.confirmation_requested
+      title: intake.confirmation_requested
+      summary: Messaging sends the double opt-in email (transactional, no consent needed).
+      description: 'Messaging sends the double opt-in email (transactional, no consent needed).
+
+
+        Published by: `POST /submissions/{id}/resend`
+
+
+        Consumed by: crm/messaging.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: intake.confirmation_requested
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/intake
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/IntakeConfirmationRequested'
+    intakeAdmitted:
+      name: intake.admitted
+      title: intake.admitted
+      summary: A confirmed subscription or a screened enquiry, with its consent evidence (ADR 004).
+      description: 'A confirmed subscription or a screened enquiry, with its consent evidence (ADR 004).
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/acquisition, crm/sales.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: intake.admitted
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/intake
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/IntakeAdmitted'
+  schemas:
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+    IntakeConfirmationRequested:
+      type: object
+      required:
+      - submission_id
+      - email
+      - confirm_url
+      - expires_at
+      properties:
+        submission_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        form_id:
+          type: string
+          format: uuid
+        confirm_url:
+          type: string
+          format: uri
+          description: Edge /confirm/{token} link
+        expires_at:
+          type: string
+          format: date-time
+    IntakeAdmitted:
+      type: object
+      required:
+      - submission_id
+      - kind
+      - form_id
+      - email
+      - fields
+      - submitted_at
+      properties:
+        submission_id:
+          type: string
+          format: uuid
+          description: Once-only key for admission
+        kind:
+          type: string
+          enum:
+          - SUBSCRIPTION
+          - ENQUIRY
+        form_id:
+          type: string
+          format: uuid
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        email:
+          type: string
+          format: email
+        fields:
+          type: object
+          additionalProperties:
+            type: string
+        consent:
+          type: object
+          properties:
+            text:
+              type: string
+            submitted_ip:
+              type: string
+            submitted_at:
+              type: string
+              format: date-time
+            confirmed_ip:
+              type: string
+            confirmed_at:
+              type: string
+              format: date-time
+        visitor_id:
+          type: string
+        page_url:
+          type: string
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+        submitted_at:
+          type: string
+          format: date-time
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

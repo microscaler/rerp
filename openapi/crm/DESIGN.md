@@ -1,199 +1,79 @@
-# RERP CRM System Design Document
+# RERP CRM — design
 
-> **Version:** 1.0.0
-> **Scope:** Complete architectural blueprint, data model, and API contract strategy
-> **Priority:** Foundation for OpenAPI specification generation across all 11 components
-> **Status:** Active design spec
-> **Repository Structure:** `openapi/crm/`
+> **Status:** Current, 2026-11-09. Replaces the earlier 13-service, four-database design (kept in docs/01 to 05 for
+> history). **Decided by:** [ADR 003](../../docs/adrs/003-crm-funnel-conversion-boundary.md),
+> [ADR 004](../../docs/adrs/004-crm-capture-intake-and-workspaces.md),
+> [08-service-decomposition.md](docs/08-service-decomposition.md) (D1 to D14).
 
----
+## 1. What we are building
 
-## Document Structure
+A CRM with a marketing suite, built consumer-first: the PriceWhisperer platform portal's CRM screens (Epic 55, 40
+stories) were designed and run against a mock, the operations they call (237) were tabulated, and the contracts were
+derived from them. The scope is what those screens need: contacts and consent, segments, email and SMS campaigns,
+automations, a sales pipeline with tasks, forms and tracking, ads and attribution, reports, dashboards and scores, and
+the settings to run it, for one or several brands per organisation.
 
-This document is organized into modular design documents. Use this table of contents to navigate to the specific design area you need.
+Out of scope for v1: live chat, subscription billing and MRR (RERP `sales/subscription` and PriceWhisperer billing own
+them), enrichment and ICP mining (`intelligence`, deferred), and anything a screen does not need.
 
-| # | Document | Description | Diagrams |
-|---|----------|-------------|----------|
-| 0 | **This document** | Table of contents and executive overview | — |
-| 1 | [01-architecture.md](docs/01-architecture.md) | System topology, service mesh, deployment, auth flow | Architecture, sequence, matrix, topology |
-| 2 | [02-entity-relationships.md](docs/02-entity-relationships.md) | Complete ERD for all 11 services and their relationships | ERD diagrams per service + unified summary |
-| 3 | [03-data-flow.md](docs/03-data-flow.md) | CRUD flows, event-driven patterns, CDC, batch processing | Sequence diagrams, flow charts |
-| 4 | [04-automation-engine.md](docs/04-automation-engine.md) | Workflow trigger-execution model, rule engine, cron | Flow charts, sequence diagrams, state diagrams |
-| 5 | [05-graph-database.md](docs/05-graph-database.md) | Hierarchical trees, relationship graphs, scoring models | Graph diagrams, state diagrams |
-| 6 | [06-marketing-feature-map.md](docs/06-marketing-feature-map.md) | Marketing platform feature map reverse-engineered from a market leader; v1 curation and reference tenant | Tables |
+## 2. Principles
 
----
+1. **The contract comes first.** Nine OpenAPI documents and nine AsyncAPI documents are the source of truth; the Rust
+   crates are generated from them, and a checker enforces the conventions ([09](docs/09-api-conventions.md)).
+2. **Split by the questions a service answers**, not by entity: audience answers "can we reach this person?",
+   messaging "what did we send?", automation "what happens next?", sales "what are we selling?", acquisition "where did
+   they come from, and what are they worth?", insights "what does it add up to?", workspace "how is this run?".
+3. **Events, not shared tables.** A service owns its schema; others learn through `crm.<service>.v1` topics. The few
+   synchronous calls form no cycle ([08 §5.2](docs/08-service-decomposition.md)).
+4. **The internet touches nothing with a credential.** The edge validates and publishes; services re-validate.
+5. **No consent, no contact.** Anonymous input waits in intake until it is confirmed or screened (ADR 004).
+6. **Every row belongs to a workspace**, isolated by row-level security, and every write is audited.
+7. **The customer master stays in RERP.** A prospect becomes a customer only through a signed conversion (ADR 003).
 
-## Executive Overview
+## 3. Components
 
-RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship management platform. Unlike proprietary CRM ecosystems that lock data into UI-driven workflows, RERP defines every entity, endpoint, and business rule in machine-readable OpenAPI 3.1.0 specifications. This enables:
+| Component | Owns | Runtime |
+|---|---|---|
+| audience | contacts, organisations, tags, segments and the condition tree, lists, subscriptions and consent history, suppressions, notes, timeline, the per-contact facts projection, bulk jobs | API; segment p95 ≤ 700 ms at 100 k contacts |
+| messaging | templates, snippets, assets, campaigns, the send ledger and engagement, senders and domains, SMS senders, tracking domains, postal addresses, list exclusions, providers, mailboxes, social accounts and posts | API and send workers, ≥ 100 k recipients / hour / workspace |
+| automation | workflows and step graphs, triggers, the action catalogue, recipes, enrolments, durable timers | API and step engine, exactly once per step, timers within 60 s |
+| sales | leads and triage, pipelines and stages, deals with contacts, roles, notes, files, emails; tasks, types, outcomes, calendars; saved responses; teams and assignment; the signed conversion | API |
+| acquisition | forms and submissions, tracked sites and events, visitors and clicks, conversions and goals, ad accounts, audiences, creatives, buys, link tagging, conversion relay, attribution | API and adapter workers |
+| insights | read models for every report, dashboards and widgets, named scores | event consumers, own analytics database, ≤ 5 min behind |
+| workspace | workspaces and memberships, custom field definitions, API keys, webhooks, notification rules, compliance, data requests and erasure, brand kit, jobs, audit log | API and job runner |
+| edge | nothing (validates, signs and verifies tokens, publishes) | public, scales on request rate |
+| intake | pending submissions only (7 days pending, 30 days decided) | worker and a staff API |
 
-- **Automatic SDK generation** for TypeScript, Python, Go, and Java
-- **Strict API contracts** with zero drift between frontend, mobile, and backend
-- **Rust-level performance** for sub-millisecond latency and bulk operations on 100,000+ records
-- **Self-hosted data sovereignty** with no per-seat pricing, rate limits, or vendor lock-in
+Details per component are in each folder's README and [08 §4](docs/08-service-decomposition.md); entity diagrams in
+[08 §6](docs/08-service-decomposition.md); flows and state machines in [08 §7](docs/08-service-decomposition.md).
 
-The system is organized into **13 functional components** (microservices), each representing a critical dimension of modern CRM.
+## 4. Data
 
----
+| Store | Holds |
+|---|---|
+| CRM store: Postgres on GCP (Crossplane) | one schema per service (audience, messaging, automation, sales, acquisition, workspace), RLS on `workspace_id` everywhere |
+| Analytics database | insights' read models, rebuildable from events |
+| Intake database | pending submissions, written only by intake |
+| RERP tenant database | `crm_accounts` and the conversion ledger (ADR 003) |
+| Object storage | assets, deal files, exports (signed URLs) |
+| Secret Manager | provider keys, OAuth tokens, ad tokens, webhook and token-signing secrets |
 
-## System Components
+## 5. Interfaces
 
-### Component Overview
+| Interface | Where | Rules |
+|---|---|---|
+| HTTP | `/api/v1/crm/<service>/…` behind the gateway; the edge on `t.<workspace domain>` | [09-api-conventions.md](docs/09-api-conventions.md) |
+| Events | Pub/Sub `crm.<service>.v1`, envelope with `data` | [10-events.md](docs/10-events.md) |
+| Roles | owner, admin, marketer, sales, read-only per workspace | [11-permissions.md](docs/11-permissions.md) |
+| Conversion to RERP | `crm-conversions`, signed (`microservices/crm/conversion`) | ADR 003 |
 
-| Component | OpenAPI Dir | Paths | Schemas | Description |
-|-----------|-------------|-------|---------|-------------|
-| **Pipeline** | `pipeline/` | 9 | 18 | Lead lifecycle, stages, stages history, won/lost, revenue |
-| **Contacts** | `contacts/` | 19 | 21 | Contacts, tags, segments, activity timeline, import/export, merge |
-| **Accounts** | `accounts/` | 6 | 10 | Account hierarchy, company tree, industry classification |
-| **Teams** | `teams/` | 6 | 12 | Team management, member assignment, capacity-based distribution |
-| **Automation** | `automation/` | 27 | 42 | Step-graph workflows (wait, if/else, split, goal), enrolments, triggers, rules, execution logs |
-| **Intelligence** | `intelligence/` | 21 | 29 | Lead scoring (Bayesian PLS), enrichment, data verification |
-| **Engagement** | `engagement/` | 14 | 21 | Subscriptions, renewals, goals, gamification, health scoring |
-| **Livechat** | `livechat/` | 15 | 23 | Chat sessions, messages, agent management, conversion |
-| **Marketing** | `marketing/` | 25 | 36 | UTM tracking, form builder, site tracking, custom events, attribution |
-| **Outreach** | `outreach/` | 36 | 50 | Lists & consent, templates, campaigns, sends, events, transactional, senders, public endpoints |
-| **Social** | `social/` | 14 | 18 | Connected accounts, calendar, approval, engagement, social lead capture |
-| **Reporting** | `reporting/` | 17 | 23 | Analytics, dashboards, forecasts, KPI digests |
-| **Platform** | `platform/` | 14 | 27 | Custom fields, webhooks, API keys, audit logs, integrations |
+## 6. Reading order
 
----
-
-## Architecture at a Glance
-
-```
-Client Tier (Web/Mobile/CLI/External)
-    │
-    ▼
-Gateway Layer (openapi.yaml)
-    │
-    ├── pipeline/    ← Lead lifecycle, stages, revenue
-    ├── contacts/    ← Contact tree, merge, dedup
-    ├── accounts/    ← Account hierarchy, industry
-    ├── teams/       ← Team assignment, capacity
-    ├── automation/  ← Workflows, rules, triggers
-    ├── intelligence/← Scoring, enrichment, verification
-    ├── engagement/  ← Subscriptions, goals, badges
-    ├── livechat/    ← Chat sessions, agents, conversion
-    ├── marketing/   ← UTM, forms, site tracking, events, attribution
-    ├── outreach/    ← Lists, consent, templates, campaigns, sends
-    ├── social/      ← Accounts, calendar, engagement
-    ├── reporting/   ← Analytics, forecasts, digests
-    └── platform/    ← Custom fields, webhooks, audit, API keys
-    │
-    ▼
-Storage Tier (PostgreSQL — 5 DBs: Core, Analytics, Events, Platform, Outreach [outside the tenant DB, ADR 003])
-```
-
----
-
-## Key Design Principles
-
-1. **OpenAPI-first:** Every entity, field, and endpoint defined in specs before implementation
-2. **Unified Lead Model:** One entity for leads and opportunities; conversion is a state change, not a data copy
-3. **Rust Performance:** Sub-millisecond API latency, async I/O, batch operations on 100K+ records
-4. **Self-Hosted Sovereignty:** No per-seat pricing, no rate limits, full data ownership
-5. **Explainable AI:** Bayesian scoring with top_factors, not black-box ML
-6. **API-Defined Workflows:** Automation defined in JSON/JSON schema, not UI-only config
-
----
-
-## Data Architecture: 4-DB Strategy
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  DB 1: CRM Core (Primary)                               │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │ Schema: crm_core                                  │  │
-│  │  pipeline/  — leads, stages, stage_history        │  │
-│  │  contacts/  — contacts, contact_tree, merge       │  │
-│  │  accounts/  — accounts, account_tree, industry    │  │
-│  │  teams/     — teams, team_members, assignments    │  │
-│  └───────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│  DB 2: CRM Analytics                                    │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │ Schema: crm_analytics                             │  │
-│  │  automation/  — workflows, rules, triggers, logs  │  │
-│  │  intelligence/— scoring_frequencies, lead_scores  │  │
-│  │  reporting/   — analytics, forecasts              │  │
-│  └───────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│  DB 3: CRM Events                                       │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │ Schema: crm_events                                │  │
-│  │  livechat/  — chat_sessions, chat_messages        │  │
-│  │  marketing/ — utm_campaigns, web_forms, visitors  │  │
-│  └───────────────────────────────────────────────────┘  │
-├─────────────────────────────────────────────────────────┤
-│  DB 4: CRM Platform                                     │
-│  ┌───────────────────────────────────────────────────┐  │
-│  │ Schema: crm_platform                              │  │
-│  │  custom_fields / webhooks / audit_log             │  │
-│  │  api_keys / integrations                          │  │
-│  └───────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
-```
-
----
-
-## OpenAPI Compliance Standards
-
-All 11 specs follow these BRRTRouter-compliant conventions:
-
-- **OpenAPI 3.1.0** with `openapi: "3.1.0"` version string
-- **2 server entries:** `http://localhost:10352` + `/api/v1`
-- **Components:** `securitySchemes`, `parameters`, `schemas` (exactly these 3)
-- **Security:** `bearerAuth` (HTTP Bearer, JWT) on every operation
-- **Parameters:** Shared `Id` (path, uuid), `Page` (query, int), `Limit` (query, int)
-- **Pagination:** `PaginatedResponse` base class + typed `PaginatedXxx` for list endpoints
-- **Error handling:** `ErrorResponse` schema on all operations (codes 200, 201, 204, 400, 401, 403, 404, 409, 500)
-- **Operation IDs:** snake_case, e.g., `create_lead`, `get_lead_by_id`
-- **BRRTRouter markers:** `x-brrtrouter-impl: true` on all POST/PUT/PATCH operations
-
----
-
-## Implementation Roadmap
-
-### Phase 1: Foundation (P0 — Weeks 1-4)
-- Unified `Lead` entity, `Contact`, `Account` linkage
-- `Stage` entity, `StageHistory`, `LostReason`, won/lost cascades
-- Revenue fields on Lead (`expected_revenue`, `prorated_revenue`)
-- `Team` and `TeamMember` entities with capacity-based assignment
-- Basic deduplication (email/phone normalization, fuzzy match)
-- Lead conversion and merge endpoints
-
-### Phase 2: Pipeline & Analytics (P1 — Weeks 5-8)
-- Stage transition validation, rotting detection
-- `ScoringFrequency` and `LeadScore` entities, Bayesian PLS cron job
-- `RepPerformance`, `PipelineSummary`, `ConversionRate` analytics
-- `UTMCampaign`/`UTMMedium`/`UTMSource` tracking
-- Email templates, activity timeline, calendar event linking
-
-### Phase 3: Automation & Engagement (P1/P2 — Weeks 9-12)
-- `Workflow`, `Rule`, `Trigger` entities, stage-change/time-based triggers
-- `ChatSession`, `ChatMessage`, `Agent` entities, livechat endpoints
-- `Subscription`, `RenewalAlert` entities, MRR/churn tracking
-- `Goal`, `Badge`, `UserBadge` gamification entities, leaderboard
-- Customer health score calculation, at-risk detection
-
-### Phase 4: Intelligence, Marketing & Platform (P3/P4 — Weeks 13-16)
-- `EnrichmentRequest`/`EnrichmentResult` entities, Clearbit/Hunter API
-- `WebForm`, `VisitorTracking`, `EventRegistration` entities
-- `CustomField`, `Webhook`, `AuditLog`, `ApiKey` entities
-- SDK generation pipeline, sandbox environment, two-way ERP sync
-- Advanced reporting: cohort analysis, territory mapping, ad-hoc query builder
-
----
-
-## Explicit Non-Goals (V1)
-
-- No visual drag-and-drop workflow builder (API/JSON definition only)
-- No built-in landing page builder (public form endpoint is enough)
-- No native email client (SMTP/IMAP integration via external providers)
-- No mobile app (responsive web + generated mobile SDKs)
-- No built-in BI dashboard UI (API returns raw analytics data)
-
----
-
-*This document serves as the single source of truth for RERP CRM architecture. All sub-specs (`pipeline/`, `contacts/`, `accounts/`, `teams/`, `automation/`, `intelligence/`, `engagement/`, `livechat/`, `marketing/`, `reporting/`, `platform/`) must align with these entities, endpoints, and patterns.*
+1. This page.
+2. [08-service-decomposition.md](docs/08-service-decomposition.md): forces, options, the split, entities, flows,
+   decisions.
+3. [ADR 003](../../docs/adrs/003-crm-funnel-conversion-boundary.md) and
+   [ADR 004](../../docs/adrs/004-crm-capture-intake-and-workspaces.md).
+4. [09-api-conventions.md](docs/09-api-conventions.md), then the service folders.
+5. [13-implementation-plan.md](docs/13-implementation-plan.md) before writing code;
+   [12-portal-migration.md](docs/12-portal-migration.md) before touching the portal.

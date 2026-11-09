@@ -1,5 +1,7 @@
 # CRM Automation Engine Design
 
+> **Historical (superseded 2026-11-09):** crm/automation is now a step graph with triggers, enrolments and durable timers ([08 §4.3, §7.5](08-service-decomposition.md), [automation/openapi.yaml](../automation/openapi.yaml)). Still useful: rule evaluation and the lead-assignment algorithm (sales `POST /assign/run`). Current design: [DESIGN.md](../DESIGN.md).
+
 > **Version:** 1.0.0
 > **Scope:** Workflow trigger-execution model, rule engine, cron scheduling, and action processing
 > **Status:** Active design spec

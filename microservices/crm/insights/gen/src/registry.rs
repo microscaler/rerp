@@ -26,7 +26,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "get_conversion_rates",
         crate::controllers::get_conversion_rates::GetConversionRatesController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -62,7 +62,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "get_leaderboard",
         crate::controllers::get_leaderboard::GetLeaderboardController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -379,7 +379,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_conversion_rates" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_conversion_rates::GetConversionRatesController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -427,7 +427,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_leaderboard" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_leaderboard::GetLeaderboardController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

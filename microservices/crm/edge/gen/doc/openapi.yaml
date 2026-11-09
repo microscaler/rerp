@@ -57,6 +57,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecordAdCallRequest'
+            example:
+              caller_number: Caller number
+              called_number: Called number
+              duration_seconds: 3
+              outcome: Outcome
+              recording_url: Recording url
+              at: '2026-11-05T16:00:00Z'
+              provider: Provider
+              external_id: ext_cd776572a1
       security: []
       responses:
         '201':
@@ -65,6 +74,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdTouchpoint'
+              example:
+                kind: AD_CLICK
+                at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -74,22 +86,49 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
       x-brrtrouter-impl: true
+      description: 'Record an inbound call (telephony webhook) as a touchpoint; matched to a contact by caller number or by
+        the dynamically inserted number''s session. Public: no authentication; the edge validates shape, origin and rate,
+        publishes, and returns at once.
+
+
+        Publishes `ad_call.received` on `crm.edge.v1`.'
+      x-events:
+      - ad_call.received
   /ads/clicks:
     post:
       operationId: record_ad_click
       summary: 'Public: the site script posts the ad click ids and UTM it found on landing'
       tags:
       - ad-tracking
-      description: Called by the tracking snippet (`/tracking/sites`) on every landing that carries a click id (`gclid`, `wbraid`,
-        `gbraid`, `fbclid`, `ttclid`, `li_fat_id`, `msclkid`, `twclid`, `epik`, or the workspace's own `pw_cid`) or UTM parameters.
-        The origin must be an allowed tracked site. When `cookie.server_set` is on, the response carries a `Set-Cookie` for
-        the tracking domain so the id survives ITP's 7-day cap on script-set cookies.
+      description: 'Called by the tracking snippet (`/tracking/sites`) on every landing that carries a click id (`gclid`,
+        `wbraid`, `gbraid`, `fbclid`, `ttclid`, `li_fat_id`, `msclkid`, `twclid`, `epik`, or the workspace''s own `pw_cid`)
+        or UTM parameters. The origin must be an allowed tracked site. When `cookie.server_set` is on, the response carries
+        a `Set-Cookie` for the tracking domain so the id survives ITP''s 7-day cap on script-set cookies.
+
+
+        Publishes `ad_click.received` on `crm.edge.v1`.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/RecordAdClickRequest'
+            example:
+              site_key: Site key
+              visitor_id: ext_20eadbef80
+              landing_url: https://northwindtraders.example/pricing
+              referrer: Referrer
+              click_ids:
+                key: Value
+              utm:
+                key: Value
+              contact_token: Contact token
+              consent:
+                analytics: false
+                ads: false
+              fingerprint:
+                key: Value
+              at: '2026-11-05T16:00:00Z'
       security: []
       responses:
         '201':
@@ -98,6 +137,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AdClickResult'
+              example:
+                click_id: c959d5fb-5951-55ce-88a2-1a2a0c57359b
+                visitor_id: v_new
+                contact_id: 1f8a19e4-e646-5150-9e90-d62be2bd2fcf
+                set_cookie: false
+                consent_applied: FULL
         '400':
           $ref: '#/components/responses/BadRequest'
         '429':
@@ -105,51 +150,17 @@ paths:
         '422':
           $ref: '#/components/responses/Unprocessable'
       x-brrtrouter-impl: true
-  /ads/conversions:
-    post:
-      operationId: record_ad_conversion
-      summary: Record a conversion from another service (pipeline on deal won, outreach on form, the ERP on payment) and relay
-        it per the rules
-      tags:
-      - ad-tracking
-      description: Internal (service-to-service). The contact's stored click ids, hashed identifiers and the first-party cookie
-        id are attached so the platform can match without a browser pixel; `value` defaults from the rule's `value_from`.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RecordAdConversionRequest'
-      security: []
-      responses:
-        '201':
-          description: Conversion rows, one per matching rule
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/AdConversion'
-                required:
-                - items
-        '401':
-          $ref: '#/components/responses/Unauthorized'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '429':
-          $ref: '#/components/responses/TooManyRequests'
-        '422':
-          $ref: '#/components/responses/Unprocessable'
-      x-brrtrouter-impl: true
+      x-events:
+      - ad_click.received
   /c/{token}:
     get:
       operationId: public_click
       summary: Click redirect
-      description: Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations
+      description: 'Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations
         are never taken from the query string.
+
+
+        Publishes `click.received` on `crm.edge.v1`.'
       tags:
       - public
       parameters:
@@ -168,6 +179,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      x-events:
+      - click.received
   /calendars/{token}.ics:
     get:
       operationId: get_calendar_ics
@@ -193,15 +206,14 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '422':
-          description: Validation failed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unprocessable'
         '429':
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      description: 'The feed as iCalendar (no auth; the token is the secret). One VEVENT per task with due date/time, the
+        type''s default duration, assignee as attendee, related contact/deal in the description, VALARMs from reminders when
+        include_alerts. Public: no authentication; the edge validates shape, origin and rate, publishes, and returns at once.'
   /confirm/{token}:
     get:
       operationId: public_confirm_subscription
@@ -223,6 +235,13 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      description: 'Double opt-in confirmation. Public: no authentication; the edge validates shape, origin and rate, publishes,
+        and returns at once.
+
+
+        Publishes `confirmation.received` on `crm.edge.v1`.'
+      x-events:
+      - confirmation.received
   /events/register:
     post:
       operationId: register_event
@@ -235,10 +254,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EventRegistrationRequest'
-            examples:
-              default:
-                event_id: 00000000-0000-0000-0000-000000000029
-                contact_id: 00000000-0000-0000-0000-000000000002
+            example:
+              event_name: Event name
+              event_date: '2026-11-05T16:00:00Z'
+              attendee_name: Attendee name
+              attendee_email: priya.natarajan@northwindtraders.example
+              attendee_phone: Attendee phone
+              attendee_company: Attendee company
+              attendee_function: Attendee function
+              source: Source
         description: Register for an event
       responses:
         '201':
@@ -247,21 +271,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EventRegistration'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000028
-                  event_id: 00000000-0000-0000-0000-000000000029
-                  contact_id: 00000000-0000-0000-0000-000000000002
-                  registered_at: '2024-01-15T10:30:00Z'
-                  status: confirmed
+              example:
+                id: 9fa51332-6221-502c-a499-80ae6ddde550
+                event_name: Event name
+                event_date: '2026-11-05T16:00:00Z'
+                attendee_name: Attendee name
+                attendee_email: Attendee email
+                attendee_company: Attendee company
+                attendee_phone: Attendee phone
+                attendee_function: Attendee function
+                lead_id: b68dbf73-2479-5234-b517-798dd1265706
+                source: Source
+                attended: false
+                registration_date: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -272,7 +298,12 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
-      description: Register for an event
+      description: 'Register for an event
+
+
+        Publishes `event_registration.received` on `crm.edge.v1`.'
+      x-events:
+      - event_registration.received
   /forms/{id}/config:
     get:
       operationId: get_form_config
@@ -293,15 +324,49 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WebForm'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000030
-                  name: Contact Us Form
-                  fields:
-                  - name
-                  - email
-                  - message
-                  enabled: true
+              example:
+                id: 9fa51332-6221-502c-a499-80ae6ddde550
+                name: Northwind Traders
+                description: Example
+                fields:
+                - key: snippet.signature
+                  label: Primary
+                  kind: TEXT
+                actions:
+                - kind: SUBSCRIBE_LIST
+                style:
+                  layout: INLINE
+                  theme: {}
+                  submit_label: Submit label
+                  success_message: Success message
+                  trigger: {}
+                double_opt_in: false
+                allowed_origins:
+                - https://northwindtraders.example/pricing
+                submission_count: 3
+                conversion_rate: 12.5
+                public_url: https://northwindtraders.example/pricing
+                redirect_url: Redirect url
+                on_submit: THANK_YOU
+                is_active: true
+                allow_blank_overwrite: false
+                block_free_mail: false
+                blocked_domains:
+                - Blocked domains
+                custom_html: Custom html
+                workflow_ids:
+                - 93fc52f4-00e0-548c-98fc-b9faa5056849
+                capture_fields: {}
+                team_id: 58c109b8-638d-5291-b28c-af97be8e3ee1
+                user_id: alex
+                utm_source_id: 67ca3504-b03e-5297-a195-b111bb9a54b2
+                utm_medium_id: d01dfabd-7761-5c37-933a-1da620c32b92
+                utm_campaign_id: a3603147-303a-5f7a-93aa-73df90f2a0ee
+                consent_required: false
+                consent_text: Consent text
+                api_endpoint: Api endpoint
+                embed_code: Embed code
+                created_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -324,6 +389,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SubmissionAccepted'
+              example:
+                status: CONFIRMATION_SENT
+                message: Example
         '429':
           $ref: '#/components/responses/TooManyRequests'
         '404':
@@ -332,24 +400,44 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       description: 'Checks origin (the form''s allowed origins), honeypot, size and rate, then publishes form.submission.received.
         crm/intake quarantines it: a subscription waits for the confirmation click; an enquiry is admitted after screening
-        (ADR 004).'
+        (ADR 004).
+
+
+        Publishes `form_submission.received` on `crm.edge.v1`.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/PublicFormSubmission'
+            example:
+              fields:
+                key: Value
+              consent:
+                given: false
+                text: Thanks for getting in touch.
+              visitor_id: ext_20eadbef80
+              page_url: https://northwindtraders.example/pricing
+              referrer: Referrer
+              utm:
+                key: Value
+              website: ''
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
       - $ref: '#/components/parameters/IdempotencyKey'
       security: []
+      x-events:
+      - form_submission.received
   /o/{token}:
     get:
       operationId: public_open
       summary: Open pixel
-      description: Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token
+      description: 'Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token
         is an HMAC of the send id.
+
+
+        Publishes `open.received` on `crm.edge.v1`.'
       tags:
       - public
       parameters:
@@ -368,6 +456,8 @@ paths:
           $ref: '#/components/responses/NotFound'
       security: []
       x-brrtrouter-impl: true
+      x-events:
+      - open.received
   /oauth/{flow}/callback:
     get:
       operationId: oauth_callback
@@ -381,8 +471,11 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '404':
           $ref: '#/components/responses/NotFound'
-      description: Verifies the signed state and publishes oauth.completed for the service named in it; tokens go to the secrets
-        service, never to the browser.
+      description: 'Verifies the signed state and publishes oauth.completed for the service named in it; tokens go to the
+        secrets service, never to the browser.
+
+
+        Publishes `oauth.completed` on `crm.edge.v1`.'
       parameters:
       - name: flow
         in: path
@@ -409,6 +502,8 @@ paths:
           type: string
       x-brrtrouter-impl: true
       security: []
+      x-events:
+      - oauth.completed
   /p/{token}:
     get:
       operationId: public_preferences_get
@@ -417,6 +512,8 @@ paths:
       - public
       parameters:
       - $ref: '#/components/parameters/Token'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       responses:
         '200':
           description: The contact's lists and their current status
@@ -424,12 +521,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PreferencePage'
+              example:
+                email_masked: a***e@example.com
+                lists:
+                - list_id: 5d4df9aa-18c7-58a5-b87a-7af2ce28c75f
+                  name: Northwind Traders
+                  subscribed: false
         '404':
           $ref: '#/components/responses/NotFound'
         '429':
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      description: 'Preference page state. Public: no authentication; the edge validates shape, origin and rate, publishes,
+        and returns at once.'
     post:
       operationId: public_preferences_update
       summary: Update list subscriptions from the preference page
@@ -443,6 +548,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PreferenceUpdate'
+            example:
+              lists:
+              - list_id: 5d4df9aa-18c7-58a5-b87a-7af2ce28c75f
+                subscribed: false
+              unsubscribe_all: false
       responses:
         '200':
           description: Updated
@@ -450,6 +560,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PreferencePage'
+              example:
+                email_masked: a***e@example.com
+                lists:
+                - list_id: 5d4df9aa-18c7-58a5-b87a-7af2ce28c75f
+                  name: Northwind Traders
+                  subscribed: false
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -460,6 +576,13 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
+      description: 'Update list subscriptions from the preference page. Public: no authentication; the edge validates shape,
+        origin and rate, publishes, and returns at once.
+
+
+        Publishes `preferences.received` on `crm.edge.v1`.'
+      x-events:
+      - preferences.received
   /surveys/submit:
     post:
       operationId: submit_survey
@@ -472,6 +595,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SurveyResponseRequest'
+            example:
+              survey_name: Survey name
+              respondent_name: Respondent name
+              respondent_email: priya.natarajan@northwindtraders.example
+              responses: {}
         description: Submit a survey response
       responses:
         '201':
@@ -480,21 +608,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SurveyResponse'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000032
-                  survey_id: 00000000-0000-0000-0000-000000000033
-                  contact_id: 00000000-0000-0000-0000-000000000002
-                  score: 4
-                  feedback: Great experience!
+              example:
+                id: 9fa51332-6221-502c-a499-80ae6ddde550
+                survey_name: Survey name
+                respondent_email: Respondent email
+                respondent_name: Respondent name
+                responses: {}
+                lead_id: b68dbf73-2479-5234-b517-798dd1265706
+                response_date: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -505,9 +630,14 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
-      description: Submit a survey response
+      description: 'Submit a survey response
+
+
+        Publishes `survey.received` on `crm.edge.v1`.'
       parameters:
       - $ref: '#/components/parameters/IdempotencyKey'
+      x-events:
+      - survey.received
   /track:
     post:
       operationId: track_page_view
@@ -520,6 +650,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TrackPageViewRequest'
+            example:
+              visitor_id: ext_20eadbef80
+              url_visited: Url visited
+              referrer: Referrer
+              user_agent: User agent
+              ip_address: Ip address
         description: Track a visitor page view
       responses:
         '201':
@@ -528,19 +664,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VisitorTracking'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000035
-                  visitor_id: 00000000-0000-0000-0000-000000000014
-                  page: /pricing
-                  duration: 45
-                  timestamp: '2024-01-15T10:30:00Z'
+              example:
+                id: 9fa51332-6221-502c-a499-80ae6ddde550
+                visitor_id: ext_20eadbef80
+                url_visited: Url visited
+                referrer: Referrer
+                user_agent: User agent
+                country: DE
+                city: City
+                first_seen: '2026-11-05T16:00:00Z'
+                last_seen: '2026-11-05T16:00:00Z'
+                pages_viewed: 3
+                converted_to_lead: false
+                lead_id: b68dbf73-2479-5234-b517-798dd1265706
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -553,7 +691,12 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
-      description: Track visitor activity on a page
+      description: 'Track visitor activity on a page
+
+
+        Publishes `track.received` on `crm.edge.v1`.'
+      x-events:
+      - track.received
   /u/{token}:
     get:
       operationId: public_unsubscribe_page
@@ -575,6 +718,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      description: 'Unsubscribe landing page. Public: no authentication; the edge validates shape, origin and rate, publishes,
+        and returns at once.'
     post:
       operationId: public_unsubscribe_one_click
       summary: One-click unsubscribe (RFC 8058 List-Unsubscribe-Post)
@@ -603,6 +748,13 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
+      description: 'One-click unsubscribe (RFC 8058 List-Unsubscribe-Post). Public: no authentication; the edge validates
+        shape, origin and rate, publishes, and returns at once.
+
+
+        Publishes `unsubscribe.received` on `crm.edge.v1`.'
+      x-events:
+      - unsubscribe.received
   /view/{token}:
     get:
       operationId: public_web_view
@@ -624,6 +776,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       security: []
       x-brrtrouter-impl: true
+      description: 'View the message in a browser. Public: no authentication; the edge validates shape, origin and rate, publishes,
+        and returns at once.'
   /webhooks/ads/{platform}:
     post:
       operationId: ad_platform_webhook
@@ -641,8 +795,11 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: Verifies the platform's signature and publishes ad.webhook.received. Lead-form leads go through crm/intake
+      description: 'Verifies the platform''s signature and publishes ad.webhook.received. Lead-form leads go through crm/intake
         like any other form.
+
+
+        Publishes `ad_webhook.received` on `crm.edge.v1`.'
       parameters:
       - name: platform
         in: path
@@ -669,8 +826,11 @@ paths:
               type: object
               properties: {}
               additionalProperties: true
+            example: {}
       x-brrtrouter-impl: true
       security: []
+      x-events:
+      - ad_webhook.received
   /webhooks/provider/{provider}:
     post:
       operationId: ingest_provider_events
@@ -684,7 +844,8 @@ paths:
 
         crm-conversions intake in ADR 003), never directly from the provider to the service.
 
-        '
+
+        Publishes `provider_event.received` on `crm.edge.v1`.'
       tags:
       - provider-webhooks
       parameters:
@@ -700,6 +861,7 @@ paths:
             schema:
               type: object
               description: Provider-native payload
+            example: {}
       responses:
         '200':
           description: Accepted
@@ -713,6 +875,8 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security: []
       x-brrtrouter-impl: true
+      x-events:
+      - provider_event.received
 components:
   schemas:
     AdClickResult:
@@ -735,65 +899,6 @@ components:
           - FULL
           - ANALYTICS_ONLY
           - COOKIELESS
-    AdConversion:
-      type: object
-      required:
-      - id
-      - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        rule_id:
-          type: string
-          format: uuid
-        account_id:
-          type: string
-          format: uuid
-        platform:
-          type: string
-        event:
-          type: string
-        external_event_name:
-          type: string
-        contact_id:
-          type: string
-          format: uuid
-        contact_name:
-          type: string
-        deal_id:
-          type: string
-          format: uuid
-        value:
-          type: number
-          format: double
-        currency:
-          type: string
-        click_id_param:
-          type: string
-        identifiers_sent:
-          type: array
-          items:
-            type: string
-        status:
-          type: string
-          enum:
-          - QUEUED
-          - SENT
-          - FAILED
-          - SKIPPED_NO_MATCH
-          - SKIPPED_NO_CONSENT
-          - SKIPPED_DUPLICATE
-        platform_response:
-          type: string
-        occurred_at:
-          type: string
-          format: date-time
-        sent_at:
-          type: string
-          format: date-time
-        error:
-          type: string
     AdTouchpoint:
       type: object
       required:
@@ -839,8 +944,10 @@ components:
         url:
           type: string
         value:
-          type: number
-          format: double
+          type: string
+          format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
         joined_by:
           type: string
           enum:
@@ -959,7 +1066,8 @@ components:
           format: uuid
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         url:
           type: string
           format: uri
@@ -1209,33 +1317,6 @@ components:
         at:
           type: string
           format: date-time
-    RecordAdConversionRequest:
-      type: object
-      required:
-      - event
-      - contact_id
-      properties:
-        event:
-          type: string
-        contact_id:
-          type: string
-          format: uuid
-        deal_id:
-          type: string
-          format: uuid
-        payment_id:
-          type: string
-        value:
-          type: number
-          format: double
-        currency:
-          type: string
-        occurred_at:
-          type: string
-          format: date-time
-        properties:
-          type: object
-          additionalProperties: true
     SubmissionAccepted:
       type: object
       properties:
@@ -1436,7 +1517,8 @@ components:
           format: uuid
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         utm_source_id:
           type: string
           format: uuid
@@ -1466,6 +1548,7 @@ components:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -1473,6 +1556,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -1495,6 +1583,11 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
   parameters:
     Token:
       name: token
@@ -1504,6 +1597,25 @@ components:
         type: string
         maxLength: 128
       description: Opaque signed token minted at send time; names a send (and link index) without exposing ids
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
     Id:
       name: id
       in: path
@@ -1564,6 +1676,15 @@ components:
           $ref: '#/components/headers/RequestId'
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected failure; retry with the same Idempotency-Key where there is one
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
       content:
         application/json:
           schema:

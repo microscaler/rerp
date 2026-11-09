@@ -46,14 +46,6 @@ pub struct Request {
 
 pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_name")]
-    pub company_name: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "contacts")]
     pub contacts: Option<Vec<DealContact>>,
 
@@ -80,8 +72,8 @@ pub struct Response {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "expected_close_at")]
-    pub expected_close_at: Option<String>,
+    #[serde(rename = "expected_close_date")]
+    pub expected_close_date: Option<String>,
 
     #[serde(rename = "id")]
     pub id: String,
@@ -101,6 +93,14 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "open_task_count")]
     pub open_task_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_id")]
+    pub organisation_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_name")]
+    pub organisation_name: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "owner_id")]
@@ -159,11 +159,11 @@ pub struct Response {
     pub updated_at: Option<String>,
 
     #[serde(rename = "value")]
-    pub value: f64,
+    pub value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "weighted_value")]
-    pub weighted_value: Option<f64>,
+    pub weighted_value: Option<String>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -175,14 +175,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
@@ -191,14 +189,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

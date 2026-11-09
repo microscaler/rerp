@@ -1,5 +1,7 @@
 # CRM Entity Graph & Hierarchy Design
 
+> **Historical (superseded 2026-11-09):** there is no graph database; hierarchies are adjacency lists in Postgres. Still useful: the recursive SQL patterns (§13) for organisation and contact trees in audience. Bayesian lead scoring (§5) is deferred; insights has rule-based named scores instead. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Version:** 1.0.0
 > **Scope:** Hierarchical entity trees (accounts, contacts, pipelines), relationship graphs, and self-referential patterns
 > **Status:** Active design spec

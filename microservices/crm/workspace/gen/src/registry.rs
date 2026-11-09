@@ -170,25 +170,25 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "list_jobs",
         crate::controllers::list_jobs::ListJobsController,
-        24576,
+        28672,
     );
 
     dispatcher.register_typed_with_stack_size(
         "start_export",
         crate::controllers::start_export::StartExportController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "get_job",
         crate::controllers::get_job::GetJobController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "cancel_job",
         crate::controllers::cancel_job::CancelJobController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -529,7 +529,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "list_jobs" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::list_jobs::ListJobsController,
-                    24576,
+                    28672,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -537,7 +537,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "start_export" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::start_export::StartExportController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -545,7 +545,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_job" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_job::GetJobController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -553,7 +553,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "cancel_job" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::cancel_job::CancelJobController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

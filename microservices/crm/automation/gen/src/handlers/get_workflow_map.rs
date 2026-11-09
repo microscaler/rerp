@@ -21,21 +21,21 @@ pub struct Request {
 
 pub struct Response {
     #[serde(rename = "active")]
-    pub active: i32,
+    pub active: i64,
 
     #[serde(rename = "completed")]
-    pub completed: i32,
+    pub completed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "goal_reached")]
-    pub goal_reached: Option<i32>,
+    pub goal_reached: Option<i64>,
 
     #[serde(rename = "steps")]
     pub steps: Vec<serde_json::Value>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "stopped")]
-    pub stopped: Option<i32>,
+    pub stopped: Option<i64>,
 
     #[serde(rename = "workflow_id")]
     pub workflow_id: String,
@@ -50,14 +50,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
@@ -66,14 +64,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));

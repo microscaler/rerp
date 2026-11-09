@@ -1,0 +1,703 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Acquisition events
+  version: 1.0.0
+  description: 'Events crm/acquisition publishes on Pub/Sub topic `crm.acquisition.v1` and the events it consumes from other
+    CRM services. Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least
+    once: consumers are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.acquisition.v1
+    title: crm.acquisition.v1
+    description: Everything crm/acquisition publishes.
+    messages:
+      formSubmitted:
+        $ref: '#/components/messages/formSubmitted'
+      siteVisited:
+        $ref: '#/components/messages/siteVisited'
+      eventRecorded:
+        $ref: '#/components/messages/eventRecorded'
+      adClicked:
+        $ref: '#/components/messages/adClicked'
+      conversionRecorded:
+        $ref: '#/components/messages/conversionRecorded'
+      adAudienceSynced:
+        $ref: '#/components/messages/adAudienceSynced'
+      adBuyChanged:
+        $ref: '#/components/messages/adBuyChanged'
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+  from_audience:
+    address: crm.audience.v1
+    title: crm.audience.v1
+    description: Subscription `acquisition-audience` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      contactCreated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactCreated
+      contactMerged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactMerged
+      contactErased:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactErased
+      subscriptionChanged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/subscriptionChanged
+      suppressionAdded:
+        $ref: ../audience/asyncapi.yaml#/components/messages/suppressionAdded
+      suppressionRemoved:
+        $ref: ../audience/asyncapi.yaml#/components/messages/suppressionRemoved
+  from_edge:
+    address: crm.edge.v1
+    title: crm.edge.v1
+    description: Subscription `acquisition-edge` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      trackReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/trackReceived
+      adClickReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/adClickReceived
+      adCallReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/adCallReceived
+      adWebhookReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/adWebhookReceived
+      oauthCompleted:
+        $ref: ../edge/asyncapi.yaml#/components/messages/oauthCompleted
+  from_intake:
+    address: crm.intake.v1
+    title: crm.intake.v1
+    description: Subscription `acquisition-intake` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      intakeAdmitted:
+        $ref: ../intake/asyncapi.yaml#/components/messages/intakeAdmitted
+  from_messaging:
+    address: crm.messaging.v1
+    title: crm.messaging.v1
+    description: Subscription `acquisition-messaging` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      campaignScheduled:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/campaignScheduled
+      messageClicked:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageClicked
+  from_sales:
+    address: crm.sales.v1
+    title: crm.sales.v1
+    description: Subscription `acquisition-sales` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      dealWon:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealWon
+  from_workspace:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Subscription `acquisition-workspace` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      fieldDefined:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldDefined
+      fieldChanged:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldChanged
+      erasureRequested:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/erasureRequested
+      workspaceCreated:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/workspaceCreated
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/acquisition publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/formSubmitted'
+    - $ref: '#/channels/published/messages/siteVisited'
+    - $ref: '#/channels/published/messages/eventRecorded'
+    - $ref: '#/channels/published/messages/adClicked'
+    - $ref: '#/channels/published/messages/conversionRecorded'
+    - $ref: '#/channels/published/messages/adAudienceSynced'
+    - $ref: '#/channels/published/messages/adBuyChanged'
+    - $ref: '#/channels/published/messages/erasureCompleted'
+  consume_audience:
+    action: receive
+    channel:
+      $ref: '#/channels/from_audience'
+    summary: crm/acquisition consumes contact.created, contact.merged, contact.erased, subscription.changed, suppression.added,
+      suppression.removed
+    messages:
+    - $ref: '#/channels/from_audience/messages/contactCreated'
+    - $ref: '#/channels/from_audience/messages/contactMerged'
+    - $ref: '#/channels/from_audience/messages/contactErased'
+    - $ref: '#/channels/from_audience/messages/subscriptionChanged'
+    - $ref: '#/channels/from_audience/messages/suppressionAdded'
+    - $ref: '#/channels/from_audience/messages/suppressionRemoved'
+  consume_edge:
+    action: receive
+    channel:
+      $ref: '#/channels/from_edge'
+    summary: crm/acquisition consumes track.received, ad_click.received, ad_call.received, ad_webhook.received, oauth.completed
+    messages:
+    - $ref: '#/channels/from_edge/messages/trackReceived'
+    - $ref: '#/channels/from_edge/messages/adClickReceived'
+    - $ref: '#/channels/from_edge/messages/adCallReceived'
+    - $ref: '#/channels/from_edge/messages/adWebhookReceived'
+    - $ref: '#/channels/from_edge/messages/oauthCompleted'
+  consume_intake:
+    action: receive
+    channel:
+      $ref: '#/channels/from_intake'
+    summary: crm/acquisition consumes intake.admitted
+    messages:
+    - $ref: '#/channels/from_intake/messages/intakeAdmitted'
+  consume_messaging:
+    action: receive
+    channel:
+      $ref: '#/channels/from_messaging'
+    summary: crm/acquisition consumes campaign.scheduled, message.clicked
+    messages:
+    - $ref: '#/channels/from_messaging/messages/campaignScheduled'
+    - $ref: '#/channels/from_messaging/messages/messageClicked'
+  consume_sales:
+    action: receive
+    channel:
+      $ref: '#/channels/from_sales'
+    summary: crm/acquisition consumes deal.won
+    messages:
+    - $ref: '#/channels/from_sales/messages/dealWon'
+  consume_workspace:
+    action: receive
+    channel:
+      $ref: '#/channels/from_workspace'
+    summary: crm/acquisition consumes field.defined, field.changed, erasure.requested, workspace.created
+    messages:
+    - $ref: '#/channels/from_workspace/messages/fieldDefined'
+    - $ref: '#/channels/from_workspace/messages/fieldChanged'
+    - $ref: '#/channels/from_workspace/messages/erasureRequested'
+    - $ref: '#/channels/from_workspace/messages/workspaceCreated'
+components:
+  messages:
+    formSubmitted:
+      name: form.submitted
+      title: form.submitted
+      summary: An admitted submission was recorded against its form, visitor and ad click.
+      description: 'An admitted submission was recorded against its form, visitor and ad click.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: form.submitted
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/FormSubmission
+    siteVisited:
+      name: site.visited
+      title: site.visited
+      summary: An identified visitor viewed a tracked page (from edge track.received).
+      description: 'An identified visitor viewed a tracked page (from edge track.received).
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: site.visited
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/VisitorTracking
+    eventRecorded:
+      name: event.recorded
+      title: event.recorded
+      summary: A custom event was recorded for a visitor or contact.
+      description: 'A custom event was recorded for a visitor or contact.
+
+
+        Published by: `POST /analytics/event`
+
+
+        Consumed by: crm/audience, crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: event.recorded
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/VisitorTracking
+    adClicked:
+      name: ad.clicked
+      title: ad.clicked
+      summary: A landing with ad click ids was recorded (from edge ad_click.received).
+      description: 'A landing with ad click ids was recorded (from edge ad_click.received).
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad.clicked
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/AdClick
+    conversionRecorded:
+      name: conversion.recorded
+      title: conversion.recorded
+      summary: A conversion definition fired; the relay sends it to the ad platforms.
+      description: 'A conversion definition fired; the relay sends it to the ad platforms.
+
+
+        Published by: `POST /ads/conversions`
+
+
+        Consumed by: crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: conversion.recorded
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/AdConversion
+    adAudienceSynced:
+      name: ad_audience.synced
+      title: ad_audience.synced
+      summary: An ad audience sync run finished.
+      description: 'An ad audience sync run finished.
+
+
+        Published by: `POST /ads/audiences/{id}/sync`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad_audience.synced
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/AdAudienceSyncRun
+    adBuyChanged:
+      name: ad_buy.changed
+      title: ad_buy.changed
+      summary: An ad buy was created, changed, paused or resumed.
+      description: 'An ad buy was created, changed, paused or resumed.
+
+
+        Published by: `POST /ads/buys`, `PATCH /ads/buys/{id}`, `POST /ads/buys/{id}/pause`, `POST /ads/buys/{id}/resume`,
+        `POST /ads/buys/{id}/apply-recommendation`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad_buy.changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/acquisition
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/AdBuy
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      description: 'A service erased its copy for a data request.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/workspace.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+  schemas:
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

@@ -22,12 +22,12 @@ pub struct Request {
     pub period: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "start_date")]
-    pub start_date: Option<String>,
+    #[serde(rename = "from")]
+    pub from: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "end_date")]
-    pub end_date: Option<String>,
+    #[serde(rename = "to")]
+    pub to: Option<String>,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -37,7 +37,7 @@ pub struct Response {
     pub activity_count: i32,
 
     #[serde(rename = "avg_deal_size")]
-    pub avg_deal_size: f64,
+    pub avg_deal_size: String,
 
     #[serde(rename = "avg_sales_cycle_days")]
     pub avg_sales_cycle_days: f64,
@@ -61,10 +61,10 @@ pub struct Response {
     pub quota_attainment: f64,
 
     #[serde(rename = "revenue_expected")]
-    pub revenue_expected: rust_decimal::Decimal,
+    pub revenue_expected: String,
 
     #[serde(rename = "revenue_won")]
-    pub revenue_won: rust_decimal::Decimal,
+    pub revenue_won: String,
 
     #[serde(rename = "team_id")]
     pub team_id: String,
@@ -76,7 +76,7 @@ pub struct Response {
     pub user_name: String,
 
     #[serde(rename = "weighted_pipeline")]
-    pub weighted_pipeline: f64,
+    pub weighted_pipeline: String,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -88,14 +88,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
@@ -104,14 +102,13 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("user_id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"description":"Sesame user id (the sub claim of the access token)","maxLength":64,"type":"string"}),
+            );
             data_map.insert(
                 "user_id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
@@ -119,41 +116,39 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_query_param("period") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> = std::sync::LazyLock::new(
+                || serde_json::json!({"enum":["WEEK","MONTH","QUARTER","YEAR"],"type":"string"}),
+            );
             data_map.insert(
                 "period".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,Some(&serde_json::json!({"enum":["WEEK","MONTH","QUARTER","YEAR"],"type":"string"})),None,None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("start_date") {
+        if let Some(v) = req.get_query_param("from") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
             data_map.insert(
-                "start_date".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
-                    None,
-                    None,
-                ),
+                "from".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 
             // optional parameter
         }
 
-        if let Some(v) = req.get_query_param("end_date") {
+        if let Some(v) = req.get_query_param("to") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"date","type":"string"}));
             data_map.insert(
-                "end_date".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"date","type":"string"})),
-                    None,
-                    None,
-                ),
+                "to".to_string(),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
 

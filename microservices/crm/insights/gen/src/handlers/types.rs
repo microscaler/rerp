@@ -16,7 +16,7 @@ pub struct ActivateScoreResponse {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distribution: Option<Vec<i32>>,
+    pub distribution: Option<Vec<i64>>,
 
     pub entity: String,
 
@@ -109,6 +109,17 @@ pub struct AutomationContactRow {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AutomationContactRowPage {
+    pub items: Vec<AutomationContactRow>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AutomationContactsReport {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub avg_seconds_to_complete: Option<i32>,
@@ -122,7 +133,7 @@ pub struct AutomationContactsReport {
     pub completion_times: Option<Vec<CompletionBucket>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contacts: Option<PaginatedAutomationContactRow>,
+    pub contacts: Option<AutomationContactRowPage>,
 
     pub contacts_entered: i32,
 
@@ -187,6 +198,17 @@ pub struct AutomationListRow {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct AutomationListRowPage {
+    pub items: Vec<AutomationListRow>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AutomationMessageRow {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub click_rate: Option<f64>,
@@ -200,7 +222,7 @@ pub struct AutomationMessageRow {
     pub open_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub revenue: Option<rust_decimal::Decimal>,
+    pub revenue: Option<String>,
 
     pub sends: i32,
 
@@ -240,7 +262,7 @@ pub struct AutomationOverviewReport {
     pub open_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub revenue: Option<rust_decimal::Decimal>,
+    pub revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub series: Option<Vec<NamedSeries>>,
@@ -354,7 +376,18 @@ pub struct ConversionRate {
 
     pub period: String,
 
-    pub total_won_revenue: rust_decimal::Decimal,
+    pub total_won_revenue: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ConversionRatePage {
+    pub items: Vec<ConversionRate>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -414,7 +447,7 @@ pub struct CreateScoreResponse {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distribution: Option<Vec<i32>>,
+    pub distribution: Option<Vec<i64>>,
 
     pub entity: String,
 
@@ -451,6 +484,17 @@ pub struct Dashboard {
     pub user_id: String,
 
     pub widgets: Vec<DashboardWidget>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DashboardPage {
+    pub items: Vec<Dashboard>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -524,7 +568,7 @@ pub struct DealFunnelReport {
     pub won_count: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub won_value: Option<f64>,
+    pub won_value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -559,7 +603,7 @@ pub struct DealOwnerRow {
     pub avg_days_to_close: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub avg_deal_value: Option<f64>,
+    pub avg_deal_value: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deals_created: Option<i32>,
@@ -569,14 +613,14 @@ pub struct DealOwnerRow {
 
     pub lost_count: i32,
 
-    pub lost_value: f64,
+    pub lost_value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
 
     pub open_count: i32,
 
-    pub open_value: f64,
+    pub open_value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tasks_completed: Option<i32>,
@@ -587,7 +631,7 @@ pub struct DealOwnerRow {
 
     pub won_count: i32,
 
-    pub won_value: f64,
+    pub won_value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -598,10 +642,10 @@ pub struct DealStageRow {
 
     pub stage_id: String,
 
-    pub value: f64,
+    pub value: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub weighted_value: Option<f64>,
+    pub weighted_value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -610,21 +654,21 @@ pub struct DealTotals {
     pub avg_days_to_close: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub avg_deal_value: Option<f64>,
+    pub avg_deal_value: Option<String>,
 
     pub lost_count: i32,
 
-    pub lost_value: f64,
+    pub lost_value: String,
 
     pub open_count: i32,
 
-    pub open_value: f64,
+    pub open_value: String,
 
     pub win_rate: f64,
 
     pub won_count: i32,
 
-    pub won_value: f64,
+    pub won_value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -637,25 +681,9 @@ pub struct DealValueBracket {
     pub max: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub min: Option<f64>,
+    pub min: Option<String>,
 
-    pub value: f64,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteDashboardResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
+    pub value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -692,6 +720,8 @@ pub struct ErrorResponse {
     pub fields: Option<Vec<serde_json::Value>>,
 
     pub message: String,
+
+    pub reason: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
@@ -740,15 +770,26 @@ pub struct FieldBreakdownReport {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ForecastAccuracyEntry {
-    pub actual: f64,
+    pub actual: String,
 
-    pub expected: f64,
+    pub expected: String,
 
     pub period: String,
 
-    pub variance: f64,
+    pub variance: String,
 
     pub variance_pct: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ForecastAccuracyEntryPage {
+    pub items: Vec<ForecastAccuracyEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -781,24 +822,35 @@ pub struct ForecastDeal {
 
     pub title: String,
 
-    pub value: f64,
+    pub value: String,
 
-    pub weighted_value: f64,
+    pub weighted_value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ForecastEntry {
-    pub actual_close_revenue: rust_decimal::Decimal,
+    pub actual_close_revenue: String,
 
     pub confidence: f64,
 
-    pub expected_close_revenue: rust_decimal::Decimal,
+    pub expected_close_revenue: String,
 
     pub period: String,
 
-    pub variance: f64,
+    pub variance: String,
 
-    pub weighted_pipeline: f64,
+    pub weighted_pipeline: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ForecastEntryPage {
+    pub items: Vec<ForecastEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -806,20 +858,20 @@ pub struct ForecastPeriod {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub deals: Option<Vec<ForecastDeal>>,
 
-    pub forecast: f64,
+    pub forecast: String,
 
     pub open_count: i32,
 
-    pub open_value: f64,
+    pub open_value: String,
 
     pub period: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub quota: Option<f64>,
+    pub quota: Option<String>,
 
-    pub weighted_value: f64,
+    pub weighted_value: String,
 
-    pub won_value: f64,
+    pub won_value: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -850,7 +902,7 @@ pub struct FunnelStage {
     pub stage_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub value: Option<f64>,
+    pub value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -872,7 +924,7 @@ pub struct GetAutomationContactsResponse {
     pub completion_times: Option<Vec<CompletionBucket>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contacts: Option<PaginatedAutomationContactRow>,
+    pub contacts: Option<AutomationContactRowPage>,
 
     pub contacts_entered: i32,
 
@@ -916,7 +968,7 @@ pub struct GetAutomationOverviewResponse {
     pub open_rate: Option<f64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub revenue: Option<rust_decimal::Decimal>,
+    pub revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub series: Option<Vec<NamedSeries>>,
@@ -954,7 +1006,7 @@ pub struct GetConversionRatesResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1013,7 +1065,7 @@ pub struct GetDealFunnelResponse {
     pub won_count: i32,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub won_value: Option<f64>,
+    pub won_value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1075,7 +1127,7 @@ pub struct GetForecastAccuracyResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1091,7 +1143,7 @@ pub struct GetJumpToTrackingResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1102,7 +1154,7 @@ pub struct GetLeadSourceEffectivenessResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1113,7 +1165,7 @@ pub struct GetLeaderboardResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1140,7 +1192,7 @@ pub struct GetMarketingRevenueResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_campaigns: Option<Vec<RevenueSourceRow>>,
 
-    pub total_revenue: rust_decimal::Decimal,
+    pub total_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1151,7 +1203,7 @@ pub struct GetMonthlyForecastResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1162,7 +1214,7 @@ pub struct GetNearbyContactsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1173,7 +1225,7 @@ pub struct GetOneToOneEmailsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1192,9 +1244,9 @@ pub struct GetPipelineSummaryResponse {
 
     pub total_opportunities: i32,
 
-    pub total_revenue: rust_decimal::Decimal,
+    pub total_revenue: String,
 
-    pub total_weighted_revenue: rust_decimal::Decimal,
+    pub total_weighted_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1223,14 +1275,14 @@ pub struct GetQuarterlyForecastResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetRepPerformanceResponse {
     pub activity_count: i32,
 
-    pub avg_deal_size: f64,
+    pub avg_deal_size: String,
 
     pub avg_sales_cycle_days: f64,
 
@@ -1246,9 +1298,9 @@ pub struct GetRepPerformanceResponse {
 
     pub quota_attainment: f64,
 
-    pub revenue_expected: rust_decimal::Decimal,
+    pub revenue_expected: String,
 
-    pub revenue_won: rust_decimal::Decimal,
+    pub revenue_won: String,
 
     pub team_id: String,
 
@@ -1256,7 +1308,7 @@ pub struct GetRepPerformanceResponse {
 
     pub user_name: String,
 
-    pub weighted_pipeline: f64,
+    pub weighted_pipeline: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1306,7 +1358,7 @@ pub struct GetScoreResponse {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distribution: Option<Vec<i32>>,
+    pub distribution: Option<Vec<i64>>,
 
     pub entity: String,
 
@@ -1366,9 +1418,9 @@ pub struct GetTeamPerformanceResponse {
 
     pub total_opportunities: i32,
 
-    pub total_revenue: rust_decimal::Decimal,
+    pub total_revenue: String,
 
-    pub weighted_revenue: rust_decimal::Decimal,
+    pub weighted_revenue: String,
 
     pub win_rate: f64,
 }
@@ -1413,7 +1465,7 @@ pub struct GetWinLossAnalysisResponse {
 
     pub period: String,
 
-    pub revenue_won: rust_decimal::Decimal,
+    pub revenue_won: String,
 
     pub total_closed: i32,
 
@@ -1443,12 +1495,23 @@ pub struct JumpToRow {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct JumpToRowPage {
+    pub items: Vec<JumpToRow>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct LeadSourceReport {
     pub lead_count: i32,
 
     pub opportunities: i32,
 
-    pub revenue: rust_decimal::Decimal,
+    pub revenue: String,
 
     pub source_id: String,
 
@@ -1457,6 +1520,17 @@ pub struct LeadSourceReport {
     pub win_rate: f64,
 
     pub won_deals: i32,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LeadSourceReportPage {
+    pub items: Vec<LeadSourceReport>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1471,6 +1545,17 @@ pub struct LeaderboardEntry {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct LeaderboardEntryPage {
+    pub items: Vec<LeaderboardEntry>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ListAutomationReportsResponse {
     pub items: Vec<AutomationListRow>,
 
@@ -1478,7 +1563,7 @@ pub struct ListAutomationReportsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1489,7 +1574,7 @@ pub struct ListDashboardsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1505,7 +1590,7 @@ pub struct ListScoresResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1527,7 +1612,7 @@ pub struct MarketingRevenueReport {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub top_campaigns: Option<Vec<RevenueSourceRow>>,
 
-    pub total_revenue: rust_decimal::Decimal,
+    pub total_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1567,6 +1652,17 @@ pub struct NearbyContact {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub name: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct NearbyContactPage {
+    pub items: Vec<NearbyContact>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1611,6 +1707,17 @@ pub struct OneToOneEmailRow {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct OneToOneEmailRowPage {
+    pub items: Vec<OneToOneEmailRow>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct OpenTrendsReport {
     pub by_hour: Vec<serde_json::Value>,
 
@@ -1621,138 +1728,6 @@ pub struct OpenTrendsReport {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedAutomationContactRow {
-    pub items: Vec<AutomationContactRow>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedAutomationListRow {
-    pub items: Vec<AutomationListRow>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedConversionrate {
-    pub items: Vec<ConversionRate>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedDashboard {
-    pub items: Vec<Dashboard>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedForecastAccuracyEntry {
-    pub items: Vec<ForecastAccuracyEntry>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedForecastentry {
-    pub items: Vec<ForecastEntry>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedJumpToRow {
-    pub items: Vec<JumpToRow>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedLeadSourceReport {
-    pub items: Vec<LeadSourceReport>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedLeaderboardEntry {
-    pub items: Vec<LeaderboardEntry>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedNearbyContact {
-    pub items: Vec<NearbyContact>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedOneToOneEmailRow {
-    pub items: Vec<OneToOneEmailRow>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedPipelinesummary {
-    pub stages: Vec<serde_json::Value>,
-
-    pub total_opportunities: i32,
-
-    pub total_revenue: rust_decimal::Decimal,
-
-    pub total_weighted_revenue: rust_decimal::Decimal,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct PeriodCount {
     pub count: i32,
 
@@ -1760,6 +1735,17 @@ pub struct PeriodCount {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub value: Option<f64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct PipelineSummaryReport {
+    pub stages: Vec<serde_json::Value>,
+
+    pub total_opportunities: i32,
+
+    pub total_revenue: String,
+
+    pub total_weighted_revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1798,26 +1784,10 @@ pub struct RecalculateScoreResponse {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
-pub struct RemoveWidgetResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct RepPerformance {
     pub activity_count: i32,
 
-    pub avg_deal_size: f64,
+    pub avg_deal_size: String,
 
     pub avg_sales_cycle_days: f64,
 
@@ -1833,9 +1803,9 @@ pub struct RepPerformance {
 
     pub quota_attainment: f64,
 
-    pub revenue_expected: rust_decimal::Decimal,
+    pub revenue_expected: String,
 
-    pub revenue_won: rust_decimal::Decimal,
+    pub revenue_won: String,
 
     pub team_id: String,
 
@@ -1843,7 +1813,7 @@ pub struct RepPerformance {
 
     pub user_name: String,
 
-    pub weighted_pipeline: f64,
+    pub weighted_pipeline: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1898,7 +1868,7 @@ pub struct RevenueSourceRow {
 
     pub name: String,
 
-    pub revenue: rust_decimal::Decimal,
+    pub revenue: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1933,7 +1903,7 @@ pub struct SalesPerformanceRow {
     pub won_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub won_value: Option<f64>,
+    pub won_value: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2020,7 +1990,7 @@ pub struct Score {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distribution: Option<Vec<i32>>,
+    pub distribution: Option<Vec<i64>>,
 
     pub entity: String,
 
@@ -2064,7 +2034,7 @@ pub struct ScorePage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2099,7 +2069,7 @@ pub struct ScoreRule {
     pub decay_days: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub hits_30d: Option<i32>,
+    pub hits_30d: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -2261,9 +2231,9 @@ pub struct TeamPerformance {
 
     pub total_opportunities: i32,
 
-    pub total_revenue: rust_decimal::Decimal,
+    pub total_revenue: String,
 
-    pub weighted_revenue: rust_decimal::Decimal,
+    pub weighted_revenue: String,
 
     pub win_rate: f64,
 }
@@ -2334,7 +2304,7 @@ pub struct UpdateScoreResponse {
     pub description: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub distribution: Option<Vec<i32>>,
+    pub distribution: Option<Vec<i64>>,
 
     pub entity: String,
 
@@ -2507,7 +2477,7 @@ pub struct WinLossAnalysis {
 
     pub period: String,
 
-    pub revenue_won: rust_decimal::Decimal,
+    pub revenue_won: String,
 
     pub total_closed: i32,
 

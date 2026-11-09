@@ -109,7 +109,7 @@ be consolidated later without changing an API.
 | **Answers** | "Who matches this segment?", "Can we email / text this person on this list?", "What has happened to this person?" |
 | **Does not own** | Engagement facts (they arrive as events and are projected), customers (RERP `crm/accounts`), field definitions (`crm/workspace`). |
 | **Consumes** | Facts from every other service, projected into a per-contact **facts** table (last open / click, pages visited, events, deal stages, score bands, enrolments) so segment evaluation is one query in one schema. |
-| **Publishes** | `contact.created / updated / merged / erased`, `subscription.changed`, `suppression.added / removed`, `tag.added / removed`, `segment.saved`. |
+| **Publishes** | `contact.created`, `contact.updated`, `contact.merged`, `contact.archived`, `contact.erased`, `subscription.changed`, `suppression.added`, `suppression.removed`, `tag.added`, `tag.removed`, `organisation.created`, `organisation.updated`. Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | Synchronous API; segment evaluation p95 ≤ 700 ms on 100 k contacts. |
 
 ### 4.2 crm/messaging — what we send
@@ -118,7 +118,7 @@ be consolidated later without changing an API.
 |---|---|
 | **Owns** | Templates (versioned), snippets, assets, merge-field catalogue, campaigns (one-time, A/B, RSS, recurring, reminder; email and SMS), the per-recipient send ledger and engagement events, senders and sending domains, SMS senders, tracking domains, postal addresses, list exclusions, provider configuration, connected mailboxes (1:1 email), social accounts and posts, campaign and deliverability reports. |
 | **Asks audience** | To resolve an audience (lists − exclusions − unsubscribed − suppressed, ∩ segment), paged, at send time. |
-| **Publishes** | `campaign.scheduled / sending / sent`, `message.sent / delivered / opened / clicked / bounced / complained / replied`, `social.post.published / failed`, `mailbox.message.synced`. |
+| **Publishes** | `campaign.scheduled`, `campaign.cancelled`, `campaign.sending`, `campaign.sent`, `message.sent`, `message.delivered`, `message.opened`, `message.clicked`, `message.bounced`, `message.complained`, `message.replied`, `social.post.published`, `social.post.failed`. Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | API plus send workers (≥ 100 k recipients / hour / workspace), throttled per provider; idempotent per recipient. |
 
 ### 4.3 crm/automation — what happens next
@@ -128,7 +128,7 @@ be consolidated later without changing an API.
 | **Owns** | Workflows and their step graphs (with versions), the trigger and action catalogue, recipes, enrolments with step history, durable timers. |
 | **Calls** | Audience (evaluate a condition for one contact), messaging (send a template to one contact), sales (create a deal or task), acquisition (add to / remove from an ad audience). |
 | **Consumes** | Every trigger event (`subscription.changed`, `tag.added`, `form.submitted`, `site.visited`, `deal.stage_changed`, `ad.clicked`, `conversion.recorded`, ...). |
-| **Publishes** | `enrolment.started / step_completed / goal_reached / completed / stopped / failed`. |
+| **Publishes** | `enrolment.started`, `enrolment.step_completed`, `enrolment.goal_reached`, `enrolment.completed`, `enrolment.stopped`, `enrolment.failed`, `workflow.activated`, `workflow.paused`. Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | API plus a step engine: exactly-once per enrolment step, timers released within 60 s of due. |
 
 ### 4.4 crm/sales — selling
@@ -136,7 +136,7 @@ be consolidated later without changing an API.
 | | |
 |---|---|
 | **Owns** | Website leads and their triage (the EPIC-32 board), pipelines and stages, deals with contacts and roles, notes, files and emails, deal settings, task types, outcomes and settings, tasks, calendar feeds, saved responses, sales teams and assignment (from `crm/teams`), and the **conversion** to customer. |
-| **Publishes** | `lead.created / stage_changed`, `deal.created / stage_changed / won / lost`, `task.created / completed`, and the signed conversion on `crm-conversions` (ADR 003). |
+| **Publishes** | `lead.created`, `lead.stage_changed`, `lead.converted`, `deal.created`, `deal.updated`, `deal.stage_changed`, `deal.won`, `deal.lost`, `deal.reopened`, `task.created`, `task.completed`, `task.reopened` and the signed conversion on `crm-conversions` (ADR 003). Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | Synchronous API. Already partly implemented as `crm/pipeline` (leads, stages, convert). |
 
 ### 4.5 crm/acquisition — where contacts come from and what they are worth
@@ -144,7 +144,7 @@ be consolidated later without changing an API.
 | | |
 |---|---|
 | **Owns** | Forms (definition, embed, submissions), tracked sites and event types, the visitor / click store, conversions and business goals, ad accounts and adapters, ad audiences and sync runs, creatives and buys, tracking settings and link-decoration rules, conversion relay rules and the relay log, attribution models, touchpoints, LTV cohorts. |
-| **Publishes** | `form.submitted`, `site.visited`, `event.recorded`, `ad.clicked`, `conversion.recorded`, `ad_audience.synced`, `ad_buy.changed`. |
+| **Publishes** | `form.submitted`, `site.visited`, `event.recorded`, `ad.clicked`, `conversion.recorded`, `ad_audience.synced`, `ad_buy.changed`. Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | API plus adapter workers (platform rate limits, retries, secrets in the secrets service). An ad-platform outage stays inside this service. |
 
 ### 4.6 crm/insights — what it adds up to
@@ -153,7 +153,7 @@ be consolidated later without changing an API.
 |---|---|
 | **Owns** | Read models for every report (deals, contacts, email trends, automations, revenue, analytics hub), dashboards and widgets with their saved queries, the metric catalogue, rule-based named scores with their rules, distributions and explanations (replacing the single implicit score in `crm/intelligence`). |
 | **Consumes** | Events from every service; never reads another service's tables. |
-| **Publishes** | `score.changed` (with band), which audience projects for segments and automation triggers on. |
+| **Publishes** | `score.changed`. Also `erasure.completed`, like every service holding personal data. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | Event consumers and scheduled jobs; reports p95 ≤ 800 ms over 12 months; read models at most 5 minutes behind. Its own database, so a heavy report never touches an OLTP pool. |
 
 ### 4.7 crm/workspace — how the workspace is run
@@ -162,7 +162,7 @@ be consolidated later without changing an API.
 |---|---|
 | **Owns** | Workspaces (one per brand) and memberships with a role per workspace, custom field definitions and groups (values live with the owning entity), API keys, outgoing webhooks and delivery logs, notification rules, compliance settings, data requests (access and erasure) and their orchestration, brand kit, import / export jobs, the audit log, a read facade over team members and roles. |
 | **Does not own** | Users and roles (identity plane). |
-| **Publishes** | `field.defined / changed`, `erasure.requested` (each service erases and replies `erasure.completed`), `webhook.delivery.failed`. |
+| **Publishes** | `field.defined`, `field.changed`, `erasure.requested`, `workspace.created`, `member.changed`. Full catalogue: [10-events.md](10-events.md). |
 | **Runtime** | API plus a job runner (imports, exports, webhook delivery, erasure saga). |
 
 ### 4.8 crm/edge — the public surface
@@ -176,7 +176,6 @@ signs or verifies tokens, and publishes to Pub/Sub. The owning service pulls and
 | `GET /confirm/{token}` (double opt-in) | outreach `/public/confirm` ✅ | intake, which admits the contact |
 | `POST /track` (page view, custom event) | marketing `POST /analytics/track` | acquisition |
 | `POST /ads/clicks` (landing with click ids) | marketing ✅ | acquisition; edge sets the first-party cookie |
-| `POST /ads/conversions` (server-side events) | marketing ✅ | acquisition |
 | `POST /ads/calls` (call tracking) | marketing ✅ | acquisition |
 | `GET /o/{token}` open pixel · `GET /c/{token}` click redirect · `GET /view/{token}` | outreach `/public/*` ✅ | messaging |
 | `GET` / `POST /u/{token}` one-click unsubscribe · `GET` / `POST /p/{token}` preferences | outreach `/public/*` ✅ | audience |
@@ -191,7 +190,7 @@ signs or verifies tokens, and publishes to Pub/Sub. The owning service pulls and
 | | |
 |---|---|
 | **Owns** | Pending submissions in their own small database: the fields, consent text shown, form and workspace, submission IP and time, the confirmation token and its expiry; the decision (admitted, rejected, expired). |
-| **Does** | Consumes `form.submission.received` from the edge; screens (honeypot, rate per address and IP, syntax and disposable domains); sends the double opt-in email for subscriptions; on `confirmation.received` (or immediately, for an enquiry) publishes `intake.admitted` with the submission and its evidence. Until the website's forms post to the edge, it also reads the EPIC-32 Supabase capture tables. |
+| **Does** | Consumes `form_submission.received` from the edge; screens (honeypot, rate per address and IP, syntax and disposable domains); sends the double opt-in email for subscriptions; on `confirmation.received` (or immediately, for an enquiry) publishes `intake.admitted` with the submission and its evidence. Until the website's forms post to the edge, it also reads the EPIC-32 Supabase capture tables. |
 | **Never** | Writes to the CRM store, or keeps anything past 7 days pending or 30 days decided. |
 | **API** | Staff-only, workspace-scoped: list pending submissions, re-send a confirmation, discard one. Nothing on the internet. |
 
@@ -852,7 +851,7 @@ sequenceDiagram
     participant M as crm/messaging
     V->>E: POST /forms/{id}/submit (fields, consent text, visitor id)
     E->>E: origin, honeypot, rate limit, size, schema
-    E->>B: form.submission.received
+    E->>B: form_submission.received
     E-->>V: 202, "check your inbox"
     B->>N: pull
     N->>N: screen, store PENDING (quarantine DB)
@@ -1079,31 +1078,16 @@ stateDiagram-v2
 
 ## 8. Event catalogue
 
-Topics are per publishing service (`crm.<service>.v1`); every message carries `workspace_id`, `event_id`, `occurred_at`
-and the entity id. Consumers are idempotent on `event_id`.
+The catalogue is now the services' `asyncapi.yaml` documents; [10-events.md](10-events.md) is generated from them
+(75 event types: who publishes each, from which operations, its `data` schema, and who consumes it). The rules:
 
-| Event | Publisher | Main consumers |
-|---|---|---|
-| `contact.created / updated / merged / erased` | audience | automation, insights, acquisition, sales |
-| `subscription.changed` | audience | automation (trigger), messaging (cache), insights |
-| `suppression.added / removed` | audience | messaging, acquisition (ad audience removal) |
-| `tag.added / removed` | audience | automation (trigger), insights (scores) |
-| `campaign.scheduled / sending / sent` | messaging | insights |
-| `message.sent / delivered / opened / clicked / bounced / complained / replied` | messaging | audience (facts), automation (goals, conditions), insights, acquisition (warm-up removal) |
-| `social.post.published / failed` | messaging | insights |
-| `enrolment.started / step_completed / goal_reached / completed / stopped / failed` | automation | audience (facts, timeline), insights |
-| `lead.created / stage_changed` | sales | automation, insights |
-| `deal.created / stage_changed / won / lost` | sales | automation (trigger), audience (facts), insights, acquisition (relay) |
-| `task.created / completed` | sales | automation, audience (timeline), insights |
-| conversion (signed, `crm-conversions`) | sales, PriceWhisperer billing | RERP crm/accounts intake |
-| `form.submitted` | acquisition | automation (trigger), insights |
-| `site.visited`, `event.recorded` | acquisition | audience (facts), automation, insights |
-| `ad.clicked`, `conversion.recorded` | acquisition | automation, insights |
-| `ad_audience.synced`, `ad_buy.changed` | acquisition | insights |
-| `score.changed` | insights | audience (facts), automation (trigger) |
-| `field.defined / changed` | workspace | every service (cache) |
-| `erasure.requested` / `erasure.completed` | workspace / every service | every service / workspace |
-| `*.received` (form, click, track, provider event, unsubscribe) | edge | acquisition, messaging, audience |
+- One topic per publishing service, `crm.<service>.v1`; one subscription per consumer and publisher, filtered on
+  `event_type`, with a dead-letter topic.
+- Every message is an envelope (`event_id`, `event_type`, `workspace_id`, `occurred_at`, `producer`, `actor`,
+  `request_id`, `entity_id`) around `data`; consumers are idempotent on `event_id`.
+- Events leave through an outbox written in the same transaction as the change.
+- The edge's `*.received` events are untrusted; the consumer re-validates.
+- Every operation that publishes names its events in `x-events`.
 
 ---
 
@@ -1434,6 +1418,9 @@ ways; the spec has one.
 
 ### 10.1 Conventions every new spec follows
 
+> The full, normative rules (with the ones added while writing the specs: money as decimal strings, Sesame user ids,
+> error `reason`, query vocabulary, examples) are [09-api-conventions.md](09-api-conventions.md).
+
 - OpenAPI 3.1, one file per service at `openapi/crm/<service>/openapi.yaml`, header comment
   `x-brrtrouter-stack-size: 128KiB`, `x-brrtrouter-impl: true` on every operation.
 - Base path `/api/v1/crm/<service>`; resources plural; ids are UUIDs; verbs as `POST /<resource>/{id}/<verb>`.
@@ -1448,7 +1435,8 @@ ways; the spec has one.
   generated, not written twice.
 - The shared condition tree (`ConditionGroup`) is defined once (audience) and referenced by messaging, automation,
   acquisition and insights.
-- Events in an AsyncAPI document per service next to its OpenAPI file, so the catalogue in §8 is checked too.
+- Events in an AsyncAPI document per service next to its OpenAPI file, so the catalogue in §8 is checked too (done:
+  `openapi/crm/<service>/asyncapi.yaml`, checked by `tools/check_specs.py`).
 
 ### 10.2 Source material per new spec
 
@@ -1475,6 +1463,8 @@ ways; the spec has one.
 5. **acquisition**, then **insights** (both consume events from the others).
 
 ### 10.4 Moving the portal and the mock
+
+> The work list, with every field change and the full path map, is [12-portal-migration.md](12-portal-migration.md).
 
 The portal's CRM client keeps its call sites; a path map in `utils/crm/api.ts` (old prefix → new service and path)
 moves every page at once, and `crm-mock`'s seed `path` fields move with it. The contract check from Epic 55
@@ -1518,3 +1508,9 @@ yet.
 | D12 | Several workspaces (brands) per organisation; `workspace_id` with RLS everywhere; `X-Workspace-Id` on every call (ADR 004). | Accepted |
 | D13 | The edge receives all public traffic, including ad-platform webhooks, and only publishes to Pub/Sub. | Accepted |
 | D14 | Every component is its own Deployment on GKE Autopilot; the edge scales on request rate, workers on subscription backlog. | Accepted |
+| D15 | Money is a decimal string (`format: decimal`) beside `currency`, as in RERP accounting; rates and counts stay numbers. | Accepted |
+| D16 | User references are Sesame user ids (strings), never UUID-typed. | Accepted |
+| D17 | The condition tree has two explicit levels (group, sub-group) so it generates; audience owns it and the others copy it identically. | Accepted |
+| D18 | Events leave through a transactional outbox; consumers are idempotent on `event_id`; every subscription has a dead-letter topic. | Accepted |
+| D19 | Recording a conversion is server-side only (`POST /acquisition/ads/conversions`, authenticated); the edge does not take it. The marketing service's public form submit is dropped for the edge's. | Accepted |
+| D20 | Errors carry a stable `reason`; filters use plain field names, `search`, and `from` / `to`. | Accepted |

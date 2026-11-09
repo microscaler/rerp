@@ -93,6 +93,8 @@ pub mod update_conversion_rule;
 
 pub mod list_ad_conversions;
 
+pub mod record_ad_conversion;
+
 pub mod retry_ad_conversion;
 
 pub mod list_ad_creatives;
@@ -152,8 +154,6 @@ pub mod list_recent_form_submissions;
 pub mod get_form;
 
 pub mod update_form;
-
-pub mod submit_form;
 
 pub mod archive_form;
 

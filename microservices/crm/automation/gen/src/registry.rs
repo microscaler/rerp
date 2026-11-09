@@ -92,7 +92,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "instantiate_workflow_recipe",
         crate::controllers::instantiate_workflow_recipe::InstantiateWorkflowRecipeController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -176,19 +176,19 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "create_workflow",
         crate::controllers::create_workflow::CreateWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "get_workflow",
         crate::controllers::get_workflow::GetWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "update_workflow",
         crate::controllers::update_workflow::UpdateWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -200,25 +200,25 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "patch_workflow",
         crate::controllers::patch_workflow::PatchWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "activate_workflow",
         crate::controllers::activate_workflow::ActivateWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "bind_workflow_parameters",
         crate::controllers::bind_workflow_parameters::BindWorkflowParametersController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "duplicate_workflow",
         crate::controllers::duplicate_workflow::DuplicateWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -248,7 +248,7 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "pause_workflow",
         crate::controllers::pause_workflow::PauseWorkflowController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -284,13 +284,13 @@ pub unsafe fn register_all(dispatcher: &mut Dispatcher) {
     dispatcher.register_typed_with_stack_size(
         "get_workflow_steps",
         crate::controllers::get_workflow_steps::GetWorkflowStepsController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
         "replace_workflow_steps",
         crate::controllers::replace_workflow_steps::ReplaceWorkflowStepsController,
-        20480,
+        24576,
     );
 
     dispatcher.register_typed_with_stack_size(
@@ -413,7 +413,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "instantiate_workflow_recipe" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::instantiate_workflow_recipe::InstantiateWorkflowRecipeController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -525,7 +525,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "create_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::create_workflow::CreateWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -533,7 +533,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_workflow::GetWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -541,7 +541,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "update_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::update_workflow::UpdateWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -557,7 +557,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "patch_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::patch_workflow::PatchWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -565,7 +565,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "activate_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::activate_workflow::ActivateWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -573,7 +573,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "bind_workflow_parameters" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::bind_workflow_parameters::BindWorkflowParametersController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -581,7 +581,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "duplicate_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::duplicate_workflow::DuplicateWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -621,7 +621,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "pause_workflow" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::pause_workflow::PauseWorkflowController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -669,7 +669,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "get_workflow_steps" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::get_workflow_steps::GetWorkflowStepsController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);
@@ -677,7 +677,7 @@ pub unsafe fn register_from_spec(dispatcher: &mut Dispatcher, routes: &[RouteMet
             "replace_workflow_steps" => {
                 let tx = spawn_typed_with_stack_size_and_name(
                     crate::controllers::replace_workflow_steps::ReplaceWorkflowStepsController,
-                    20480,
+                    24576,
                     Some(route.handler_name.as_ref()),
                 );
                 dispatcher.add_route(route.clone(), tx);

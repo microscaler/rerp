@@ -1,79 +1,68 @@
-# CRM Automation
+# crm/automation — what happens next
 
-## What It Is
+What happens next: workflows and their versioned step graphs, the trigger and action catalogue, recipes, enrolments with step history and durable timers.
 
-The CRM Automation service is your sales team's intelligent assistant—the system that automates repetitive tasks, nurtures leads automatically, and ensures no opportunity falls through the cracks. It's the workflow automation engine that makes your CRM proactive instead of reactive, working 24/7 to move deals forward.
+| | |
+|---|---|
+| **Contract** | [openapi.yaml](openapi.yaml) (47 operations), [asyncapi.yaml](asyncapi.yaml) |
+| **Base path** | `/api/v1/crm/automation`, `X-Workspace-Id` on every call |
+| **Generated crate** | `microservices/crm/automation/gen` (`rerp_crm_automation_gen`) |
+| **Implementation** | Not started; the generated crate serves the spec examples. Build step 3 in [13-implementation-plan.md](../docs/13-implementation-plan.md). |
+| **Replaces** | automation |
 
-## Why Your Business Needs This
+## Design
 
-**The Problem**: Your sales team is drowning in manual work. They spend more time updating records, sending follow-up emails, and creating tasks than they do talking to customers. Important follow-ups get missed. Leads go cold. Opportunities stall. You're losing revenue to administrative overhead.
+From [08-service-decomposition.md §4](../docs/08-service-decomposition.md):
 
-**The Pain Points**:
-- **Manual Follow-Ups**: Sales reps forget to follow up, deals go cold, revenue is lost
-- **Repetitive Tasks**: Creating tasks, sending emails, updating records—all done manually
-- **Inconsistent Processes**: Every rep handles leads differently, no standardized approach
-- **Lead Nurturing Gaps**: Leads that aren't ready to buy get forgotten instead of nurtured
-- **No Automation**: Everything requires manual intervention, nothing happens automatically
-- **Lost Opportunities**: Deals stall because no one knows what to do next
+| | |
+|---|---|
+| **Owns** | Workflows and their step graphs (with versions), the trigger and action catalogue, recipes, enrolments with step history, durable timers. |
+| **Calls** | Audience (evaluate a condition for one contact), messaging (send a template to one contact), sales (create a deal or task), acquisition (add to / remove from an ad audience). |
+| **Consumes** | Every trigger event (`subscription.changed`, `tag.added`, `form.submitted`, `site.visited`, `deal.stage_changed`, `ad.clicked`, `conversion.recorded`, ...). |
+| **Publishes** | `enrolment.started / step_completed / goal_reached / completed / stopped / failed`. |
+| **Runtime** | API plus a step engine: exactly-once per enrolment step, timers released within 60 s of due. |
 
-## How It Delivers Pain Relief
+## API
 
-### 🤖 **Automated Lead Nurturing**
-Leads that aren't ready to buy get automatically nurtured with relevant content and follow-ups. When they're ready, your sales team is notified. No leads go cold, no opportunities are lost.
+| Area | Operations |
+|---|---|
+| `actions` — Scheduled and manual actions | 3 |
+| `automation-execution` — Workflow execution and run history | 1 |
+| `enrolments` — Contacts moving through workflows | 8 |
+| `rules` — Condition-action rules within workflows | 8 |
+| `triggers` — Event hooks that fire workflows | 6 |
+| `workflow-steps` — The step graph of a workflow (wait, if/else, split, goal) | 2 |
+| `workflows` — Workflow definitions and management | 19 |
 
-### ⚡ **Workflow Automation**
-Define rules once, automate forever. When a lead reaches a certain score, automatically assign it to a rep. When an opportunity moves to a stage, automatically create tasks. When a deal closes, automatically notify the team.
+Roles per operation: [11-permissions.md](../docs/11-permissions.md#automation). Conventions: [09-api-conventions.md](../docs/09-api-conventions.md).
 
-### 📧 **Email Automation**
-Send personalized email sequences automatically. Welcome new leads, follow up after meetings, re-engage cold opportunities—all without manual intervention.
+## Events
 
-### 🎯 **Intelligent Task Creation**
-Automatically create tasks based on opportunity stage, lead score, or time elapsed. Your sales team always knows what to do next, never misses a follow-up.
+Publishes on `crm.automation.v1`:
 
-### 📊 **Pipeline Automation**
-Automatically move opportunities through stages based on activity, time, or criteria. Stuck deals get flagged, hot deals get prioritized.
+- `enrolment.started` — A contact entered a workflow (trigger or manual).
+- `enrolment.step_completed` — A step ran; data.current_step_id is the step reached.
+- `enrolment.goal_reached` — The workflow goal was met.
+- `enrolment.completed` — The contact reached END.
+- `enrolment.stopped` — Stopped by a user, an unsubscribe, a conversion or an exit rule.
+- `enrolment.failed` — A step failed beyond its retries; POST /enrolments/{id}/retry resumes.
+- `workflow.activated` — Triggers are live.
+- `workflow.paused` — Triggers stopped; waiting enrolments hold.
+- `erasure.completed` — A service erased its copy for a data request.
 
-### 🔄 **Partner Assignment**
-Automatically route leads to the right partner or rep based on territory, skills, or workload. No manual assignment, no delays, no missed opportunities.
+Consumes: `ad.clicked`, `contact.archived`, `contact.created`, `contact.erased`, `contact.merged`, `contact.updated`, `conversion.recorded`, `deal.created`, `deal.lost`, `deal.reopened`, `deal.stage_changed`, `deal.won`, `erasure.requested`, `event.recorded`, `form.submitted`, `lead.converted`, `lead.created`, `lead.stage_changed`, `message.clicked`, `message.opened`, `message.replied`, `message.sent`, `score.changed`, `site.visited`, `subscription.changed`, `tag.added`, `tag.removed`, `task.completed`, `task.created`, `workspace.created`
 
-### 🎯 **Business Impact**
-- **Increase Conversion**: Automated nurturing increases lead conversion by 40%+
-- **Save Time**: Automation saves sales teams 15+ hours per week
-- **Improve Consistency**: Standardized processes ensure every lead gets proper attention
-- **Close More Deals**: Never-miss follow-ups increase close rates by 30%
+Catalogue and transport: [10-events.md](../docs/10-events.md).
 
-## Key Capabilities
+## Synchronous calls
 
-- **Workflow Rules**: Define automation rules based on lead/opportunity attributes, stage changes, or time-based triggers
-- **Email Automation**: Automated email sequences, follow-up reminders, and email templates
-- **Task Automation**: Automatic task creation, assignment, and escalation
-- **Lead Assignment**: Rule-based lead routing and partner assignment
-- **Pipeline Automation**: Automatic stage progression, opportunity qualification, and conversion workflows
-- **Conditional Logic**: Complex if-then-else logic for sophisticated automation scenarios
-- **Scheduled Actions**: Time-based automation (e.g., "send follow-up email 3 days after lead creation")
-- **Integration**: Works with CRM, marketing, and sales services for cross-module automation
+- Calls audience (evaluate a condition for one contact), messaging (send to one contact), sales (create a deal or task), acquisition (add to or remove from an ad audience).
 
-## Perfect For
+## Behaviour specs and recipes
 
-- Businesses with sales teams managing high volumes of leads
-- Companies needing consistent lead nurturing processes
-- Organizations wanting to automate repetitive sales tasks
-- Growing businesses that need scalable sales automation
-- Enterprises requiring sophisticated workflow automation
-
----
-
-*Automate the routine. Empower the sales team. Accelerate revenue.*
-
-## Behaviour (BDD) and recipes
-
-- `features/*.feature` — Gherkin for the automation engine, written from the reference tenant walk of 2026-11-05
-  (shape-diff § Automation builder, § Recipes): enrolment and reentry, wait modes, if/else, split, goal (jump to) and
-  go to, action semantics, lifecycle (readiness, exit rules, pause, stop), recipes with parameters. They are the
-  normative behaviour of this service; they move to `microservices/crm/automation/impl/tests/features/` when the
-  crate is scaffolded and become its cucumber suite.
-- `recipes/*.yaml` — the recipe library in the `WorkflowRecipe.definition` shape: a graph with `$list`,
-  `$tag:<key>`, `$template:<key>`, `$url`, `$condition` placeholders bound at instantiation
-  (`POST /recipes/{id}/instantiate` with `bindings`; `/workflows/{id}/setup` lists what is still unbound). Walked and
-  transcribed so far: free-trial-nurture, expired-trial-follow-up (chained by tag), upgrade-incentive,
-  re-engagement-by-tag.
+- [features/](features/): Gherkin scenarios for enrolment, the step kinds (action, branching, wait), the workflow
+  lifecycle and recipes. They are the acceptance tests for the step engine: each scenario becomes a test when the
+  service is implemented (step 3 of [13-implementation-plan.md](../docs/13-implementation-plan.md)).
+- [recipes/](recipes/): the workflow recipes `GET /recipes` and `POST /recipes/{id}/instantiate` serve (free-trial
+  nurture, expired-trial follow-up, upgrade incentive, re-engagement by tag), with `$list`, `$tag` and template
+  parameters bound by `PATCH /workflows/{id}/bindings`.

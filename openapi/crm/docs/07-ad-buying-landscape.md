@@ -1,5 +1,7 @@
 # Ad buying landscape — who sells impressions, how to hook in, and what "doing it ourselves" means
 
+> **Note (2026-11-09):** `crm/marketing` `/ads/*` now lives in crm/acquisition ([acquisition/openapi.yaml](../acquisition/openapi.yaml)).
+
 Companion to `crm/marketing` `/ads/*` (shape-diff § Ad audiences, ad tracking and attribution). Written
 2026-11-06 from vendor pages and trade press; minimums and fees move, so re-check before signing anything.
 

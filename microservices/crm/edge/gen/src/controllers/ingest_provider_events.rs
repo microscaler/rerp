@@ -7,11 +7,5 @@ use brrtrouter_macros::handler;
 
 #[handler(IngestProviderEventsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    HttpJson::ok(Response {
-        code: 42,
-        details: Some("example".to_string()),
-        fields: Some(vec![]),
-        message: "example".to_string(),
-        request_id: Some("example".to_string()),
-    })
+    HttpJson::ok(Response {})
 }

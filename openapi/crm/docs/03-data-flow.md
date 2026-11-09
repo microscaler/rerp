@@ -1,5 +1,7 @@
 # CRM Data Flow Design
 
+> **Historical (superseded 2026-11-09):** flows are now [08 §7](08-service-decomposition.md) and the event catalogue [10-events.md](10-events.md); form submission goes through the edge and intake (ADR 004), and change data capture is replaced by a transactional outbox. Still useful: webhook delivery (§8) and report generation (§11) in outline. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Version:** 1.0.0
 > **Scope:** Request/response flows, event-driven patterns, change data capture, and batch processing
 > **Status:** Active design spec

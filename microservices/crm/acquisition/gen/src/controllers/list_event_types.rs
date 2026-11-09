@@ -10,5 +10,32 @@ use crate::handlers::types::EventTypeDef;
 
 #[handler(ListEventTypesController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    HttpJson::ok(Response(vec![]))
+    // Example response:
+    // {
+    //   "items": [
+    //     {
+    //       "name": "Northwind Traders"
+    //     }
+    //   ]
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "items": [
+    {
+      "name": "Northwind Traders"
+    }
+  ]
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
+    HttpJson::ok(Response(vec![serde_json::from_value::<EventTypeDef>(
+        serde_json::json!({"name":"Northwind Traders"}),
+    )
+    .unwrap_or_default()]))
 }

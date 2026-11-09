@@ -1,0 +1,1044 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Edge events
+  version: 1.0.0
+  description: 'Events crm/edge publishes on Pub/Sub topic `crm.edge.v1` and the events it consumes from other CRM services.
+    Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once: consumers
+    are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.edge.v1
+    title: crm.edge.v1
+    description: Everything crm/edge publishes.
+    messages:
+      formSubmissionReceived:
+        $ref: '#/components/messages/formSubmissionReceived'
+      surveyReceived:
+        $ref: '#/components/messages/surveyReceived'
+      eventRegistrationReceived:
+        $ref: '#/components/messages/eventRegistrationReceived'
+      confirmationReceived:
+        $ref: '#/components/messages/confirmationReceived'
+      openReceived:
+        $ref: '#/components/messages/openReceived'
+      clickReceived:
+        $ref: '#/components/messages/clickReceived'
+      unsubscribeReceived:
+        $ref: '#/components/messages/unsubscribeReceived'
+      preferencesReceived:
+        $ref: '#/components/messages/preferencesReceived'
+      trackReceived:
+        $ref: '#/components/messages/trackReceived'
+      adClickReceived:
+        $ref: '#/components/messages/adClickReceived'
+      adCallReceived:
+        $ref: '#/components/messages/adCallReceived'
+      providerEventReceived:
+        $ref: '#/components/messages/providerEventReceived'
+      adWebhookReceived:
+        $ref: '#/components/messages/adWebhookReceived'
+      oauthCompleted:
+        $ref: '#/components/messages/oauthCompleted'
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/edge publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/formSubmissionReceived'
+    - $ref: '#/channels/published/messages/surveyReceived'
+    - $ref: '#/channels/published/messages/eventRegistrationReceived'
+    - $ref: '#/channels/published/messages/confirmationReceived'
+    - $ref: '#/channels/published/messages/openReceived'
+    - $ref: '#/channels/published/messages/clickReceived'
+    - $ref: '#/channels/published/messages/unsubscribeReceived'
+    - $ref: '#/channels/published/messages/preferencesReceived'
+    - $ref: '#/channels/published/messages/trackReceived'
+    - $ref: '#/channels/published/messages/adClickReceived'
+    - $ref: '#/channels/published/messages/adCallReceived'
+    - $ref: '#/channels/published/messages/providerEventReceived'
+    - $ref: '#/channels/published/messages/adWebhookReceived'
+    - $ref: '#/channels/published/messages/oauthCompleted'
+components:
+  messages:
+    formSubmissionReceived:
+      name: form_submission.received
+      title: form_submission.received
+      summary: A public form was submitted.
+      description: 'A public form was submitted.
+
+
+        Published by: `POST /forms/{id}/submit`
+
+
+        Consumed by: crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: form_submission.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    surveyReceived:
+      name: survey.received
+      title: survey.received
+      summary: A survey response was submitted.
+      description: 'A survey response was submitted.
+
+
+        Published by: `POST /surveys/submit`
+
+
+        Consumed by: crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: survey.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    eventRegistrationReceived:
+      name: event_registration.received
+      title: event_registration.received
+      summary: Someone registered for an event.
+      description: 'Someone registered for an event.
+
+
+        Published by: `POST /events/register`
+
+
+        Consumed by: crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: event_registration.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    confirmationReceived:
+      name: confirmation.received
+      title: confirmation.received
+      summary: A double opt-in link was clicked.
+      description: 'A double opt-in link was clicked.
+
+
+        Published by: `GET /confirm/{token}`
+
+
+        Consumed by: crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: confirmation.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    openReceived:
+      name: open.received
+      title: open.received
+      summary: Open pixel fetched.
+      description: 'Open pixel fetched.
+
+
+        Published by: `GET /o/{token}`
+
+
+        Consumed by: crm/messaging.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: open.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    clickReceived:
+      name: click.received
+      title: click.received
+      summary: Tracked link followed (the edge redirects at once).
+      description: 'Tracked link followed (the edge redirects at once).
+
+
+        Published by: `GET /c/{token}`
+
+
+        Consumed by: crm/messaging.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: click.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    unsubscribeReceived:
+      name: unsubscribe.received
+      title: unsubscribe.received
+      summary: One-click or page unsubscribe.
+      description: 'One-click or page unsubscribe.
+
+
+        Published by: `POST /u/{token}`
+
+
+        Consumed by: crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: unsubscribe.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    preferencesReceived:
+      name: preferences.received
+      title: preferences.received
+      summary: Preference page saved.
+      description: 'Preference page saved.
+
+
+        Published by: `POST /p/{token}`
+
+
+        Consumed by: crm/audience.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: preferences.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    trackReceived:
+      name: track.received
+      title: track.received
+      summary: A page view from the site script.
+      description: 'A page view from the site script.
+
+
+        Published by: `POST /track`
+
+
+        Consumed by: crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: track.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    adClickReceived:
+      name: ad_click.received
+      title: ad_click.received
+      summary: Ad click ids found on landing.
+      description: 'Ad click ids found on landing.
+
+
+        Published by: `POST /ads/clicks`
+
+
+        Consumed by: crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad_click.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    adCallReceived:
+      name: ad_call.received
+      title: ad_call.received
+      summary: A call-tracking webhook.
+      description: 'A call-tracking webhook.
+
+
+        Published by: `POST /ads/calls`
+
+
+        Consumed by: crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad_call.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    providerEventReceived:
+      name: provider_event.received
+      title: provider_event.received
+      summary: Delivery events from the email or SMS provider.
+      description: 'Delivery events from the email or SMS provider.
+
+
+        Published by: `POST /webhooks/provider/{provider}`
+
+
+        Consumed by: crm/messaging.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: provider_event.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    adWebhookReceived:
+      name: ad_webhook.received
+      title: ad_webhook.received
+      summary: A push from an ad platform; lead-form leads go to intake.
+      description: 'A push from an ad platform; lead-form leads go to intake.
+
+
+        Published by: `POST /webhooks/ads/{platform}`
+
+
+        Consumed by: crm/acquisition, crm/intake.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: ad_webhook.received
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/Received'
+    oauthCompleted:
+      name: oauth.completed
+      title: oauth.completed
+      summary: An OAuth redirect came back; the service named in the state exchanges the code.
+      description: 'An OAuth redirect came back; the service named in the state exchanges the code.
+
+
+        Published by: `GET /oauth/{flow}/callback`
+
+
+        Consumed by: crm/messaging, crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: oauth.completed
+          workspace_id:
+            type:
+            - string
+            - 'null'
+            format: uuid
+            description: Resolved from the form, site or token when the edge can; consumers re-resolve
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/edge
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/OAuthCompleted'
+  schemas:
+    Received:
+      type: object
+      required:
+      - received_at
+      - request_id
+      description: 'What the edge saw. It is untrusted: consumers re-validate everything before acting.'
+      properties:
+        received_at:
+          type: string
+          format: date-time
+        request_id:
+          type: string
+        ip:
+          type: string
+          description: Client IP; consumers keep it only as consent evidence
+        user_agent:
+          type: string
+        origin:
+          type: string
+        token:
+          type: string
+          description: The signed token from the path, unverified
+        path_params:
+          type: object
+          additionalProperties:
+            type: string
+        query:
+          type: object
+          additionalProperties:
+            type: string
+        body:
+          description: The request body as received (JSON), within the edge size limit
+        signature_verified:
+          type: boolean
+          description: 'Webhooks: the provider signature checked out'
+    OAuthCompleted:
+      type: object
+      required:
+      - flow
+      - state
+      properties:
+        flow:
+          type: string
+          enum:
+          - mailbox
+          - ad-account
+          - social-account
+        state:
+          type: string
+          description: Signed by the service that started the flow; it names that service
+        code:
+          type: string
+          description: Authorisation code; exchanged once by the named service
+        error:
+          type: string
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

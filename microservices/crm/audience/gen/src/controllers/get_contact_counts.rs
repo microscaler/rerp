@@ -7,12 +7,36 @@ use brrtrouter_macros::handler;
 
 #[handler(GetContactCountsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // Example response:
+    // {
+    //   "bounced": 464,
+    //   "pending": 476,
+    //   "subscribed": 10912,
+    //   "total": 12480,
+    //   "unsubscribed": 1104
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "bounced": 464,
+  "pending": 476,
+  "subscribed": 10912,
+  "total": 12480,
+  "unsubscribed": 1104
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
     HttpJson::ok(Response {
-        bounced: Some(42),
-        pending: Some(42),
+        bounced: Some(464),
+        pending: Some(476),
         segments: Some(vec![]),
-        subscribed: Some(42),
-        total: 42,
-        unsubscribed: Some(42),
+        subscribed: Some(10912),
+        total: 12480,
+        unsubscribed: Some(1104),
     })
 }

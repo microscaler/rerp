@@ -1,5 +1,7 @@
 # RERP CRM OpenAPI Competitive Audit
 
+> **Historical (superseded 2026-11-09):** a May 2026 audit of the first three specs; the contracts it reviewed no longer exist. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Date:** 2026-05-10  
 > **Sources:** RERP OpenAPI specs (gateway + 3 sub-services), Odoo Community/Enterprise CRM modules, vendor live pages (Salesforce, HubSpot, Odoo, SAP, Microsoft)  
 > **Scope:** Functional gap analysis, world-class CRM component definition, implementation priorities

@@ -15,10 +15,6 @@ pub struct Request {
     pub city: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "country_id")]
     pub country_id: Option<String>,
 
@@ -40,6 +36,10 @@ pub struct Request {
 
     #[serde(rename = "name")]
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_id")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "parent_id")]
@@ -93,10 +93,6 @@ pub struct Response {
     pub color: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "company_id")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "country_id")]
     pub country_id: Option<String>,
 
@@ -144,6 +140,10 @@ pub struct Response {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opportunity_count")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "organisation_id")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "parent_id")]
@@ -203,14 +203,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(

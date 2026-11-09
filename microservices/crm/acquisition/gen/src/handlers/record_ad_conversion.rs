@@ -2,6 +2,7 @@
 // ⚠️ DO NOT MODIFY - Changes will be overwritten on next generation
 // ⚠️ To modify API behavior, edit the OpenAPI spec and regenerate
 // ⚠️ To implement business logic, edit the corresponding controller file
+use crate::handlers::types::AdConversion;
 use brrtrouter::dispatcher::HandlerRequest;
 use brrtrouter::typed::HttpJson;
 use brrtrouter::typed::TypedHandlerRequest;
@@ -10,39 +11,44 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "consent_given")]
-    pub consent_given: Option<bool>,
-
-    #[serde(rename = "fields")]
-    pub fields: serde_json::Value,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "visitor_id")]
-    pub visitor_id: Option<String>,
-
-    #[serde(rename = "X-Workspace-Id")]
-    pub x_workspace_id: String,
-
-    #[serde(rename = "id")]
-    pub id: String,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-
-pub struct Response {
     #[serde(rename = "contact_id")]
     pub contact_id: String,
 
-    #[serde(rename = "form_id")]
-    pub form_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "currency")]
+    pub currency: Option<String>,
 
-    #[serde(rename = "lead_id")]
-    pub lead_id: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "deal_id")]
+    pub deal_id: Option<String>,
 
-    #[serde(rename = "redirect_url")]
-    pub redirect_url: String,
+    #[serde(rename = "event")]
+    pub event: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "occurred_at")]
+    pub occurred_at: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "payment_id")]
+    pub payment_id: Option<String>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "properties")]
+    pub properties: Option<serde_json::Value>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "value")]
+    pub value: Option<String>,
+
+    #[serde(rename = "X-Workspace-Id")]
+    pub x_workspace_id: String,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+// Newtype wrapping the array: must be transparent so JSON matches OpenAPI `type: array` (not `{"0":[...]}`).
+#[serde(transparent)]
+pub struct Response(pub Vec<AdConversion>);
 
 impl TryFrom<HandlerRequest> for Request {
     type Error = anyhow::Error;
@@ -53,33 +59,17 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
                 "Missing required parameter 'X-Workspace-Id'"
             ));
-        }
-
-        if let Some(v) = req.get_path_param("id") {
-            data_map.insert(
-                "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
-            );
-        } else {
-            return Err(anyhow::anyhow!("Missing required parameter 'id'"));
         }
 
         if let Some(body) = req.body {
@@ -101,5 +91,5 @@ impl TryFrom<HandlerRequest> for Request {
 
 #[allow(dead_code)]
 pub fn handler(req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
-    crate::controllers::submit_form::handle(req)
+    crate::controllers::record_ad_conversion::handle(req)
 }

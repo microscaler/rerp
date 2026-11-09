@@ -1,0 +1,1044 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Messaging events
+  version: 1.0.0
+  description: 'Events crm/messaging publishes on Pub/Sub topic `crm.messaging.v1` and the events it consumes from other CRM
+    services. Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once:
+    consumers are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.messaging.v1
+    title: crm.messaging.v1
+    description: Everything crm/messaging publishes.
+    messages:
+      campaignScheduled:
+        $ref: '#/components/messages/campaignScheduled'
+      campaignCancelled:
+        $ref: '#/components/messages/campaignCancelled'
+      campaignSending:
+        $ref: '#/components/messages/campaignSending'
+      campaignSent:
+        $ref: '#/components/messages/campaignSent'
+      messageSent:
+        $ref: '#/components/messages/messageSent'
+      messageDelivered:
+        $ref: '#/components/messages/messageDelivered'
+      messageOpened:
+        $ref: '#/components/messages/messageOpened'
+      messageClicked:
+        $ref: '#/components/messages/messageClicked'
+      messageBounced:
+        $ref: '#/components/messages/messageBounced'
+      messageComplained:
+        $ref: '#/components/messages/messageComplained'
+      messageReplied:
+        $ref: '#/components/messages/messageReplied'
+      socialPostPublished:
+        $ref: '#/components/messages/socialPostPublished'
+      socialPostFailed:
+        $ref: '#/components/messages/socialPostFailed'
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+  from_audience:
+    address: crm.audience.v1
+    title: crm.audience.v1
+    description: Subscription `messaging-audience` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      contactMerged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactMerged
+      contactErased:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactErased
+      subscriptionChanged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/subscriptionChanged
+      suppressionAdded:
+        $ref: ../audience/asyncapi.yaml#/components/messages/suppressionAdded
+      suppressionRemoved:
+        $ref: ../audience/asyncapi.yaml#/components/messages/suppressionRemoved
+  from_edge:
+    address: crm.edge.v1
+    title: crm.edge.v1
+    description: Subscription `messaging-edge` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      openReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/openReceived
+      clickReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/clickReceived
+      providerEventReceived:
+        $ref: ../edge/asyncapi.yaml#/components/messages/providerEventReceived
+      oauthCompleted:
+        $ref: ../edge/asyncapi.yaml#/components/messages/oauthCompleted
+  from_intake:
+    address: crm.intake.v1
+    title: crm.intake.v1
+    description: Subscription `messaging-intake` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      intakeConfirmationRequested:
+        $ref: ../intake/asyncapi.yaml#/components/messages/intakeConfirmationRequested
+  from_workspace:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Subscription `messaging-workspace` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      erasureRequested:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/erasureRequested
+      workspaceCreated:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/workspaceCreated
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/messaging publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/campaignScheduled'
+    - $ref: '#/channels/published/messages/campaignCancelled'
+    - $ref: '#/channels/published/messages/campaignSending'
+    - $ref: '#/channels/published/messages/campaignSent'
+    - $ref: '#/channels/published/messages/messageSent'
+    - $ref: '#/channels/published/messages/messageDelivered'
+    - $ref: '#/channels/published/messages/messageOpened'
+    - $ref: '#/channels/published/messages/messageClicked'
+    - $ref: '#/channels/published/messages/messageBounced'
+    - $ref: '#/channels/published/messages/messageComplained'
+    - $ref: '#/channels/published/messages/messageReplied'
+    - $ref: '#/channels/published/messages/socialPostPublished'
+    - $ref: '#/channels/published/messages/socialPostFailed'
+    - $ref: '#/channels/published/messages/erasureCompleted'
+  consume_audience:
+    action: receive
+    channel:
+      $ref: '#/channels/from_audience'
+    summary: crm/messaging consumes contact.merged, contact.erased, subscription.changed, suppression.added, suppression.removed
+    messages:
+    - $ref: '#/channels/from_audience/messages/contactMerged'
+    - $ref: '#/channels/from_audience/messages/contactErased'
+    - $ref: '#/channels/from_audience/messages/subscriptionChanged'
+    - $ref: '#/channels/from_audience/messages/suppressionAdded'
+    - $ref: '#/channels/from_audience/messages/suppressionRemoved'
+  consume_edge:
+    action: receive
+    channel:
+      $ref: '#/channels/from_edge'
+    summary: crm/messaging consumes open.received, click.received, provider_event.received, oauth.completed
+    messages:
+    - $ref: '#/channels/from_edge/messages/openReceived'
+    - $ref: '#/channels/from_edge/messages/clickReceived'
+    - $ref: '#/channels/from_edge/messages/providerEventReceived'
+    - $ref: '#/channels/from_edge/messages/oauthCompleted'
+  consume_intake:
+    action: receive
+    channel:
+      $ref: '#/channels/from_intake'
+    summary: crm/messaging consumes intake.confirmation_requested
+    messages:
+    - $ref: '#/channels/from_intake/messages/intakeConfirmationRequested'
+  consume_workspace:
+    action: receive
+    channel:
+      $ref: '#/channels/from_workspace'
+    summary: crm/messaging consumes erasure.requested, workspace.created
+    messages:
+    - $ref: '#/channels/from_workspace/messages/erasureRequested'
+    - $ref: '#/channels/from_workspace/messages/workspaceCreated'
+components:
+  messages:
+    campaignScheduled:
+      name: campaign.scheduled
+      title: campaign.scheduled
+      summary: Checks passed and a send time is set.
+      description: 'Checks passed and a send time is set.
+
+
+        Published by: `POST /campaigns/{id}/schedule`
+
+
+        Consumed by: crm/insights, crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: campaign.scheduled
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Campaign
+    campaignCancelled:
+      name: campaign.cancelled
+      title: campaign.cancelled
+      summary: A scheduled campaign went back to draft.
+      description: 'A scheduled campaign went back to draft.
+
+
+        Published by: `POST /campaigns/{id}/cancel`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: campaign.cancelled
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Campaign
+    campaignSending:
+      name: campaign.sending
+      title: campaign.sending
+      summary: The send worker started on the campaign.
+      description: 'The send worker started on the campaign.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: campaign.sending
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Campaign
+    campaignSent:
+      name: campaign.sent
+      title: campaign.sent
+      summary: Every recipient was processed.
+      description: 'Every recipient was processed.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: campaign.sent
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/Campaign
+    messageSent:
+      name: message.sent
+      title: message.sent
+      summary: The provider accepted a message (campaign, automation, transactional or 1:1). Test sends are flagged and excluded
+        from reports.
+      description: 'The provider accepted a message (campaign, automation, transactional or 1:1). Test sends are flagged and
+        excluded from reports.
+
+
+        Published by: `POST /transactional/send`, `POST /mailboxes/{id}/send`, `POST /campaigns/{id}/test-send`
+
+
+        Consumed by: crm/audience, crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.sent
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageDelivered:
+      name: message.delivered
+      title: message.delivered
+      summary: Provider delivery receipt.
+      description: 'Provider delivery receipt.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.delivered
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageOpened:
+      name: message.opened
+      title: message.opened
+      summary: Open pixel fetched (edge open.received, attributed).
+      description: 'Open pixel fetched (edge open.received, attributed).
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/automation, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.opened
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageClicked:
+      name: message.clicked
+      title: message.clicked
+      summary: Tracked link followed (edge click.received, attributed).
+      description: 'Tracked link followed (edge click.received, attributed).
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/automation, crm/insights, crm/acquisition.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.clicked
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageBounced:
+      name: message.bounced
+      title: message.bounced
+      summary: Soft or hard bounce from the provider; hard bounces make audience suppress the address.
+      description: 'Soft or hard bounce from the provider; hard bounces make audience suppress the address.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.bounced
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageComplained:
+      name: message.complained
+      title: message.complained
+      summary: Spam complaint; audience unsubscribes and suppresses.
+      description: 'Spam complaint; audience unsubscribes and suppresses.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/audience, crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.complained
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    messageReplied:
+      name: message.replied
+      title: message.replied
+      summary: A reply arrived in a connected mailbox.
+      description: 'A reply arrived in a connected mailbox.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/automation, crm/insights, crm/sales.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: message.replied
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/MessageEvent
+    socialPostPublished:
+      name: social.post.published
+      title: social.post.published
+      summary: The platform accepted the post.
+      description: 'The platform accepted the post.
+
+
+        Published by: `POST /social/posts/{id}/publish`
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: social.post.published
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/SocialPost
+    socialPostFailed:
+      name: social.post.failed
+      title: social.post.failed
+      summary: Publishing failed after retries.
+      description: 'Publishing failed after retries.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/insights.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: social.post.failed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/messaging
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: ./openapi.yaml#/components/schemas/SocialPost
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      description: 'A service erased its copy for a data request.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/workspace.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+  schemas:
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

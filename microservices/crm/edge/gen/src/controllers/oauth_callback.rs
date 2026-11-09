@@ -12,6 +12,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
         details: Some("example".to_string()),
         fields: Some(vec![]),
         message: "example".to_string(),
+        reason: "example".to_string(),
         request_id: Some("example".to_string()),
     })
 }

@@ -1,5 +1,5 @@
 Feature: Action steps
-  An ACTION step does one thing and continues. Sends go through crm/outreach and respect consent;
+  An ACTION step does one thing and continues. Sends go through crm/messaging and respect consent;
   everything else mutates the contact, deal or account, or talks to staff or another system.
 
   Background:
@@ -35,7 +35,7 @@ Feature: Action steps
 
   Scenario: CREATE_TASK creates a task on the contact, or on their open deal
     Given the step is CREATE_TASK {"title": "Call about trial", "task_type_id": "<Call>", "assignee": "OWNER", "due_after_seconds": 172800}
-    Then a crm/tasks task exists for "ana@example.com", type Call, owner = the contact's owner, due in 2 days
+    Then a crm/sales task exists for "ana@example.com", type Call, owner = the contact's owner, due in 2 days
     Given instead {"deal": true, "pipeline_id": "<Sales>"}
     And she has an open deal in Sales
     Then the task is attached to that deal

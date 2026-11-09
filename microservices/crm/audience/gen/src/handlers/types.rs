@@ -94,6 +94,17 @@ pub enum ActivityKind {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct ActivityPage {
+    pub items: Vec<Activity>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct AddContactNoteRequest {
     pub body: String,
 }
@@ -143,9 +154,6 @@ pub struct AddContactTagsResponse {
     pub color: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
 
     pub create_date: String,
@@ -180,6 +188,9 @@ pub struct AddContactTagsResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -236,7 +247,7 @@ pub struct AudienceUpdateTagResponse {
     pub color: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
@@ -257,7 +268,7 @@ pub struct BulkJob {
     pub by: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contacts: Option<i32>,
+    pub contacts: Option<i64>,
 
     pub created_at: String,
 
@@ -320,7 +331,7 @@ pub struct BulkJobPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
@@ -415,9 +426,6 @@ pub struct Contact {
     pub color: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
 
     pub create_date: String,
@@ -452,6 +460,9 @@ pub struct Contact {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -493,21 +504,21 @@ pub struct Contact {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ContactCountsSummary {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bounced: Option<i32>,
+    pub bounced: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pending: Option<i32>,
+    pub pending: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscribed: Option<i32>,
+    pub subscribed: Option<i64>,
 
-    pub total: i32,
+    pub total: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed: Option<i32>,
+    pub unsubscribed: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -518,13 +529,13 @@ pub struct ContactPage {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateAccountRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub city: Option<String>,
@@ -580,7 +591,7 @@ pub struct CreateAccountResponse {
     pub active_lead_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_ids: Option<Vec<String>>,
@@ -655,7 +666,7 @@ pub struct CreateAccountResponse {
     pub tax_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<rust_decimal::Decimal>,
+    pub total_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
@@ -701,7 +712,7 @@ pub struct CreateBulkJobResponse {
     pub by: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contacts: Option<i32>,
+    pub contacts: Option<i64>,
 
     pub created_at: String,
 
@@ -740,9 +751,6 @@ pub struct CreateContactRequest {
     pub city: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -758,6 +766,9 @@ pub struct CreateContactRequest {
     pub mobile: Option<String>,
 
     pub name: String,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -796,9 +807,6 @@ pub struct CreateContactResponse {
     pub color: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
 
     pub create_date: String,
@@ -833,6 +841,9 @@ pub struct CreateContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -909,10 +920,10 @@ pub struct CreateListResponse {
     pub sender_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscriber_count: Option<i32>,
+    pub subscriber_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed_count: Option<i32>,
+    pub unsubscribed_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
@@ -937,7 +948,7 @@ pub struct CreateMailingListRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct CreateOrganisationRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub city: Option<String>,
@@ -999,7 +1010,7 @@ pub struct CreateSegmentResponse {
     pub conditions: ConditionGroup,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     pub created_at: String,
 
@@ -1062,7 +1073,7 @@ pub struct CreateTagResponse {
     pub color: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
@@ -1073,102 +1084,6 @@ pub struct CreateTagResponse {
     pub id: String,
 
     pub name: String,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteAccountResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteContactResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteListResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteSegmentResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteSuppressionResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct DeleteTagResponse {
-    pub code: i32,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub details: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub fields: Option<Vec<serde_json::Value>>,
-
-    pub message: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub request_id: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1183,6 +1098,8 @@ pub struct ErrorResponse {
 
     pub message: String,
 
+    pub reason: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     pub request_id: Option<String>,
 }
@@ -1194,7 +1111,7 @@ pub struct EvaluateSegmentRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct EvaluateSegmentResponse {
-    pub count: i32,
+    pub count: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sample: Option<Vec<Contact>>,
@@ -1215,7 +1132,7 @@ pub struct ExportContactsRequest {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ExportContactsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created: Option<i32>,
+    pub created: Option<i64>,
 
     pub created_at: String,
 
@@ -1233,18 +1150,18 @@ pub struct ExportContactsResponse {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub processed_rows: Option<i32>,
+    pub processed_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skipped: Option<i32>,
+    pub skipped: Option<i64>,
 
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_rows: Option<i32>,
+    pub total_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated: Option<i32>,
+    pub updated: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1255,7 +1172,7 @@ pub struct GetAccountContactsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1266,7 +1183,7 @@ pub struct GetAccountHierarchyResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1278,7 +1195,7 @@ pub struct GetAccountResponse {
     pub active_lead_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_ids: Option<Vec<String>>,
@@ -1353,7 +1270,7 @@ pub struct GetAccountResponse {
     pub tax_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<rust_decimal::Decimal>,
+    pub total_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
@@ -1373,7 +1290,7 @@ pub struct GetContactAccountsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1384,27 +1301,27 @@ pub struct GetContactActivityResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetContactCountsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub bounced: Option<i32>,
+    pub bounced: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub pending: Option<i32>,
+    pub pending: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub segments: Option<Vec<serde_json::Value>>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscribed: Option<i32>,
+    pub subscribed: Option<i64>,
 
-    pub total: i32,
+    pub total: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed: Option<i32>,
+    pub unsubscribed: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1415,7 +1332,7 @@ pub struct GetContactHierarchyResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1431,9 +1348,6 @@ pub struct GetContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
@@ -1470,6 +1384,9 @@ pub struct GetContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -1511,7 +1428,7 @@ pub struct GetContactResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct GetImportJobResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created: Option<i32>,
+    pub created: Option<i64>,
 
     pub created_at: String,
 
@@ -1529,18 +1446,18 @@ pub struct GetImportJobResponse {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub processed_rows: Option<i32>,
+    pub processed_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skipped: Option<i32>,
+    pub skipped: Option<i64>,
 
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_rows: Option<i32>,
+    pub total_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated: Option<i32>,
+    pub updated: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1565,10 +1482,10 @@ pub struct GetListResponse {
     pub sender_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscriber_count: Option<i32>,
+    pub subscriber_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed_count: Option<i32>,
+    pub unsubscribed_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
@@ -1579,7 +1496,7 @@ pub struct GetSegmentResponse {
     pub conditions: ConditionGroup,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     pub created_at: String,
 
@@ -1637,7 +1554,7 @@ pub struct GetSubscriptionResponse {
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ImportContactsResponse {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created: Option<i32>,
+    pub created: Option<i64>,
 
     pub created_at: String,
 
@@ -1655,24 +1572,24 @@ pub struct ImportContactsResponse {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub processed_rows: Option<i32>,
+    pub processed_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skipped: Option<i32>,
+    pub skipped: Option<i64>,
 
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_rows: Option<i32>,
+    pub total_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated: Option<i32>,
+    pub updated: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct ImportJob {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub created: Option<i32>,
+    pub created: Option<i64>,
 
     pub created_at: String,
 
@@ -1690,18 +1607,18 @@ pub struct ImportJob {
     pub kind: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub processed_rows: Option<i32>,
+    pub processed_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub skipped: Option<i32>,
+    pub skipped: Option<i64>,
 
     pub status: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_rows: Option<i32>,
+    pub total_rows: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub updated: Option<i32>,
+    pub updated: Option<i64>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1712,7 +1629,7 @@ pub struct ListAccountsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1723,7 +1640,7 @@ pub struct ListBulkJobsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1739,7 +1656,7 @@ pub struct ListContactsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1750,7 +1667,7 @@ pub struct ListListSubscriptionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1761,7 +1678,7 @@ pub struct ListListsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1772,7 +1689,7 @@ pub struct ListSegmentsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1783,7 +1700,7 @@ pub struct ListSuppressionsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1794,7 +1711,7 @@ pub struct ListTagsResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1819,13 +1736,24 @@ pub struct MailingList {
     pub sender_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscriber_count: Option<i32>,
+    pub subscriber_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed_count: Option<i32>,
+    pub unsubscribed_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct MailingListPage {
+    pub items: Vec<MailingList>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -1866,7 +1794,7 @@ pub struct Organisation {
     pub active_lead_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_ids: Option<Vec<String>>,
@@ -1941,7 +1869,7 @@ pub struct Organisation {
     pub tax_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<rust_decimal::Decimal>,
+    pub total_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
@@ -1981,84 +1909,7 @@ pub struct OrganisationPage {
 
     pub page: i32,
 
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedActivity {
-    pub items: Vec<Activity>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedMailingList {
-    pub items: Vec<MailingList>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedOrganisation {
-    pub items: Vec<Organisation>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedSegment {
-    pub items: Vec<Segment>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedSubscription {
-    pub items: Vec<Subscription>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedSuppression {
-    pub items: Vec<Suppression>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
-}
-
-#[derive(Debug, Serialize, Deserialize, Default)]
-pub struct PaginatedTag {
-    pub items: Vec<Tag>,
-
-    pub limit: i32,
-
-    pub page: i32,
-
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2066,8 +1917,6 @@ pub struct PatchContactRequest {
     pub active: bool,
 
     pub city: String,
-
-    pub company_id: String,
 
     pub country_id: String,
 
@@ -2080,6 +1929,8 @@ pub struct PatchContactRequest {
     pub mobile: String,
 
     pub name: String,
+
+    pub organisation_id: String,
 
     pub parent_id: String,
 
@@ -2109,9 +1960,6 @@ pub struct PatchContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
@@ -2148,6 +1996,9 @@ pub struct PatchContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -2206,9 +2057,6 @@ pub struct RemoveContactTagsResponse {
     pub color: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
 
     pub create_date: String,
@@ -2243,6 +2091,9 @@ pub struct RemoveContactTagsResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -2289,7 +2140,7 @@ pub struct SearchContactsByEmailResponse {
 
     pub page: i32,
 
-    pub total: i32,
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2297,7 +2148,7 @@ pub struct Segment {
     pub conditions: ConditionGroup,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     pub created_at: String,
 
@@ -2310,6 +2161,17 @@ pub struct Segment {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SegmentPage {
+    pub items: Vec<Segment>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
@@ -2413,6 +2275,17 @@ pub struct Subscription {
     pub unsubscribed_at: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SubscriptionPage {
+    pub items: Vec<Subscription>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum SubscriptionStatus {
     #[default]
@@ -2452,6 +2325,17 @@ pub struct Suppression {
     pub source_send_id: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Default)]
+pub struct SuppressionPage {
+    pub items: Vec<Suppression>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 pub enum SuppressionReason {
     #[default]
@@ -2474,7 +2358,7 @@ pub struct Tag {
     pub color: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,
@@ -2493,6 +2377,17 @@ pub struct TagNames {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct TagPage {
+    pub items: Vec<Tag>,
+
+    pub limit: i32,
+
+    pub page: i32,
+
+    pub total: i64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UndoBulkJobResponse {
     pub action: BulkJobAction,
 
@@ -2500,7 +2395,7 @@ pub struct UndoBulkJobResponse {
     pub by: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contacts: Option<i32>,
+    pub contacts: Option<i64>,
 
     pub created_at: String,
 
@@ -2586,7 +2481,7 @@ pub struct UnsubscribeResponse {
 pub struct UpdateAccountRequest {
     pub active: bool,
 
-    pub annual_revenue: rust_decimal::Decimal,
+    pub annual_revenue: String,
 
     pub city: String,
 
@@ -2628,7 +2523,7 @@ pub struct UpdateAccountResponse {
     pub active_lead_count: Option<i32>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub annual_revenue: Option<rust_decimal::Decimal>,
+    pub annual_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub child_ids: Option<Vec<String>>,
@@ -2703,7 +2598,7 @@ pub struct UpdateAccountResponse {
     pub tax_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub total_revenue: Option<rust_decimal::Decimal>,
+    pub total_revenue: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub website: Option<String>,
@@ -2721,8 +2616,6 @@ pub struct UpdateContactRequest {
 
     pub city: String,
 
-    pub company_id: String,
-
     pub country_id: String,
 
     pub department: String,
@@ -2734,6 +2627,8 @@ pub struct UpdateContactRequest {
     pub mobile: String,
 
     pub name: String,
+
+    pub organisation_id: String,
 
     pub parent_id: String,
 
@@ -2763,9 +2658,6 @@ pub struct UpdateContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub color: Option<i32>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub company_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub country_id: Option<String>,
@@ -2802,6 +2694,9 @@ pub struct UpdateContactResponse {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub opportunity_count: Option<i32>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub organisation_id: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
@@ -2880,10 +2775,10 @@ pub struct UpdateListResponse {
     pub sender_id: String,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub subscriber_count: Option<i32>,
+    pub subscriber_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub unsubscribed_count: Option<i32>,
+    pub unsubscribed_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
@@ -2911,7 +2806,7 @@ pub struct UpdateMailingListRequest {
 pub struct UpdateOrganisationRequest {
     pub active: bool,
 
-    pub annual_revenue: rust_decimal::Decimal,
+    pub annual_revenue: String,
 
     pub city: String,
 
@@ -2959,7 +2854,7 @@ pub struct UpdateSegmentResponse {
     pub conditions: ConditionGroup,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     pub created_at: String,
 
@@ -2992,7 +2887,7 @@ pub struct UpdateTagResponse {
     pub color: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub contact_count: Option<i32>,
+    pub contact_count: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub created_at: Option<String>,

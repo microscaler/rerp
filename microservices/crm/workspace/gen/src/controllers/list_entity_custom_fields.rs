@@ -10,10 +10,47 @@ use crate::handlers::types::CustomField;
 
 #[handler(ListEntityCustomFieldsController)]
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
+    // Example response:
+    // {
+    //   "items": [
+    //     {
+    //       "entity": "Entity",
+    //       "field_type": "STRING",
+    //       "id": "94b293ed-258b-5091-8e79-75d2ac471f25",
+    //       "label": "Primary",
+    //       "name": "Northwind Traders",
+    //       "visible": false
+    //     }
+    //   ],
+    //   "limit": 25,
+    //   "page": 1,
+    //   "total": 2
+    // }
+    match serde_json::from_str::<Response>(
+        r###"{
+  "items": [
+    {
+      "entity": "Entity",
+      "field_type": "STRING",
+      "id": "94b293ed-258b-5091-8e79-75d2ac471f25",
+      "label": "Primary",
+      "name": "Northwind Traders",
+      "visible": false
+    }
+  ],
+  "limit": 25,
+  "page": 1,
+  "total": 2
+}"###,
+    ) {
+        Ok(parsed) => return HttpJson::ok(parsed),
+        Err(e) => {
+            eprintln!("Failed to parse mock example JSON into Response: {}", e);
+            // Fallback to empty default structs below
+        }
+    }
+
     HttpJson::ok(Response {
-        items: vec![],
-        limit: 42,
-        page: 42,
-        total: 42,
+        items: vec![serde_json::from_value::<CustomField>(serde_json::json!({"entity":"Entity","field_type":"STRING","id":"94b293ed-258b-5091-8e79-75d2ac471f25","label":"Primary","name":"Northwind Traders","visible":false})).unwrap_or_default()],limit: 25,page: 1,total: 2,
     })
 }

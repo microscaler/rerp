@@ -37,6 +37,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntakeSubmissionPage'
+              example:
+                items:
+                - id: 19659456-e0be-5b35-8762-ea6182cdf0cb
+                  kind: SUBSCRIPTION
+                  status: PENDING
+                  submitted_at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -65,6 +74,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Pending and recent submissions. Paged (`page`, `limit` ≤ 100). Filters: `status`, `form_id`.'
   /submissions/{id}:
     get:
       operationId: get_submission
@@ -78,6 +88,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntakeSubmission'
+              example:
+                id: 19659456-e0be-5b35-8762-ea6182cdf0cb
+                form_id: 925a878b-6c34-54c3-aae1-7b3a051667f8
+                form_name: Form name
+                kind: SUBSCRIPTION
+                email_masked: Email masked
+                status: PENDING
+                reject_reason: HONEYPOT
+                submitted_at: '2026-11-05T16:00:00Z'
+                confirmation_sent_at: '2026-11-05T16:00:00Z'
+                confirmation_count: 3
+                confirmed_at: '2026-11-05T16:00:00Z'
+                decided_at: '2026-11-05T16:00:00Z'
+                expires_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -98,6 +122,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: A submission. 404 when the record does not exist in this workspace.
     delete:
       operationId: discard_submission
       summary: Discard a submission
@@ -124,6 +149,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Discard a submission. Audited. 404 when the record does not exist in this workspace.
   /submissions/{id}/resend:
     post:
       operationId: resend_confirmation
@@ -137,6 +163,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/IntakeSubmission'
+              example:
+                id: 19659456-e0be-5b35-8762-ea6182cdf0cb
+                form_id: 925a878b-6c34-54c3-aae1-7b3a051667f8
+                form_name: Form name
+                kind: SUBSCRIPTION
+                email_masked: Email masked
+                status: PENDING
+                reject_reason: HONEYPOT
+                submitted_at: '2026-11-05T16:00:00Z'
+                confirmation_sent_at: '2026-11-05T16:00:00Z'
+                confirmation_count: 3
+                confirmed_at: '2026-11-05T16:00:00Z'
+                decided_at: '2026-11-05T16:00:00Z'
+                expires_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -147,7 +187,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: 409 unless PENDING; at most 3 sends per submission.
+      description: '409 unless PENDING; at most 3 sends per submission.
+
+
+        Publishes `intake.confirmation_requested` on `crm.intake.v1`.'
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -159,6 +202,8 @@ paths:
       - owner
       - admin
       - marketer
+      x-events:
+      - intake.confirmation_requested
 components:
   schemas:
     IntakeSubmission:
@@ -244,6 +289,7 @@ components:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -251,6 +297,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -273,6 +324,11 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
   parameters:
     Page:
       name: page

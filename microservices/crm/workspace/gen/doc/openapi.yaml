@@ -58,21 +58,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedApiKey'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000023
-                    name: Production API
-                    key: sk_test_00000000000000000000
-                    enabled: true
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/ApiKeyPage'
+              example:
+                items:
+                - id: b90438d1-e134-5543-919f-19864d0919d3
+                  name: Website (public tracking key)
+                  scopes: {}
+                  created_at: '2026-07-28T16:00:00Z'
+                  is_active: true
+                - id: 08dd68b1-5f07-5687-b207-d5b9cf18daaf
+                  name: Product backend
+                  scopes: {}
+                  created_at: '2026-07-28T16:00:00Z'
+                  is_active: true
+                - id: 02a937b8-4dcd-59b0-9797-dcefad332287
+                  name: BI export
+                  scopes: {}
+                  created_at: '2026-07-28T16:00:00Z'
+                  is_active: true
+                total: 3
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -87,6 +93,8 @@ paths:
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       x-required-role:
       - owner
       - admin
@@ -104,10 +112,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateApiKeyRequest'
-            examples:
-              default:
-                name: Production API
-                enabled: true
+            example:
+              name: Northwind Traders
+              scopes: {}
+              rate_limit: 3
+              ip_whitelist:
+              - Ip whitelist
+              expires_at: '2026-11-05T16:00:00Z'
         description: Create a new API key
       responses:
         '201':
@@ -127,22 +138,13 @@ paths:
                     description: This key will only be shown once — save it now.
                   key_hash:
                     type: string
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000004
-                  name: Discovery
-                  order: 1
-                  pipeline_id: 00000000-0000-0000-0000-000000000005
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: b90438d1-e134-5543-919f-19864d0919d3
+                name: Website (public tracking key)
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -161,7 +163,6 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       x-required-role:
       - owner
-      - admin
   /audit-log:
     get:
       operationId: list_audit_log
@@ -172,11 +173,11 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - name: filter_entity
+      - name: entity
         in: query
         schema:
           type: string
-      - name: filter_action
+      - name: action
         in: query
         schema:
           type: string
@@ -187,17 +188,17 @@ paths:
           - READ
           - EXPORT
           - IMPORT
-      - name: filter_user_id
+      - name: user_id
         in: query
         schema:
           type: string
           format: uuid
-      - name: filter_date_from
+      - name: date_from
         in: query
         schema:
           type: string
           format: date-time
-      - name: filter_date_to
+      - name: date_to
         in: query
         schema:
           type: string
@@ -208,20 +209,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAuditLogEntry'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000038
-                    entity: lead
-                    entity_id: 00000000-0000-0000-0000-000000000001
-                    action: updated
-                    timestamp: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/AuditLogEntryPage'
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  entity: Entity
+                  entity_id: ext_58da2141b0
+                  action: CREATE
+                  user_id: alex
+                  created_at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -277,11 +276,15 @@ paths:
                     format: int64
                 required:
                 - items
-              examples:
-                default:
-                  entity: lead
-                  entity_id: 00000000-0000-0000-0000-000000000003
-                  log_entries: []
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  entity: Entity
+                  entity_id: ext_58da2141b0
+                  action: CREATE
+                  user_id: alex
+                  created_at: '2026-11-05T16:00:00Z'
+                total: 2
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -318,6 +321,8 @@ paths:
                 key:
                   type: string
                   description: API key (plain text, not hashed)
+            example:
+              key: snippet.signature
         description: Validate an API key or bearer token for access
       responses:
         '200':
@@ -334,19 +339,12 @@ paths:
                   rate_limit_remaining:
                     type: integer
                     format: int32
-              examples:
-                default:
-                  valid: true
-                  user_id: u001
-                  permissions:
-                  - crm:read
-                  - crm:write
+              example:
+                valid: false
+                scope: {}
+                rate_limit_remaining: 3
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -365,13 +363,10 @@ paths:
                   rate_limit_remaining:
                     type: integer
                     format: int32
-              examples:
-                default:
-                  valid: true
-                  user_id: u001
-                  permissions:
-                  - crm:read
-                  - crm:write
+              example:
+                valid: false
+                scope: {}
+                rate_limit_remaining: 3
         '404':
           $ref: '#/components/responses/NotFound'
         '409':
@@ -391,6 +386,9 @@ paths:
       x-required-role:
       - owner
       - admin
+      - marketer
+      - sales
+      - read-only
   /brand-kit:
     get:
       operationId: get_brand_kit
@@ -404,6 +402,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BrandKit'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                logo_url: https://northwindtraders.example/pricing
+                colors:
+                  accent: Accent
+                  ink: Ink
+                  ground: Ground
+                  positive: Positive
+                heading_font: Heading font
+                body_font: Body font
+                button_style: ROUNDED_FILLED
+                social_links:
+                - Social links
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -421,6 +432,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: The brand kit.
   /brand-kit/{id}:
     put:
       operationId: update_brand_kit
@@ -434,6 +446,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BrandKit'
+              example:
+                id: 272a2106-4955-5cc1-b44c-8e6efc933b02
+                logo_url: https://northwindtraders.example/pricing
+                colors:
+                  accent: '#1F5AF6'
+                  ink: '#0F1420'
+                  ground: '#F6F7F9'
+                  positive: '#0B7A4B'
+                heading_font: Inter
+                body_font: Inter
+                button_style: ROUNDED_FILLED
+                social_links:
+                - x.com/acme
+                - linkedin.com/company/acme
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -450,6 +476,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/BrandKitInput'
+            example:
+              logo_url: https://northwindtraders.example/pricing
+              colors:
+                accent: Accent
+                ink: Ink
+                ground: Ground
+                positive: Positive
+              heading_font: Heading font
+              body_font: Body font
+              button_style: ROUNDED_FILLED
+              social_links:
+              - Social links
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -459,6 +497,8 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Change the brand kit. Replaces the resource with the body; audited. 404 when the record does not exist
+        in this workspace.
   /compliance:
     get:
       operationId: get_compliance
@@ -472,6 +512,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ComplianceSettings'
+              example:
+                double_opt_in_default: true
+                require_unsubscribe_links: true
+                one_click_unsubscribe: true
+                anonymous_retention_days: 90
+                footer_postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                updated_at: '2026-10-24T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -489,6 +536,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Consent, retention and cookie settings.
     put:
       operationId: update_compliance
       summary: Change compliance settings
@@ -501,6 +549,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ComplianceSettings'
+              example:
+                double_opt_in_default: true
+                require_unsubscribe_links: true
+                one_click_unsubscribe: true
+                anonymous_retention_days: 90
+                footer_postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -515,6 +570,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ComplianceSettings'
+            example:
+              double_opt_in_default: false
+              double_opt_in_regions:
+              - Double opt in regions
+              legitimate_interest_allowed: false
+              require_unsubscribe_links: false
+              one_click_unsubscribe: false
+              anonymous_retention_days: 3
+              pending_signup_expiry_days: 3
+              cookie_consent_mode: ALWAYS
+              footer_postal_address: Footer postal address
+              updated_at: '2026-11-05T16:00:00Z'
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -523,6 +590,7 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Change compliance settings. Replaces the resource with the body; audited.
   /custom-fields:
     get:
       operationId: list_custom_fields
@@ -533,7 +601,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - name: filter_entity
+      - name: entity
         in: query
         schema:
           type: string
@@ -543,22 +611,46 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCustomField'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000021
-                    entity: lead
-                    name: priority
-                    type: string
-                    required: false
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/CustomFieldPage'
+              example:
+                items:
+                - id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
+                  entity: contact
+                  label: Plan
+                  options: {}
+                  required: false
+                  searchable: false
+                  group: Profile
+                  sequence: 1
+                  show_on_card: false
+                  name: Northwind Traders
+                  field_type: STRING
+                  visible: false
+                - id: 6cb8ed49-8877-5cc2-bc25-eafe10a4a357
+                  entity: contact
+                  label: Renewal date
+                  required: false
+                  searchable: false
+                  group: Profile
+                  sequence: 2
+                  show_on_card: false
+                  name: Northwind Traders
+                  field_type: STRING
+                  visible: false
+                - id: 8b2236e2-bcc8-589a-baaf-fa871172e5ee
+                  entity: contact
+                  label: Seats
+                  required: false
+                  searchable: false
+                  group: Profile
+                  sequence: 3
+                  show_on_card: false
+                  name: Northwind Traders
+                  field_type: STRING
+                  visible: false
+                total: 20
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -588,12 +680,20 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCustomFieldRequest'
-            examples:
-              default:
-                entity: lead
-                name: priority
-                type: string
-                required: false
+            example:
+              entity: crm.lead
+              name: Northwind Traders
+              label: Primary
+              field_type: STRING
+              options: {}
+              required: false
+              visible: false
+              searchable: false
+              default_value: Default value
+              group: Group
+              sequence: 1
+              show_on_card: false
+              personalization_tag: Personalization tag
         description: Create a new custom field definition
       responses:
         '201':
@@ -602,25 +702,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000021
-                  entity: lead
-                  name: priority
-                  type: string
-                  required: false
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
+                entity: contact
+                label: Plan
+                options: {}
+                required: false
+                searchable: false
+                group: Profile
+                sequence: 1
+                show_on_card: false
+                name: Northwind Traders
+                field_type: STRING
+                visible: false
         '400':
           $ref: '#/components/responses/BadRequest'
         '403':
           $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -632,12 +732,17 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
-      description: Create a new custom-fields
+      description: 'Create a new custom-fields
+
+
+        Publishes `field.defined` on `crm.workspace.v1`.'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
       x-required-role:
       - owner
       - admin
+      x-events:
+      - field.defined
   /custom-fields/{id}:
     get:
       operationId: get_custom_field
@@ -659,15 +764,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000021
-                  entity: lead
-                  name: priority
-                  type: string
-                  required: false
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
+                entity: contact
+                label: Plan
+                options: {}
+                required: false
+                searchable: false
+                group: Profile
+                sequence: 1
+                show_on_card: false
+                name: Northwind Traders
+                field_type: STRING
+                visible: false
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -705,12 +814,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
-            examples:
-              default:
-                entity: lead
-                name: priority
-                type: string
-                required: false
+            example:
+              label: Primary
+              field_type: STRING
+              options: {}
+              required: false
+              visible: false
+              searchable: false
+              default_value: Default value
+              group: Group
+              sequence: 1
+              show_on_card: false
+              personalization_tag: Personalization tag
         description: Update a custom field definition
       responses:
         '200':
@@ -719,37 +834,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000021
-                  entity: lead
-                  name: priority
-                  type: string
-                  required: false
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
+                entity: contact
+                label: Plan
+                options: {}
+                required: false
+                searchable: false
+                group: Profile
+                sequence: 1
+                show_on_card: false
+                name: Northwind Traders
+                field_type: STRING
+                visible: false
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '204':
           description: Resource updated successfully
         '401':
@@ -761,10 +868,15 @@ paths:
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
-      description: Update custom-fields by ID
+      description: 'Update custom-fields by ID
+
+
+        Publishes `field.changed` on `crm.workspace.v1`.'
       x-required-role:
       - owner
       - admin
+      x-events:
+      - field.changed
     delete:
       operationId: delete_custom_field
       summary: Delete custom field
@@ -784,28 +896,25 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
           $ref: '#/components/responses/TooManyRequests'
       security:
       - bearerAuth: []
-      description: Delete custom-fields by ID
+      description: 'Delete custom-fields by ID
+
+
+        Publishes `field.changed` on `crm.workspace.v1`.'
       x-brrtrouter-impl: true
       x-required-role:
       - owner
       - admin
+      x-events:
+      - field.changed
     patch:
       operationId: patch_custom_field
       summary: Change some of a field's settings
@@ -818,6 +927,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CustomField'
+              example:
+                id: 9851eff3-bcf4-59e1-9c43-82ba49bdc08c
+                entity: contact
+                label: Plan
+                options: {}
+                required: false
+                searchable: false
+                group: Profile
+                sequence: 1
+                show_on_card: false
+                name: Northwind Traders
+                field_type: STRING
+                visible: false
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -828,13 +950,28 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: A type change is refused (409) when stored values cannot convert.
+      description: 'A type change is refused (409) when stored values cannot convert.
+
+
+        Publishes `field.changed` on `crm.workspace.v1`.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCustomFieldRequest'
+            example:
+              label: Primary
+              field_type: STRING
+              options: {}
+              required: false
+              visible: false
+              searchable: false
+              default_value: Default value
+              group: Group
+              sequence: 1
+              show_on_card: false
+              personalization_tag: Personalization tag
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -844,6 +981,8 @@ paths:
       x-required-role:
       - owner
       - admin
+      x-events:
+      - field.changed
   /data-requests:
     get:
       operationId: list_data_requests
@@ -857,6 +996,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataRequestPage'
+              example:
+                items:
+                - id: c4faeb88-b400-5f86-84ae-47f52514f082
+                  kind: ACCESS
+                  contact_email: marcus.reid@adventure.example
+                  requested_by: Contact · preference page
+                  status: DONE
+                  note: 2.1 MB JSON
+                  created_at: '2026-11-02T16:00:00Z'
+                - id: bac118f7-c5eb-539d-bde0-41b5b513bce3
+                  kind: ACCESS
+                  contact_email: old-team@fabrikam.example
+                  requested_by: 'Alex Morgan · ticket #4412'
+                  status: DONE
+                  note: Anonymised · consent log kept
+                  created_at: '2026-09-30T16:00:00Z'
+                - id: 8b40f48a-b29b-5329-a1e1-39f7966192c4
+                  kind: ACCESS
+                  contact_email: j.doe@example.org
+                  requested_by: Contact · email to privacy@
+                  status: PENDING_REVIEW
+                  note: 28 days left
+                  created_at: '2026-11-04T16:00:00Z'
+                total: 3
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -880,6 +1045,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Access and erasure requests. Paged (`page`, `limit` ≤ 100). Filters: `status`.'
     post:
       operationId: create_data_request
       summary: Record an access or erasure request
@@ -892,6 +1058,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataRequest'
+              example:
+                id: c4faeb88-b400-5f86-84ae-47f52514f082
+                kind: ACCESS
+                contact_email: marcus.reid@adventure.example
+                requested_by: Contact · preference page
+                status: DONE
+                note: 2.1 MB JSON
+                created_at: '2026-11-02T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -906,6 +1080,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateDataRequestRequest'
+            example:
+              kind: ACCESS
+              contact_email: priya.natarajan@northwindtraders.example
+              note: Note
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -914,6 +1092,7 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Record an access or erasure request. Audited.
   /data-requests/{id}/approve:
     post:
       operationId: approve_data_request
@@ -927,6 +1106,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DataRequest'
+              example:
+                id: c4faeb88-b400-5f86-84ae-47f52514f082
+                kind: ACCESS
+                contact_email: marcus.reid@adventure.example
+                requested_by: Contact · preference page
+                status: DONE
+                note: 2.1 MB JSON
+                created_at: '2026-11-02T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -937,7 +1124,10 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: Publishes erasure.requested (or builds the access export) and tracks each service's confirmation.
+      description: 'Publishes erasure.requested (or builds the access export) and tracks each service''s confirmation.
+
+
+        Publishes `erasure.requested` on `crm.workspace.v1`.'
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -947,7 +1137,8 @@ paths:
       - bearerAuth: []
       x-required-role:
       - owner
-      - admin
+      x-events:
+      - erasure.requested
   /entities/{entity}/custom-fields:
     get:
       operationId: list_entity_custom_fields
@@ -976,22 +1167,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCustomField'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000021
-                    entity: lead
-                    name: priority
-                    type: string
-                    required: false
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/CustomFieldPage'
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  entity: Entity
+                  name: Northwind Traders
+                  label: Primary
+                  field_type: STRING
+                  visible: false
+                total: 2
+                page: 1
+                limit: 25
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1023,6 +1210,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FieldGroupPage'
+              example:
+                items:
+                - id: 25f0a77a-7b4a-5920-9ff0-a8c43e04063c
+                  entity: deal
+                  name: Deal information
+                  sequence: 0
+                - id: d0d7d178-94f3-57b2-9d7b-893c784b0f0d
+                  entity: deal
+                  name: Commercials
+                  sequence: 1
+                - id: dfab8875-e18d-5385-911b-0ab29df3e038
+                  entity: contact
+                  name: Profile
+                  sequence: 0
+                total: 5
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1046,6 +1250,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Custom field groups. Paged (`page`, `limit` ≤ 100). Filters: `entity`.'
     post:
       operationId: create_field_group
       summary: Create a field group
@@ -1058,6 +1263,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/FieldGroup'
+              example:
+                id: 25f0a77a-7b4a-5920-9ff0-a8c43e04063c
+                entity: deal
+                name: Deal information
+                sequence: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1072,6 +1282,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FieldGroupRequest'
+            example:
+              entity: contact
+              name: Northwind Traders
+              sequence: 1
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1080,6 +1294,7 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Create a field group. Audited.
   /integrations:
     get:
       operationId: list_integrations
@@ -1092,21 +1307,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedIntegration'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000024
-                    name: Slack Integration
-                    type: messaging
-                    status: connected
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/IntegrationPage'
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  name: Northwind Traders
+                  type: ERP
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1121,6 +1330,8 @@ paths:
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
       x-required-role:
       - owner
       - admin
@@ -1138,10 +1349,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateIntegrationRequest'
-            examples:
-              default:
-                name: Slack Integration
-                type: messaging
+            example:
+              name: Northwind Traders
+              type: ERP
+              config: {}
+              sync_direction: CRM_TO_EXTERNAL
         description: Create a new integration
       responses:
         '201':
@@ -1150,22 +1362,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000024
-                  name: Slack Integration
-                  type: messaging
-                  status: connected
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                name: Northwind Traders
+                type: ERP
+                config: {}
+                is_active: true
+                sync_direction: CRM_TO_EXTERNAL
+                last_sync: '2026-11-05T16:00:00Z'
+                sync_status: IDLE
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1206,14 +1416,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Integration'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000024
-                  name: Slack Integration
-                  type: messaging
-                  status: connected
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                name: Northwind Traders
+                type: ERP
+                config: {}
+                is_active: true
+                sync_direction: CRM_TO_EXTERNAL
+                last_sync: '2026-11-05T16:00:00Z'
+                sync_status: IDLE
+                created_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1260,17 +1472,11 @@ paths:
                     format: uuid
                   status:
                     type: string
-              examples:
-                default:
-                  success: true
-                  integration_id: 00000000-0000-0000-0000-000000000018
-                  records_synced: 25
+              example:
+                sync_id: 827087d0-d598-5430-b72d-ea37c0dfc1b1
+                status: Status
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -1285,6 +1491,7 @@ paths:
             application/json:
               schema:
                 type: object
+              example: {}
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -1340,7 +1547,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedJob'
+                $ref: '#/components/schemas/JobPage'
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  kind: IMPORT
+                  entity: CONTACTS
+                  status: QUEUED
+                  requested_by: Requested by
+                  queued_at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1371,6 +1589,29 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ExportRequest'
+            example:
+              entity: CONTACTS
+              options:
+                mapping:
+                  key: Value
+                dedupe_on: EMAIL
+                update_existing: false
+                tag_ids:
+                - 011fbf58-c596-5dce-a9e5-c3d6b351dfe7
+                list_ids:
+                - 39cf42ae-6339-533c-9117-ac40a3482b5e
+                pipeline_id: e1c8e7f7-2059-5dcb-97d1-9f12bb73d928
+                stage_id: 29b62993-bc82-5532-8829-f28a07701cc8
+                owner_id: alex
+                filter:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                columns:
+                - Columns
+                format: CSV
+              notify_email: false
       responses:
         '202':
           description: Job queued
@@ -1378,6 +1619,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+              example:
+                id: 9b732034-b874-5185-911e-fd4355d5e7f0
+                kind: EXPORT
+                entity: CONTACTS
+                status: QUEUED
+                source: UI
+                file_name: contacts.csv
+                options:
+                  format: CSV
+                progress_pct: 0
+                requested_by: alex
+                queued_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1420,6 +1673,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+              example:
+                id: 628f717a-6de9-522e-9f1d-93e1c15c19f7
+                kind: EXPORT
+                entity: DEALS
+                status: RUNNING
+                source: UI
+                file_name: deals-q4.xlsx
+                options:
+                  filter:
+                    op: AND
+                    items:
+                    - subject: October product update
+                      operator: EQ
+                  format: XLSX
+                total_rows: 38
+                processed_rows: 24
+                progress_pct: 62
+                requested_by: alex
+                queued_at: '2026-11-05T15:57:00Z'
+                started_at: '2026-11-05T15:58:00Z'
+                finished_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1461,6 +1735,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Job'
+              example:
+                id: 628f717a-6de9-522e-9f1d-93e1c15c19f7
+                kind: EXPORT
+                entity: DEALS
+                status: RUNNING
+                source: UI
+                file_name: deals-q4.xlsx
+                options:
+                  filter:
+                    op: AND
+                    items:
+                    - subject: October product update
+                      operator: EQ
+                  format: XLSX
+                total_rows: 38
+                processed_rows: 24
+                progress_pct: 62
+                requested_by: alex
+                queued_at: '2026-11-05T15:57:00Z'
+                started_at: '2026-11-05T15:58:00Z'
+                finished_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1510,7 +1805,35 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedJobError'
+                $ref: '#/components/schemas/JobErrorPage'
+              example:
+                items:
+                - row: 14
+                  field: email
+                  code: INVALID_EMAIL
+                  message: '"jane@@example" is not a valid address'
+                  raw:
+                    First: Jane
+                    Last: Doe
+                    Email: jane@@example
+                    Company: Acme
+                - row: 88
+                  field: email
+                  code: DUPLICATE
+                  message: Row 12 has the same email; dedupe on EMAIL kept the first
+                  raw:
+                    First: P
+                    Last: Natarajan
+                    Email: priya.natarajan@northwindtraders.example
+                - row: 203
+                  field: plan
+                  code: UNKNOWN_FIELD
+                  message: Column "plan" was not mapped to a field
+                  raw:
+                    plan: Business
+                total: 4
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1542,6 +1865,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationRulePage'
+              example:
+                items:
+                - id: f3473159-784b-56cd-8dc1-c540b9842e88
+                  enabled: true
+                  when: Form submitted · Contact sales
+                  notify: Sales team
+                  how: 'Email + chat #sales-inbound'
+                  event: Event
+                - id: f20c3651-3e1e-546f-862f-4a18c3982ea7
+                  enabled: true
+                  when: Campaign send failed or paused by provider
+                  notify: Marketing admins
+                  how: Pager channel
+                  event: Event
+                - id: 484181c6-2fee-52f2-b83e-bd0dc2669dd8
+                  enabled: true
+                  when: Complaint rate above 0.1% in 24 h
+                  notify: Marketing admins
+                  how: Pager channel
+                  event: Event
+                total: 6
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1561,6 +1907,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Notification rules. Paged (`page`, `limit` ≤ 100).
     post:
       operationId: create_notification_rule
       summary: Add a notification rule
@@ -1573,6 +1920,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationRule'
+              example:
+                id: f3473159-784b-56cd-8dc1-c540b9842e88
+                enabled: true
+                when: Form submitted · Contact sales
+                notify: Sales team
+                how: 'Email + chat #sales-inbound'
+                event: Event
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1587,6 +1941,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NotificationRuleRequest'
+            example:
+              event: Event
+              filter: {}
+              recipients:
+                user_ids:
+                - User ids
+                team_ids:
+                - 932cbf40-38c4-5dc3-9cd9-375173f17af8
+                emails:
+                - priya.natarajan@northwindtraders.example
+              channels:
+              - EMAIL
+              enabled: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1595,6 +1962,7 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Add a notification rule. Audited.
   /notification-rules/{id}:
     patch:
       operationId: update_notification_rule
@@ -1608,6 +1976,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotificationRule'
+              example:
+                id: f3473159-784b-56cd-8dc1-c540b9842e88
+                enabled: true
+                when: Form submitted · Contact sales
+                notify: Sales team
+                how: 'Email + chat #sales-inbound'
+                event: Event
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1624,6 +1999,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/NotificationRuleRequest'
+            example:
+              event: Event
+              filter: {}
+              recipients:
+                user_ids:
+                - User ids
+                team_ids:
+                - 932cbf40-38c4-5dc3-9cd9-375173f17af8
+                emails:
+                - priya.natarajan@northwindtraders.example
+              channels:
+              - EMAIL
+              enabled: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1633,6 +2021,8 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Change or switch a rule on / off. Changes only the fields sent; the change is audited with before and after
+        values. 404 when the record does not exist in this workspace.
   /team:
     get:
       operationId: list_team
@@ -1646,6 +2036,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TeamMemberPage'
+              example:
+                items:
+                - user_id: alex
+                  name: Alex Morgan
+                  role: owner
+                  can_send: true
+                  can_approve_social: true
+                  last_active_at: '2026-11-05T16:00:00Z'
+                - user_id: sam
+                  name: Sam Lee
+                  role: owner
+                  can_send: false
+                  can_approve_social: false
+                  last_active_at: '2026-11-05T14:00:00Z'
+                - user_id: riya
+                  name: Riya Kapoor
+                  role: owner
+                  can_send: false
+                  can_approve_social: true
+                  last_active_at: '2026-11-04T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1665,6 +2078,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Members of this workspace, for the CRM screens. Paged (`page`, `limit` ≤ 100).
   /webhooks:
     get:
       operationId: list_webhooks
@@ -1675,7 +2089,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - name: filter_active
+      - name: active
         in: query
         schema:
           type: boolean
@@ -1685,23 +2099,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedWebhook'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000022
-                    url: https://example.com/webhook
-                    events:
-                    - lead.created
-                    - lead.updated
-                    enabled: true
-                    created_at: '2024-01-15T10:30:00Z'
-                    updated_at: '2024-01-15T10:30:00Z'
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/WebhookPage'
+              example:
+                items:
+                - id: 9a087430-47c9-5317-8abb-3f6fe7a9cbf9
+                  url: https://api.acme.example/hooks/crm
+                  events:
+                  - contact.subscribed
+                  - contact.unsubscribed
+                  created_at: '2026-08-07T16:00:00Z'
+                  name: Northwind Traders
+                  is_active: true
+                - id: ebc7ef80-6cc7-5bcc-896f-309e9b0e282e
+                  url: https://erp.acme.example/crm-conversions
+                  events:
+                  - deal.won
+                  created_at: '2026-09-26T16:00:00Z'
+                  name: Northwind Traders
+                  is_active: true
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1731,13 +2149,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWebhookRequest'
-            examples:
-              default:
-                url: https://example.com/webhook
-                events:
-                - lead.created
-                - lead.updated
-                enabled: true
+            example:
+              name: Northwind Traders
+              url: https://northwindtraders.example/pricing
+              events:
+              - Events
+              secret: Secret
+              headers: {}
+              retry_count: 3
         description: Create a new webhook endpoint
       responses:
         '201':
@@ -1746,24 +2165,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000022
-                  url: https://example.com/webhook
-                  events:
-                  - lead.created
-                  - lead.updated
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9a087430-47c9-5317-8abb-3f6fe7a9cbf9
+                url: https://api.acme.example/hooks/crm
+                events:
+                - contact.subscribed
+                - contact.unsubscribed
+                created_at: '2026-08-07T16:00:00Z'
+                name: Northwind Traders
+                is_active: true
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1804,16 +2218,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000022
-                  url: https://example.com/webhook
-                  events:
-                  - lead.created
-                  - lead.updated
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9a087430-47c9-5317-8abb-3f6fe7a9cbf9
+                url: https://api.acme.example/hooks/crm
+                events:
+                - contact.subscribed
+                - contact.unsubscribed
+                created_at: '2026-08-07T16:00:00Z'
+                name: Northwind Traders
+                is_active: true
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1851,13 +2264,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWebhookRequest'
-            examples:
-              default:
-                url: https://example.com/webhook
-                events:
-                - lead.created
-                - lead.updated
-                enabled: true
+            example:
+              name: Northwind Traders
+              url: Url
+              events:
+              - Events
+              secret: Secret
+              is_active: true
+              headers: {}
+              retry_count: 3
         description: Update an existing webhook
       responses:
         '200':
@@ -1866,38 +2281,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Webhook'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000022
-                  url: https://example.com/webhook
-                  events:
-                  - lead.created
-                  - lead.updated
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 9a087430-47c9-5317-8abb-3f6fe7a9cbf9
+                url: https://api.acme.example/hooks/crm
+                events:
+                - contact.subscribed
+                - contact.unsubscribed
+                created_at: '2026-08-07T16:00:00Z'
+                name: Northwind Traders
+                is_active: true
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '204':
           description: Resource updated successfully
         '401':
@@ -1932,17 +2334,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -1976,19 +2370,18 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedWebhookDeliveryLog'
-              examples:
-                default:
-                  items:
-                  - id: 00000000-0000-0000-0000-000000000039
-                    event: lead.created
-                    status: success
-                    response_code: 200
-                  total: 1
-                  page: 1
-                  per_page: 20
-                  has_next: false
-                  has_prev: false
+                $ref: '#/components/schemas/WebhookDeliveryLogPage'
+              example:
+                items:
+                - webhook_id: 7ba8e0e0-21a1-5f74-a91c-793dc622240e
+                  event: Event
+                  response_status: 3
+                  response_body: Response body
+                  delivered_at: '2026-11-05T16:00:00Z'
+                  retry_count: 3
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2034,18 +2427,9 @@ paths:
                   response_code:
                     type: integer
                     format: int32
-              examples:
-                default:
-                  success: true
-                  webhook_id: 00000000-0000-0000-0000-000000000016
-                  status_code: 200
-                  response_time_ms: 45
+              example: {}
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -2058,6 +2442,15 @@ paths:
             application/json:
               schema:
                 type: object
+              example:
+                id: 9a087430-47c9-5317-8abb-3f6fe7a9cbf9
+                events:
+                - contact.subscribed
+                - contact.unsubscribed
+                url: https://api.acme.example/hooks/crm
+                status: OK
+                failures: 0
+                created_at: '2026-08-07T16:00:00Z'
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -2084,6 +2477,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkspacePage'
+              example:
+                items:
+                - id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                  organisation_id: 20df1243-e229-5084-b57d-e48d795731f8
+                  name: Northwind Traders
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2093,6 +2494,7 @@ paths:
       parameters:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
+      x-no-workspace: true
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -2102,6 +2504,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Workspaces I am a member of. Paged (`page`, `limit` ≤ 100).
     post:
       operationId: create_workspace
       summary: Create a workspace (a brand)
@@ -2114,6 +2517,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workspace'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                organisation_id: 20df1243-e229-5084-b57d-e48d795731f8
+                name: Northwind Traders
+                slug: northwind
+                brand_domain: Brand domain
+                default_currency: EUR
+                timezone: Europe/Berlin
+                my_role: owner
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2128,11 +2541,24 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WorkspaceRequest'
+            example:
+              name: Northwind Traders
+              slug: northwind
+              brand_domain: Brand domain
+              default_currency: Default currency
+              timezone: Europe/Berlin
       x-required-role:
       - owner
+      x-no-workspace: true
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
+      description: 'Create a workspace (a brand). Audited.
+
+
+        Publishes `workspace.created` on `crm.workspace.v1`.'
+      x-events:
+      - workspace.created
   /workspaces/{id}:
     get:
       operationId: get_workspace
@@ -2146,6 +2572,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workspace'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                organisation_id: 20df1243-e229-5084-b57d-e48d795731f8
+                name: Northwind Traders
+                slug: northwind
+                brand_domain: Brand domain
+                default_currency: EUR
+                timezone: Europe/Berlin
+                my_role: owner
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2154,6 +2590,7 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '404':
           $ref: '#/components/responses/NotFound'
+      x-no-workspace: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
@@ -2165,6 +2602,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: A workspace. 404 when the record does not exist in this workspace.
     patch:
       operationId: update_workspace
       summary: Change a workspace
@@ -2177,6 +2615,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workspace'
+              example:
+                id: 94b293ed-258b-5091-8e79-75d2ac471f25
+                organisation_id: 20df1243-e229-5084-b57d-e48d795731f8
+                name: Northwind Traders
+                slug: northwind
+                brand_domain: Brand domain
+                default_currency: EUR
+                timezone: Europe/Berlin
+                my_role: owner
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2193,6 +2641,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WorkspaceRequest'
+            example:
+              name: Northwind Traders
+              slug: northwind
+              brand_domain: Brand domain
+              default_currency: Default currency
+              timezone: Europe/Berlin
+      x-no-workspace: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
@@ -2201,6 +2656,8 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: Change a workspace. Changes only the fields sent; the change is audited with before and after values. 404
+        when the record does not exist in this workspace.
   /workspaces/{id}/members:
     get:
       operationId: list_members
@@ -2214,6 +2671,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MembershipPage'
+              example:
+                items:
+                - user_id: alex
+                  role: owner
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2226,6 +2690,7 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/Id'
+      x-no-workspace: true
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -2235,6 +2700,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Members and their roles. Paged (`page`, `limit` ≤ 100). 404 when the record does not exist in this workspace.
     post:
       operationId: add_member
       summary: Add or invite a member
@@ -2247,6 +2713,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Membership'
+              example:
+                user_id: alex
+                name: Northwind Traders
+                email: priya.natarajan@northwindtraders.example
+                role: owner
+                last_active_at: '2026-11-05T16:00:00Z'
+                added_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2263,6 +2736,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/AddMemberRequest'
+            example:
+              user_id: alex
+              email: priya.natarajan@northwindtraders.example
+              role: owner
+      x-no-workspace: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
@@ -2271,6 +2749,13 @@ paths:
       x-required-role:
       - owner
       - admin
+      description: 'Add or invite a member. A state change on one resource; audited. 404 when the record does not exist in
+        this workspace.
+
+
+        Publishes `member.changed` on `crm.workspace.v1`.'
+      x-events:
+      - member.changed
   /workspaces/{id}/members/{user_id}:
     patch:
       operationId: update_member
@@ -2284,6 +2769,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Membership'
+              example:
+                user_id: alex
+                name: Northwind Traders
+                email: priya.natarajan@northwindtraders.example
+                role: owner
+                last_active_at: '2026-11-05T16:00:00Z'
+                added_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2294,13 +2786,19 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: 409 when it would leave the workspace without an owner.
+      description: '409 when it would leave the workspace without an owner.
+
+
+        Publishes `member.changed` on `crm.workspace.v1`.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateMemberRequest'
+            example:
+              role: owner
+      x-no-workspace: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
@@ -2309,12 +2807,15 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       security:
       - bearerAuth: []
       x-required-role:
       - owner
       - admin
+      x-events:
+      - member.changed
     delete:
       operationId: remove_member
       summary: Remove a member
@@ -2331,7 +2832,11 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
         '404':
           $ref: '#/components/responses/NotFound'
-      description: 409 when it would leave the workspace without an owner.
+      description: '409 when it would leave the workspace without an owner.
+
+
+        Publishes `member.changed` on `crm.workspace.v1`.'
+      x-no-workspace: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/Id'
@@ -2340,12 +2845,15 @@ paths:
         required: true
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       security:
       - bearerAuth: []
       x-required-role:
       - owner
       - admin
+      x-events:
+      - member.changed
 components:
   schemas:
     AddMemberRequest:
@@ -2353,6 +2861,8 @@ components:
       properties:
         user_id:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         email:
           type: string
           format: email
@@ -2431,7 +2941,8 @@ components:
           $ref: '#/components/schemas/AuditAction'
         user_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         changes:
           type: object
           description: Field changes before/after
@@ -2444,6 +2955,18 @@ components:
           format: date-time
           readOnly: true
       description: An audit log entry recording a system action
+    BrandColors:
+      type: object
+      properties:
+        accent:
+          type: string
+        ink:
+          type: string
+        ground:
+          type: string
+        positive:
+          type: string
+      description: Brand colours as hex values
     BrandKit:
       type: object
       properties:
@@ -2454,16 +2977,7 @@ components:
           type: string
           format: uri
         colors:
-          type: object
-          properties:
-            accent:
-              type: string
-            ink:
-              type: string
-            ground:
-              type: string
-            positive:
-              type: string
+          $ref: '#/components/schemas/BrandColors'
         heading_font:
           type: string
         body_font:
@@ -2684,7 +3198,8 @@ components:
           type: string
         created_by:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         created_at:
           type: string
           format: date-time
@@ -2723,6 +3238,8 @@ components:
           description: Shown to staff until the request is done
         requested_by:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         source:
           type: string
           enum:
@@ -2970,7 +3487,8 @@ components:
           format: date-time
         requested_by:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         message:
           type: string
         queued_at:
@@ -3063,9 +3581,10 @@ components:
           format: uuid
         owner_id:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         filter:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: 'Export: the saved filter / segment applied'
         columns:
           type: array
@@ -3092,7 +3611,8 @@ components:
       properties:
         user_id:
           type: string
-          description: Sesame user id
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         email:
@@ -3150,6 +3670,8 @@ components:
               type: array
               items:
                 type: string
+                maxLength: 64
+                description: Sesame user id (the sub claim of the access token)
             team_ids:
               type: array
               items:
@@ -3220,6 +3742,8 @@ components:
               type: array
               items:
                 type: string
+                maxLength: 64
+                description: Sesame user id (the sub claim of the access token)
             team_ids:
               type: array
               items:
@@ -3240,180 +3764,6 @@ components:
             - PUSH
         enabled:
           type: boolean
-    PaginatedApiKey:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ApiKey'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of ApiKey records
-    PaginatedAuditLogEntry:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditLogEntry'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of AuditLogEntry records
-    PaginatedCustomField:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomField'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of CustomField records
-    PaginatedIntegration:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Integration'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of Integration records
-    PaginatedJob:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Job'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedJobError:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/JobError'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedWebhook:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Webhook'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of Webhook records
-    PaginatedWebhookDeliveryLog:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/WebhookDeliveryLog'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of WebhookDeliveryLog records
     SyncDirection:
       type: string
       enum:
@@ -3433,6 +3783,8 @@ components:
       properties:
         user_id:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         name:
           type: string
         email:
@@ -3715,6 +4067,7 @@ components:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -3722,6 +4075,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -3744,6 +4102,11 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
     BrandKitInput:
       type: object
       properties:
@@ -3751,16 +4114,7 @@ components:
           type: string
           format: uri
         colors:
-          type: object
-          properties:
-            accent:
-              type: string
-            ink:
-              type: string
-            ground:
-              type: string
-            positive:
-              type: string
+          $ref: '#/components/schemas/BrandColors'
         heading_font:
           type: string
         body_font:
@@ -3777,6 +4131,263 @@ components:
           items:
             type: string
       description: BrandKit (request body; id come from the path or headers)
+    ApiKeyPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKey'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ApiKey records
+    AuditLogEntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditLogEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of AuditLogEntry records
+    CustomFieldPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomField'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of CustomField records
+    IntegrationPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Integration'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of Integration records
+    JobPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Job'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    JobErrorPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobError'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    WebhookPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Webhook'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of Webhook records
+    WebhookDeliveryLogPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebhookDeliveryLog'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of WebhookDeliveryLog records
+    Condition:
+      type: object
+      required:
+      - subject
+      - operator
+      properties:
+        subject:
+          type: string
+          description: 'What is tested: field:<name>, custom:<key>, tag, list:<id>, score, engagement:opened:<days>,
+
+            engagement:clicked:<days>, engagement:any:<days>, deal:stage, deal:value, site:visited:<path>,
+
+            event:<name>, form:<id>, created_at, last_activity_at, timezone, country
+
+            '
+        operator:
+          type: string
+          enum:
+          - EQ
+          - NEQ
+          - CONTAINS
+          - NOT_CONTAINS
+          - STARTS_WITH
+          - GT
+          - GTE
+          - LT
+          - LTE
+          - IN
+          - NOT_IN
+          - IS_SET
+          - IS_NOT_SET
+          - HAS
+          - HAS_NOT
+          - BEFORE
+          - AFTER
+          - WITHIN_DAYS
+          - NOT_WITHIN_DAYS
+        value:
+          description: String, number, boolean, ISO date or array as the operator requires
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+      description: Defined by crm/audience; this is an identical copy.
+    ConditionGroup:
+      type: object
+      required:
+      - op
+      - items
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Condition'
+            - $ref: '#/components/schemas/ConditionSubgroup'
+      description: 'AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences: a group holds conditions
+        and sub-groups, a sub-group holds conditions (two levels). Defined by crm/audience; this is an identical copy.'
+    ConditionSubgroup:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+      required:
+      - op
+      - items
+      description: A nested AND/OR group of conditions inside a ConditionGroup. Defined by crm/audience; this is an identical
+        copy.
   parameters:
     Page:
       name: page
@@ -3884,6 +4495,15 @@ components:
           $ref: '#/components/headers/RequestId'
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected failure; retry with the same Idempotency-Key where there is one
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
       content:
         application/json:
           schema:

@@ -1,5 +1,7 @@
 # Marketing platform feature map — reverse-engineered from ActiveCampaign
 
+> **Note (2026-11-09):** Service names here are the old folders: marketing is now crm/acquisition, outreach is split between audience and messaging, platform is crm/workspace ([08 §10.5](08-service-decomposition.md)).
+
 > **Status:** Working document, 2026-11-05. Source: a full walk of an ActiveCampaign trial account
 > (every primary section, every secondary panel, the automation trigger and action catalogues, the
 > settings tree). Used to curate v1 of RERP's CRM + marketing platform and to keep the Claude Design

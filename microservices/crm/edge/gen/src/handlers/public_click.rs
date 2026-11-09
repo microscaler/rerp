@@ -31,6 +31,9 @@ pub struct Response {
     #[serde(rename = "message")]
     pub message: String,
 
+    #[serde(rename = "reason")]
+    pub reason: String,
+
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "request_id")]
     pub request_id: Option<String>,
@@ -45,14 +48,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_path_param("token") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"maxLength":128,"type":"string"}));
             data_map.insert(
                 "token".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"maxLength":128,"type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'token'"));

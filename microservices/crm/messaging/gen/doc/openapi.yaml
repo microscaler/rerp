@@ -81,6 +81,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetPage'
+              example:
+                items:
+                - id: 8692f757-7ab4-5792-8895-3cb42594a05d
+                  name: hero-october.png
+                  url: https://mail.acme.example/assets/hero-october.png
+                  size_bytes: 412000
+                  width: 1200
+                  height: 600
+                  created_at: '2026-11-05T16:00:00Z'
+                - id: d016ee7e-b764-5145-80a9-19a23ccce65e
+                  name: logo.png
+                  url: https://mail.acme.example/assets/logo.png
+                  size_bytes: 18000
+                  width: 1200
+                  height: 600
+                  created_at: '2026-10-27T16:00:00Z'
+                - id: 83ff295d-5bfe-5dc1-acfe-3b615507475d
+                  name: case-study-northwind.jpg
+                  url: https://mail.acme.example/assets/case-study-northwind.jpg
+                  size_bytes: 630000
+                  width: 1200
+                  height: 600
+                  created_at: '2026-10-18T16:00:00Z'
+                total: 42
+                page: 1
+                limit: 100
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -101,6 +127,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Images in the asset store. Paged (`page`, `limit` ≤ 100). Filters: `search`.'
     post:
       operationId: create_asset
       summary: Start an image upload
@@ -113,6 +140,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AssetUpload'
+              example:
+                asset:
+                  id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  name: Northwind Traders
+                  url: https://northwindtraders.example/pricing
+                  content_type: Content type
+                  size_bytes: 3
+                  width: 3
+                  height: 3
+                  created_at: '2026-11-05T16:00:00Z'
+                upload_url: https://northwindtraders.example/pricing
+                expires_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -128,6 +167,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateAssetRequest'
+            example:
+              name: Northwind Traders
+              content_type: image/png
+              size_bytes: 3
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -167,7 +210,20 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCampaign'
+                $ref: '#/components/schemas/CampaignPage'
+              example:
+                items:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  name: Northwind Traders
+                  kind: ONE_TIME
+                  channel: EMAIL
+                  status: DRAFT
+                  list_ids:
+                  - d9110aaa-756c-5aae-baf7-d708ef765e10
+                  created_at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -183,6 +239,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'List campaigns. Paged (`page`, `limit` ≤ 100). Filters: `search`, `status`, `kind`, `list_id`.'
     post:
       operationId: create_campaign
       summary: Create a campaign (draft)
@@ -194,6 +251,37 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateCampaignRequest'
+            example:
+              name: Northwind Traders
+              kind: ONE_TIME
+              channel: EMAIL
+              sender_id: dca52066-c32f-52e7-a97f-ba725090563f
+              template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+              variants:
+              - key: A
+                template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+              ab_test:
+                test_scope: SUBJECT_FROM
+                sample_percent: 10
+                ratios:
+                - 3
+                decide_winner: false
+                winner_metric: OPENS
+                decide_after_minutes: 60
+                winner_key: Winner key
+              list_ids:
+              - d9110aaa-756c-5aae-baf7-d708ef765e10
+              exclude_list_ids:
+              - 15bd8cd0-7a75-5776-a532-ec93fcf6336f
+              segment:
+                op: AND
+                items:
+                - subject: October product update
+                  operator: EQ
+              utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+              track_opens: false
+              track_clicks: false
+              folder: Folder
       responses:
         '201':
           description: Draft created
@@ -201,6 +289,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -220,6 +339,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create a campaign (draft). Audited.
   /campaigns/{id}:
     get:
       operationId: get_campaign
@@ -236,6 +356,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -253,6 +404,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Get a campaign. 404 when the record does not exist in this workspace.
     put:
       operationId: update_campaign
       summary: Update a draft or scheduled campaign
@@ -267,6 +419,35 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateCampaignRequest'
+            example:
+              name: Northwind Traders
+              sender_id: dca52066-c32f-52e7-a97f-ba725090563f
+              template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+              variants:
+              - key: A
+                template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+              ab_test:
+                test_scope: SUBJECT_FROM
+                sample_percent: 10
+                ratios:
+                - 3
+                decide_winner: false
+                winner_metric: OPENS
+                decide_after_minutes: 60
+                winner_key: Winner key
+              list_ids:
+              - d9110aaa-756c-5aae-baf7-d708ef765e10
+              exclude_list_ids:
+              - 15bd8cd0-7a75-5776-a532-ec93fcf6336f
+              segment:
+                op: AND
+                items:
+                - subject: October product update
+                  operator: EQ
+              utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+              track_opens: false
+              track_clicks: false
+              folder: Folder
       responses:
         '200':
           description: Updated
@@ -274,6 +455,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -295,6 +507,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Update a draft or scheduled campaign. Replaces the resource with the body; audited. 404 when the record
+        does not exist in this workspace.
     delete:
       operationId: delete_campaign
       summary: Delete a draft campaign
@@ -323,6 +537,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Delete a draft campaign. Audited. 409 while something still uses it. 404 when the record does not exist
+        in this workspace.
   /campaigns/{id}/audience:
     get:
       operationId: preview_campaign_audience
@@ -341,6 +557,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AudiencePreview'
+              example:
+                count: 11312
+                excluded_unsubscribed: 1104
+                excluded_suppressed: 464
+                excluded_by_segment: 0
+                sample:
+                - contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  email: priya.natarajan@northwindtraders.example
+                  name: Priya Natarajan
+                - contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  email: tom.okafor@fabrikam.example
+                  name: Tom Okafor
+                - contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                  email: lena.fischer@contoso.example
+                  name: Lena Fischer
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -375,6 +606,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -394,6 +656,13 @@ paths:
       - owner
       - admin
       - marketer
+      description: 'Cancel a scheduled campaign or stop one mid-send. A state change on one resource; audited. 409 when the
+        current state does not allow it. 404 when the record does not exist in this workspace.
+
+
+        Publishes `campaign.cancelled` on `crm.messaging.v1`.'
+      x-events:
+      - campaign.cancelled
   /campaigns/{id}/duplicate:
     post:
       operationId: duplicate_campaign
@@ -411,6 +680,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -428,6 +728,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Copy a campaign as a new draft. A state change on one resource; audited. 404 when the record does not exist
+        in this workspace.
   /campaigns/{id}/report:
     get:
       operationId: get_campaign_report
@@ -444,6 +746,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignReport'
+              example:
+                campaign_id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                sent: 9870
+                delivered: 9732
+                opened: 4047
+                clicked: 513
+                bounced: 135
+                complained: 3
+                unsubscribed: 12
+                open_rate: 0.41
+                click_rate: 0.052
+                click_to_open_rate: 0.127
+                links:
+                - url: https://acme.example/changelog/october
+                  clicks: 412
+                  unique_clicks: 388
+                - url: https://acme.example/docs/imports
+                  clicks: 161
+                  unique_clicks: 152
+                - url: https://acme.example/webinars/pricing
+                  clicks: 118
+                  unique_clicks: 109
+                opens_by_hour:
+                - hour: '2026-10-27T16:00:00Z'
+                  opens: 280
+                  clicks: 50
+                - hour: '2026-10-27T17:00:00Z'
+                  opens: 770
+                  clicks: 138
+                - hour: '2026-10-27T18:00:00Z'
+                  opens: 1330
+                  clicks: 238
+                revenue: '6240.00'
+                total_opens: 5447
+                verified_opens: 4045
+                total_clicks: 777
+                social_shares:
+                - {}
+                audience: {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -461,6 +802,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Campaign performance. 404 when the record does not exist in this workspace.
   /campaigns/{id}/report/contacts:
     get:
       operationId: list_campaign_report_contacts
@@ -496,10 +838,7 @@ paths:
           type: string
           format: uuid
         description: Only contacts who clicked this link
-      - name: q
-        in: query
-        schema:
-          type: string
+      - $ref: '#/components/parameters/Search'
       - name: page
         in: query
         schema:
@@ -517,7 +856,15 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedCampaignReportContact'
+                $ref: '#/components/schemas/CampaignReportContactPage'
+              example:
+                items:
+                - contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                  email: Email
+                  status: DELIVERED
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -540,8 +887,11 @@ paths:
     post:
       operationId: schedule_campaign
       summary: Schedule or send now
-      description: Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present)
+      description: 'Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present)
         and moves it to SCHEDULED. Omit send_at to send immediately.
+
+
+        Publishes `campaign.scheduled` on `crm.messaging.v1`.'
       tags:
       - campaigns
       parameters:
@@ -554,6 +904,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScheduleCampaignRequest'
+            example:
+              send_at: '2026-11-05T16:00:00Z'
+              send_in_contact_timezone: false
       responses:
         '200':
           description: Scheduled
@@ -561,6 +914,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Campaign'
+              example:
+                id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                name: October product update
+                kind: ONE_TIME
+                channel: EMAIL
+                status: SENT
+                sender_id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                template_id: 2f1c88b7-46a3-5aad-8049-40ebd0b66079
+                list_ids:
+                - 09f5b2f9-2adc-5edd-a6fd-c20675680671
+                exclude_list_ids: []
+                segment:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                preheader: ''
+                track_replies: true
+                utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+                send_at: '2026-10-28T16:00:00Z'
+                send_in_contact_timezone: false
+                track_opens: true
+                track_clicks: true
+                folder: Product
+                audience_count: 9870
+                sent_count: 9870
+                started_at: '2026-10-28T16:00:00Z'
+                completed_at: '2026-10-28T18:00:00Z'
+                created_by: alex
+                created_at: '2026-10-25T16:00:00Z'
+                updated_at: '2026-11-05T14:00:00Z'
         '400':
           description: Validation failed
           content:
@@ -584,6 +968,8 @@ paths:
       - owner
       - admin
       - marketer
+      x-events:
+      - campaign.scheduled
   /campaigns/{id}/sends:
     get:
       operationId: list_campaign_sends
@@ -605,7 +991,33 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSend'
+                $ref: '#/components/schemas/SendPage'
+              example:
+                items:
+                - id: 01a1ef84-be9a-5166-aaa5-6a6a9902308c
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  to: priya.natarajan@northwindtraders.example
+                  status: DELIVERED
+                  opened_at: '2026-10-28T16:00:00Z'
+                  channel: EMAIL
+                  created_at: '2026-11-05T16:00:00Z'
+                - id: 294a11f7-a7ec-5743-be57-1a1f486a17b9
+                  contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  to: tom.okafor@fabrikam.example
+                  status: DELIVERED
+                  opened_at: '2026-10-28T17:00:00Z'
+                  channel: EMAIL
+                  created_at: '2026-11-05T16:00:00Z'
+                - id: c84b4b32-0560-5476-99cf-1822e1da82fe
+                  contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                  to: lena.fischer@contoso.example
+                  status: BOUNCED
+                  opened_at: '2026-11-05T16:00:00Z'
+                  channel: EMAIL
+                  created_at: '2026-11-05T16:00:00Z'
+                total: 9870
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -623,6 +1035,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Per-recipient sends for a campaign. Paged (`page`, `limit` ≤ 100). Filters: `status`. 404 when the record
+        does not exist in this workspace.'
   /campaigns/{id}/test-send:
     post:
       operationId: test_send_campaign
@@ -636,6 +1050,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TestSendResult'
+              example:
+                sent_to:
+                - priya.natarajan@northwindtraders.example
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -646,13 +1063,20 @@ paths:
           $ref: '#/components/responses/NotFound'
         '422':
           $ref: '#/components/responses/Unprocessable'
-      description: Marked as a test and left out of every report.
+      description: 'Marked as a test and left out of every report.
+
+
+        Publishes `message.sent` on `crm.messaging.v1`.'
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/TestSendRequest'
+            example:
+              to:
+              - priya.natarajan@northwindtraders.example
+              contact_id: c891a339-996d-56b9-a022-244c570f48c9
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -664,6 +1088,8 @@ paths:
       - owner
       - admin
       - marketer
+      x-events:
+      - message.sent
   /contacts/{id}/sends:
     get:
       operationId: list_contact_sends
@@ -681,7 +1107,42 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSend'
+                $ref: '#/components/schemas/SendPage'
+              example:
+                items:
+                - id: 540e3991-1a5a-53f5-b5d2-40847552e9b8
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  campaign_id: 7de39bcc-4bc6-551b-a967-7b1629b846be
+                  channel: EMAIL
+                  to: priya.natarajan@northwindtraders.example
+                  subject: October product update
+                  status: DELIVERED
+                  opened_at: '2026-10-28T16:00:00Z'
+                  clicked_at: '2026-10-28T16:00:00Z'
+                  created_at: '2026-10-28T16:00:00Z'
+                - id: 83e7787e-deb9-5ece-93c5-58284dd9ceb5
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  campaign_id: cd847d34-2090-5e40-afc2-06c94055cc85
+                  channel: EMAIL
+                  to: priya.natarajan@northwindtraders.example
+                  subject: Webinar invite · pricing strategy
+                  status: DELIVERED
+                  opened_at: '2026-10-08T16:00:00Z'
+                  clicked_at: '2026-11-05T16:00:00Z'
+                  created_at: '2026-10-08T16:00:00Z'
+                - id: f4276478-8eee-5e00-ae6b-d72dff226d41
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  campaign_id: dcad966f-24e6-5a17-bb05-807224d4fe09
+                  channel: EMAIL
+                  to: priya.natarajan@northwindtraders.example
+                  subject: October product update
+                  status: DELIVERED
+                  opened_at: '2026-07-20T16:00:00Z'
+                  clicked_at: '2026-11-05T16:00:00Z'
+                  created_at: '2026-07-20T16:00:00Z'
+                total: 3
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -699,6 +1160,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Everything sent to a contact. Paged (`page`, `limit` ≤ 100). 404 when the record does not exist in this
+        workspace.
   /events:
     get:
       operationId: list_events
@@ -741,7 +1204,17 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMessageEvent'
+                $ref: '#/components/schemas/MessageEventPage'
+              example:
+                items:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  send_id: a28a1db3-cee2-594e-adbd-25b5f5f34365
+                  contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                  type: QUEUED
+                  at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -770,6 +1243,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListExclusionPage'
+              example:
+                items:
+                - id: 50137312-86a6-50be-b4f3-784df3c7ee21
+                  pattern: '*@competitor.example'
+                  list_ids: []
+                  list_names:
+                  - All lists
+                  reason: Competitor domain
+                  created_by: Alex Morgan
+                  created_at: '2026-09-04T16:00:00Z'
+                - id: 2e167db1-8e7c-535c-aea9-634a21d3d38f
+                  pattern: '*@acme.example'
+                  list_ids: []
+                  list_names:
+                  - Newsletter
+                  - Webinars
+                  reason: Staff should not receive marketing
+                  created_by: Alex Morgan
+                  created_at: '2026-03-12T16:00:00Z'
+                - id: 2c4bae6a-cdaf-5a49-beb4-5e3c1858a501
+                  pattern: ceo@contoso.example
+                  list_ids: []
+                  list_names:
+                  - Webinars
+                  reason: Account manager request
+                  created_by: Sam Lee
+                  created_at: '2026-10-12T16:00:00Z'
+                total: 3
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -789,6 +1292,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: List exclusions. Paged (`page`, `limit` ≤ 100).
     post:
       operationId: create_list_exclusion
       summary: Add a list exclusion
@@ -801,6 +1305,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListExclusion'
+              example:
+                id: 50137312-86a6-50be-b4f3-784df3c7ee21
+                pattern: '*@competitor.example'
+                list_ids: []
+                list_names:
+                - All lists
+                reason: Competitor domain
+                created_by: Alex Morgan
+                created_at: '2026-09-04T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -815,6 +1328,11 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateListExclusionRequest'
+            example:
+              pattern: Pattern
+              list_ids:
+              - d9110aaa-756c-5aae-baf7-d708ef765e10
+              reason: not_found
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -824,6 +1342,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Add a list exclusion. Audited.
   /list-exclusions/{id}:
     delete:
       operationId: delete_list_exclusion
@@ -851,6 +1370,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Remove a list exclusion. Audited. 404 when the record does not exist in this workspace.
   /mailboxes:
     get:
       operationId: list_mailboxes
@@ -863,7 +1383,8 @@ paths:
         in: query
         schema:
           type: string
-          format: uuid
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
       - name: status
         in: query
         schema:
@@ -885,7 +1406,72 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMailbox'
+                $ref: '#/components/schemas/MailboxPage'
+              example:
+                items:
+                - id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                  user_id: alex
+                  address: alex@acme.example
+                  display_name: Alex Morgan
+                  provider: GOOGLE
+                  status: CONNECTED
+                  sync_enabled: true
+                  sync_since: '2026-10-01T00:00:00Z'
+                  sync_scope: KNOWN_CONTACTS
+                  log_to_deals: true
+                  track_opens: true
+                  track_clicks: true
+                  signature_html: Alex Morgan · Acme Co · +359 2 000 0000
+                  shared_with_user_ids: []
+                  last_sync_at: '2026-11-05T15:58:00Z'
+                  last_error: Last error
+                  created_at: '2026-10-01T16:00:00Z'
+                - id: c2fb563e-65c5-5c5a-a0cf-b17ae70bb727
+                  user_id: sam
+                  address: sam@acme.example
+                  display_name: Sam Lee
+                  provider: MICROSOFT
+                  status: CONNECTED
+                  sync_enabled: true
+                  sync_since: '2026-09-15T00:00:00Z'
+                  sync_scope: KNOWN_CONTACTS
+                  log_to_deals: false
+                  track_opens: true
+                  track_clicks: false
+                  signature_html: ''
+                  shared_with_user_ids: []
+                  last_sync_at: '2026-11-05T15:54:00Z'
+                  last_error: Last error
+                  created_at: '2026-09-15T16:00:00Z'
+                - id: b9d592b7-1ff3-5f0c-ae30-4f183030d442
+                  user_id: alex
+                  address: sales@acme.example
+                  display_name: Acme Sales
+                  provider: IMAP
+                  status: ERROR
+                  sync_enabled: true
+                  sync_since: '2026-08-01T00:00:00Z'
+                  sync_scope: ALL
+                  log_to_deals: true
+                  track_opens: true
+                  track_clicks: true
+                  signature_html: ''
+                  shared_with_user_ids:
+                  - sam
+                  - riya
+                  imap:
+                    imap_host: imap.acme.example
+                    imap_port: 993
+                    smtp_host: smtp.acme.example
+                    smtp_port: 587
+                    username: sales@acme.example
+                    use_tls: true
+                  last_sync_at: '2026-11-02T16:00:00Z'
+                  last_error: 'AUTHENTICATIONFAILED: invalid credentials'
+                  created_at: '2026-08-01T16:00:00Z'
+                total: 4
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -915,6 +1501,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConnectMailboxRequest'
+            example:
+              provider: GOOGLE
+              address: priya.natarajan@northwindtraders.example
+              display_name: Display name
+              imap:
+                imap_host: Imap host
+                imap_port: 3
+                smtp_host: Smtp host
+                smtp_port: 3
+                username: Username
+                password: Password
+                use_tls: false
+              sync_enabled: false
+              sync_since: '2026-11-05T16:00:00Z'
+              sync_scope: KNOWN_CONTACTS
+              log_to_deals: false
+              track_opens: false
+              track_clicks: false
+              redirect_uri: https://northwindtraders.example/pricing
       responses:
         '201':
           description: Mailbox created
@@ -922,6 +1527,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConnectMailboxResponse'
+              example:
+                id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                user_id: alex
+                address: alex@acme.example
+                display_name: Alex Morgan
+                provider: GOOGLE
+                status: CONNECTED
+                sync_enabled: true
+                sync_since: '2026-10-01T00:00:00Z'
+                sync_scope: KNOWN_CONTACTS
+                log_to_deals: true
+                track_opens: true
+                track_clicks: true
+                signature_html: Alex Morgan · Acme Co · +359 2 000 0000
+                shared_with_user_ids: []
+                last_sync_at: '2026-11-05T15:58:00Z'
+                last_error: Last error
+                created_at: '2026-10-01T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -941,7 +1564,6 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
   /mailboxes/{id}:
     get:
       operationId: get_mailbox
@@ -964,6 +1586,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mailbox'
+              example:
+                id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                user_id: alex
+                address: alex@acme.example
+                display_name: Alex Morgan
+                provider: GOOGLE
+                status: CONNECTED
+                sync_enabled: true
+                sync_since: '2026-10-01T00:00:00Z'
+                sync_scope: KNOWN_CONTACTS
+                log_to_deals: true
+                track_opens: true
+                track_clicks: true
+                signature_html: Alex Morgan · Acme Co · +359 2 000 0000
+                shared_with_user_ids: []
+                last_sync_at: '2026-11-05T15:58:00Z'
+                last_error: Last error
+                created_at: '2026-10-01T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1002,6 +1642,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateMailboxRequest'
+            example:
+              display_name: Display name
+              sync_enabled: false
+              sync_since: '2026-11-05T16:00:00Z'
+              sync_scope: KNOWN_CONTACTS
+              log_to_deals: false
+              track_opens: false
+              track_clicks: false
+              signature_html: Signature html
+              shared_with_user_ids:
+              - Shared with user ids
+              imap:
+                imap_host: Imap host
+                imap_port: 3
+                smtp_host: Smtp host
+                smtp_port: 3
+                username: Username
+                password: Password
+                use_tls: false
       responses:
         '200':
           description: Updated
@@ -1009,6 +1668,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mailbox'
+              example:
+                id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                user_id: alex
+                address: alex@acme.example
+                display_name: Alex Morgan
+                provider: GOOGLE
+                status: CONNECTED
+                sync_enabled: true
+                sync_since: '2026-10-01T00:00:00Z'
+                sync_scope: KNOWN_CONTACTS
+                log_to_deals: true
+                track_opens: true
+                track_clicks: true
+                signature_html: Alex Morgan · Acme Co · +359 2 000 0000
+                shared_with_user_ids: []
+                last_sync_at: '2026-11-05T15:58:00Z'
+                last_error: Last error
+                created_at: '2026-10-01T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1026,7 +1703,6 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
     delete:
       operationId: disconnect_mailbox
       summary: Disconnect a mailbox
@@ -1059,7 +1735,6 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
   /mailboxes/{id}/messages:
     get:
       operationId: list_mailbox_messages
@@ -1114,7 +1789,53 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedMailboxMessage'
+                $ref: '#/components/schemas/MailboxMessagePage'
+              example:
+                items:
+                - id: 8d5a1935-b54e-5567-ac56-e51e2656fa19
+                  mailbox_id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                  direction: INBOUND
+                  from: priya.natarajan@northwindtraders.example
+                  to:
+                  - alex@acme.example
+                  subject: 'Re: Proposal for 120 seats'
+                  sent_at: '2026-11-05T11:00:00Z'
+                  contact_ids:
+                  - af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  deal_ids:
+                  - 63a6661f-5860-50ed-8697-f28d29a3917f
+                  opens: 0
+                  clicks: 0
+                - id: 8e29079a-9ff4-5a6e-b030-f098c14b3148
+                  mailbox_id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                  direction: OUTBOUND
+                  from: alex@acme.example
+                  to:
+                  - priya.natarajan@northwindtraders.example
+                  subject: Proposal for 120 seats
+                  sent_at: '2026-11-05T05:00:00Z'
+                  contact_ids:
+                  - af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  deal_ids:
+                  - 63a6661f-5860-50ed-8697-f28d29a3917f
+                  opens: 2
+                  clicks: 1
+                - id: 7882e22e-5ff5-5c69-ac76-7fe91510e0b1
+                  mailbox_id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                  direction: INBOUND
+                  from: tom.okafor@fabrikam.example
+                  to:
+                  - alex@acme.example
+                  subject: SSO docs
+                  sent_at: '2026-11-05T06:00:00Z'
+                  contact_ids:
+                  - 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  deal_ids: []
+                  opens: 0
+                  clicks: 0
+                total: 4
+                page: 1
+                limit: 20
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1155,6 +1876,25 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SendMailboxMessageRequest'
+            example:
+              to:
+              - priya.natarajan@northwindtraders.example
+              cc:
+              - priya.natarajan@northwindtraders.example
+              bcc:
+              - priya.natarajan@northwindtraders.example
+              subject: October product update
+              html: Html
+              text: Thanks for getting in touch.
+              saved_response_id: 7b84034f-51bd-5390-9b74-017ec1426bb4
+              contact_id: c891a339-996d-56b9-a022-244c570f48c9
+              deal_id: eb5492da-aed4-5a03-9023-5460ac5f2705
+              in_reply_to: dcaa8699-6ca7-55cc-aa19-3f47192e8cf0
+              track_opens: false
+              track_clicks: false
+              attachment_ids:
+              - fe967b33-3ff7-5d5f-813b-7dc0c125c9bc
+              send_at: '2026-11-05T16:00:00Z'
       responses:
         '201':
           description: Sent
@@ -1162,6 +1902,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MailboxMessage'
+              example:
+                id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                mailbox_id: e37ade25-ae07-5176-b130-808e945e6fc5
+                direction: INBOUND
+                from: From
+                to:
+                - To
+                subject: October product update
+                sent_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1174,12 +1923,18 @@ paths:
           $ref: '#/components/responses/Unprocessable'
       security:
       - bearerAuth: []
-      description: Send (or schedule) a one-to-one email from this mailbox as its user, logged to the contact / deal.
+      description: 'Send (or schedule) a one-to-one email from this mailbox as its user, logged to the contact / deal.
+
+
+        Publishes `message.sent` on `crm.messaging.v1`.'
       x-brrtrouter-impl: true
       x-required-role:
       - owner
       - admin
       - marketer
+      - sales
+      x-events:
+      - message.sent
   /mailboxes/{id}/sync:
     post:
       operationId: sync_mailbox
@@ -1203,6 +1958,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Mailbox'
+              example:
+                id: 22788e76-5b04-5e9c-97a4-49cade135ff3
+                user_id: alex
+                address: alex@acme.example
+                display_name: Alex Morgan
+                provider: GOOGLE
+                status: CONNECTED
+                sync_enabled: true
+                sync_since: '2026-10-01T00:00:00Z'
+                sync_scope: KNOWN_CONTACTS
+                log_to_deals: true
+                track_opens: true
+                track_clicks: true
+                signature_html: Alex Morgan · Acme Co · +359 2 000 0000
+                shared_with_user_ids: []
+                last_sync_at: '2026-11-05T15:58:00Z'
+                last_error: Last error
+                created_at: '2026-10-01T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1221,6 +1994,7 @@ paths:
       - owner
       - admin
       - marketer
+      - sales
   /merge-fields:
     get:
       operationId: list_merge_fields
@@ -1243,6 +2017,20 @@ paths:
                       $ref: '#/components/schemas/MergeField'
                 required:
                 - items
+              example:
+                items:
+                - key: contact.first_name
+                  label: First name
+                  group: contact
+                  sample: Priya
+                - key: contact.last_name
+                  label: Last name
+                  group: contact
+                  sample: Natarajan
+                - key: contact.email
+                  label: Email
+                  group: contact
+                  sample: priya@example.com
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1273,6 +2061,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostalAddressPage'
+              example:
+                items:
+                - id: 9c7a38b3-2c83-5eb5-9d4c-7cf723835c99
+                  name: Berlin HQ
+                  address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                  is_default: true
+                  used_by:
+                  - Newsletter
+                  - Customers
+                  - Webinars
+                - id: 0f860ccb-c518-552f-8ca2-767c52688164
+                  name: Cape Town office
+                  address: Acme Co (Pty) Ltd, 4 Sample Road, Cape Town 8001, South Africa
+                  is_default: false
+                  used_by:
+                  - Partners
+                - id: c699ea0a-3702-54fd-9422-9444801a3fa0
+                  name: Events
+                  address: Acme Events, PO Box 123, 10115 Berlin, Germany
+                  is_default: false
+                  used_by: []
+                total: 3
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1292,6 +2104,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Postal addresses for footers. Paged (`page`, `limit` ≤ 100).
     post:
       operationId: create_postal_address
       summary: Add a postal address
@@ -1304,6 +2117,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostalAddress'
+              example:
+                id: 9c7a38b3-2c83-5eb5-9d4c-7cf723835c99
+                name: Berlin HQ
+                address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                is_default: true
+                used_by:
+                - Newsletter
+                - Customers
+                - Webinars
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1318,6 +2140,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostalAddressRequest'
+            example:
+              name: Northwind Traders
+              address: Address
+              is_default: true
       x-required-role:
       - owner
       - admin
@@ -1326,6 +2152,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       security:
       - bearerAuth: []
+      description: Add a postal address. Audited.
   /postal-addresses/{id}:
     patch:
       operationId: update_postal_address
@@ -1339,6 +2166,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PostalAddress'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                name: Northwind Traders
+                address: Address
+                is_default: true
+                used_by:
+                - Used by
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1355,6 +2189,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/PostalAddressRequest'
+            example:
+              name: Northwind Traders
+              address: Address
+              is_default: true
       x-required-role:
       - owner
       - admin
@@ -1364,6 +2202,8 @@ paths:
       - $ref: '#/components/parameters/Id'
       security:
       - bearerAuth: []
+      description: Change a postal address. Changes only the fields sent; the change is audited with before and after values.
+        404 when the record does not exist in this workspace.
   /providers:
     get:
       operationId: get_sending_providers
@@ -1377,6 +2217,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendingProviders'
+              example:
+                email:
+                  adapter: Amazon SES
+                  region: eu-central-1
+                  credentials: Workload identity · no stored keys
+                  webhook_status: Connected
+                  webhook_last_event_at: '2026-11-05T15:59:56Z'
+                  daily_quota: 50000
+                  used_today: 12410
+                  alternatives:
+                  - Postmark
+                  - Resend
+                channels:
+                - key: sms
+                  label: SMS (Twilio)
+                  status: NOT_CONNECTED
+                - key: whatsapp
+                  label: WhatsApp (Meta)
+                  status: NOT_CONNECTED
+                - key: social
+                  label: X · LinkedIn · Threads
+                  status: CONNECTED
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1394,6 +2256,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Configured sending providers.
   /reports/campaigns:
     get:
       operationId: get_campaign_performance
@@ -1416,16 +2279,13 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: q
-        in: query
-        schema:
-          type: string
-      - name: start_date
+      - $ref: '#/components/parameters/Search'
+      - name: from
         in: query
         schema:
           type: string
           format: date
-      - name: end_date
+      - name: to
         in: query
         schema:
           type: string
@@ -1471,6 +2331,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CampaignPerformanceReport'
+              example:
+                totals:
+                  campaigns_sent: 3
+                  messages_sent: 3
+                  open_rate: 12.5
+                  click_rate: 12.5
+                  bounce_rate: 12.5
+                  unsubscribe_rate: 12.5
+                  total_contacts: 3
+                  subscribed_contacts: 3
+                  click_to_open_rate: 12.5
+                  anonymous_open_rate: 12.5
+                comparison:
+                  campaigns_sent: 3
+                  messages_sent: 3
+                  open_rate: 12.5
+                  click_rate: 12.5
+                  bounce_rate: 12.5
+                  unsubscribe_rate: 12.5
+                  total_contacts: 3
+                  subscribed_contacts: 3
+                  click_to_open_rate: 12.5
+                  anonymous_open_rate: 12.5
+                comparison_basis: NONE
+                campaigns:
+                  items:
+                  - campaign_id: 94cb11b7-4223-5b33-bb8d-320012c437a0
+                    name: Northwind Traders
+                    sent: 3
+                  total: 2
+                  page: 1
+                  limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1503,6 +2395,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DeliverabilityReport'
+              example:
+                delivered_rate: 0.987
+                soft_bounce_rate: 0.007
+                hard_bounce_rate: 0.002
+                complaint_rate: 0.0002
+                suppressed_30d: 122
+                domain_reputation: GOOD
+                by_provider:
+                - provider: Gmail / Workspace
+                  share: 0.54
+                  open_rate: 0.4
+                  bounce_rate: 0.001
+                - provider: Microsoft 365 / Outlook
+                  share: 0.31
+                  open_rate: 0.35
+                  bounce_rate: 0.003
+                - provider: Yahoo / AOL
+                  share: 0.05
+                  open_rate: 0.31
+                  bounce_rate: 0.004
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1530,6 +2442,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Bounce, complaint and reputation by provider and domain. Query: `from`, `to`.'
   /reports/lists/{id}/growth:
     get:
       operationId: get_list_growth
@@ -1552,6 +2465,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListGrowth'
+              example:
+                list_id: 03493116-74f7-52f2-8ad2-d3daeb50dfc8
+                points:
+                - date: '2026-11-25'
+                  subscribed: 3
+                  unsubscribed: 3
+                  total: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1569,6 +2489,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Subscriptions and unsubscribes per day for a list. Query: `days`. 404 when the record does not exist in
+        this workspace.'
   /reports/overview:
     get:
       operationId: get_outreach_overview
@@ -1599,6 +2521,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/OutreachOverview'
+              example:
+                campaigns_sent: 6
+                messages_sent: 61402
+                open_rate: 0.382
+                click_rate: 0.046
+                bounce_rate: 0.009
+                unsubscribe_rate: 0.003
+                total_contacts: 12480
+                subscribed_contacts: 10912
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1614,6 +2545,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Sends, open and click rates over a period. Query: `from`, `to`, `list_id`.'
   /senders:
     get:
       operationId: list_senders
@@ -1634,6 +2566,14 @@ paths:
                       $ref: '#/components/schemas/Sender'
                 required:
                 - items
+              example:
+                items:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  from_name: From name
+                  from_address: priya.natarajan@northwindtraders.example
+                  domain: northwindtraders.example
+                  status: PENDING
+                  created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1651,6 +2591,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Sender identities.
     post:
       operationId: create_sender
       summary: Add a sender identity
@@ -1664,6 +2605,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSenderRequest'
+            example:
+              from_name: From name
+              from_address: priya.natarajan@northwindtraders.example
+              reply_to: priya.natarajan@northwindtraders.example
+              provider: SES
+              postal_address: Postal address
       responses:
         '201':
           description: Sender created, verification pending
@@ -1671,6 +2618,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sender'
+              example:
+                id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                from_name: Acme Co
+                from_address: hello@acme.example
+                reply_to: support@acme.example
+                domain: acme.example
+                provider: SES
+                status: VERIFIED
+                dns_records:
+                - purpose: DKIM
+                  type: CNAME
+                  name: a1k3._domainkey
+                  value: a1k3.dkim.amazonses.com
+                  verified: true
+                - purpose: SPF
+                  type: TXT
+                  name: '@'
+                  value: v=spf1 include:amazonses.com -all
+                  verified: true
+                - purpose: DMARC
+                  type: TXT
+                  name: _dmarc
+                  value: v=DMARC1; p=quarantine; rua=mailto:dmarc@acme.example
+                  verified: true
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                last_checked_at: '2026-11-05T15:56:00Z'
+                created_at: '2026-04-19T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1689,7 +2663,6 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
   /senders/{id}:
     get:
       operationId: get_sender
@@ -1706,6 +2679,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sender'
+              example:
+                id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                from_name: Acme Co
+                from_address: hello@acme.example
+                reply_to: support@acme.example
+                domain: acme.example
+                provider: SES
+                status: VERIFIED
+                dns_records:
+                - purpose: DKIM
+                  type: CNAME
+                  name: a1k3._domainkey
+                  value: a1k3.dkim.amazonses.com
+                  verified: true
+                - purpose: SPF
+                  type: TXT
+                  name: '@'
+                  value: v=spf1 include:amazonses.com -all
+                  verified: true
+                - purpose: DMARC
+                  type: TXT
+                  name: _dmarc
+                  value: v=DMARC1; p=quarantine; rua=mailto:dmarc@acme.example
+                  verified: true
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                last_checked_at: '2026-11-05T15:56:00Z'
+                created_at: '2026-04-19T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1723,6 +2723,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Sender with verification state. 404 when the record does not exist in this workspace.
     delete:
       operationId: delete_sender
       summary: Remove a sender identity
@@ -1750,7 +2751,8 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
+      description: Remove a sender identity. Audited. 409 while something still uses it. 404 when the record does not exist
+        in this workspace.
   /senders/{id}/verify:
     post:
       operationId: verify_sender
@@ -1767,6 +2769,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sender'
+              example:
+                id: 37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2
+                from_name: Acme Co
+                from_address: hello@acme.example
+                reply_to: support@acme.example
+                domain: acme.example
+                provider: SES
+                status: VERIFIED
+                dns_records:
+                - purpose: DKIM
+                  type: CNAME
+                  name: a1k3._domainkey
+                  value: a1k3.dkim.amazonses.com
+                  verified: true
+                - purpose: SPF
+                  type: TXT
+                  name: '@'
+                  value: v=spf1 include:amazonses.com -all
+                  verified: true
+                - purpose: DMARC
+                  type: TXT
+                  name: _dmarc
+                  value: v=DMARC1; p=quarantine; rua=mailto:dmarc@acme.example
+                  verified: true
+                postal_address: Acme Co, 12 Example Street, 10115 Berlin, Germany
+                last_checked_at: '2026-11-05T15:56:00Z'
+                created_at: '2026-04-19T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1783,7 +2812,8 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
+      description: Re-check the sender's DNS records. A state change on one resource; audited. 404 when the record does not
+        exist in this workspace.
   /sends/{id}:
     get:
       operationId: get_send
@@ -1800,6 +2830,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Send'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                campaign_id: 94cb11b7-4223-5b33-bb8d-320012c437a0
+                variant_key: Variant key
+                workflow_id: f56c2ab8-e37f-57c9-80ee-b3c2d7d0cbe7
+                enrolment_id: a8314e09-6da8-5b0a-8ac0-8ffd966cf280
+                template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+                template_version: 3
+                channel: EMAIL
+                to: To
+                subject: October product update
+                status: QUEUED
+                provider: SES
+                provider_message_id: ext_e7e895df51
+                error: Error
+                opened_at: '2026-11-05T16:00:00Z'
+                clicked_at: '2026-11-05T16:00:00Z'
+                events:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  send_id: a28a1db3-cee2-594e-adbd-25b5f5f34365
+                  contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                  type: QUEUED
+                  at: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1817,6 +2872,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: One send with its events. 404 when the record does not exist in this workspace.
   /sms/senders:
     get:
       operationId: list_sms_senders
@@ -1830,6 +2886,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SmsSenderPage'
+              example:
+                items:
+                - id: b58c0df7-9372-505d-87f2-2b050e076e26
+                  label: ACME (alphanumeric)
+                  kind: ALPHANUMERIC
+                  countries:
+                  - DE
+                  - UK
+                  - FR
+                  verified: true
+                - id: af48362e-151e-57dc-bdbc-56d8053ddaab
+                  label: +49 157 … (German long number)
+                  kind: ALPHANUMERIC
+                  countries:
+                  - DE
+                  verified: true
+                - id: 72e724be-5121-5d5d-ab50-1ba7296bf2dd
+                  label: +1 (833) … (US toll-free)
+                  kind: TOLL_FREE
+                  countries:
+                  - US
+                  - CA
+                  verified: true
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1849,6 +2931,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: SMS senders. Paged (`page`, `limit` ≤ 100).
   /snippets:
     get:
       operationId: list_snippets
@@ -1862,6 +2945,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SnippetPage'
+              example:
+                items:
+                - id: d2784443-bc70-5675-8a68-30620c50a0eb
+                  key: snippet.signature
+                  value: Alex Morgan · Head of Marketing · acme.example
+                  used_by: 6
+                  created_at: '2026-07-28T16:00:00Z'
+                - id: d2e3e75f-72fa-569c-b2f1-97bedbfcd9af
+                  key: snippet.support_hours
+                  value: Mon–Fri 09:00–18:00 CET
+                  used_by: 3
+                  created_at: '2026-07-28T16:00:00Z'
+                - id: a4768040-ea68-594e-9a89-fa56cf20c045
+                  key: snippet.legal_footer
+                  value: Acme Co, 12 Example Street, 10115 Berlin · VAT DE123456789
+                  used_by: 11
+                  created_at: '2026-07-28T16:00:00Z'
+                total: 4
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1882,6 +2985,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Snippets. Paged (`page`, `limit` ≤ 100). Filters: `search`.'
     post:
       operationId: create_snippet
       summary: Create a snippet
@@ -1894,6 +2998,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Snippet'
+              example:
+                id: d2784443-bc70-5675-8a68-30620c50a0eb
+                key: snippet.signature
+                value: Alex Morgan · Head of Marketing · acme.example
+                used_by: 6
+                created_at: '2026-07-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1908,6 +3018,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SnippetRequest'
+            example:
+              key: snippet.signature
+              value: Value
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1917,6 +3030,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create a snippet. Audited.
   /snippets/{id}:
     put:
       operationId: update_snippet
@@ -1930,6 +3044,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Snippet'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                key: snippet.signature
+                value: Value
+                used_by: 3
+                created_at: '2026-11-05T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1947,6 +3068,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SnippetRequest'
+            example:
+              key: snippet.signature
+              value: Value
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -2004,6 +3128,13 @@ paths:
                       $ref: '#/components/schemas/SocialAccount'
                 required:
                 - items
+              example:
+                items:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  platform: X
+                  handle: Handle
+                  status: CONNECTING
+                  created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2021,6 +3152,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Connected social accounts.
     post:
       operationId: connect_social_account
       summary: Connect an account
@@ -2033,6 +3165,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConnectSocialAccountRequest'
+            example:
+              platform: X
+              redirect_uri: https://northwindtraders.example/pricing
       responses:
         '201':
           description: Connection started
@@ -2040,6 +3175,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialAccount'
+              example:
+                id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                platform: X
+                handle: '@acme'
+                display_name: Acme Co
+                status: CONNECTED
+                paused_reason: Paused reason
+                followers: 12400
+                created_at: '2026-07-08T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2058,7 +3202,6 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
   /social/accounts/{id}:
     get:
       operationId: get_social_account
@@ -2075,6 +3218,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialAccount'
+              example:
+                id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                platform: X
+                handle: '@acme'
+                display_name: Acme Co
+                status: CONNECTED
+                paused_reason: Paused reason
+                followers: 12400
+                created_at: '2026-07-08T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2092,6 +3244,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Get an account. 404 when the record does not exist in this workspace.
     delete:
       operationId: disconnect_social_account
       summary: Disconnect an account
@@ -2117,7 +3270,7 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
+      description: Disconnect an account. Audited. 404 when the record does not exist in this workspace.
   /social/accounts/{id}/engagement:
     get:
       operationId: get_account_engagement
@@ -2140,6 +3293,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AccountEngagementSeries'
+              example:
+                account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
+                points:
+                - date: '2026-11-25'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2157,6 +3314,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Engagement over time for an account. Query: `days`. 404 when the record does not exist in this workspace.'
   /social/accounts/{id}/pause:
     post:
       operationId: pause_social_account
@@ -2179,6 +3337,9 @@ paths:
                   type: boolean
                 reason:
                   type: string
+            example:
+              paused: false
+              reason: not_found
       responses:
         '200':
           description: Updated
@@ -2186,6 +3347,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialAccount'
+              example:
+                id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                platform: X
+                handle: '@acme'
+                display_name: Acme Co
+                status: CONNECTED
+                paused_reason: Paused reason
+                followers: 12400
+                created_at: '2026-07-08T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2202,7 +3372,8 @@ paths:
       x-required-role:
       - owner
       - admin
-      - marketer
+      description: Pause or resume publishing on an account. A state change on one resource; audited. 404 when the record
+        does not exist in this workspace.
   /social/audit:
     get:
       operationId: list_social_audit
@@ -2219,7 +3390,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedAuditEntry'
+                $ref: '#/components/schemas/AuditEntryPage'
+              example:
+                items:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  at: '2026-11-05T16:00:00Z'
+                  actor: Actor
+                  action: CREATED
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2235,6 +3415,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Who did what to the feed. Paged (`page`, `limit` ≤ 100).
   /social/calendar:
     get:
       operationId: get_social_calendar
@@ -2262,6 +3443,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialCalendar'
+              example:
+                days:
+                - date: '2026-11-25'
+                  posts:
+                  - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                    status: DRAFT
+                    body: Body
+                    targets:
+                    - account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
+                    created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2277,6 +3468,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Posts by day for a date range. Query: `from`, `to`.'
   /social/engagement:
     get:
       operationId: get_social_engagement
@@ -2290,6 +3482,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialEngagementSummary'
+              example:
+                items:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  posts_30d: 41
+                  impressions: 128000
+                  engagements: 2100
+                - account_id: 5bc54618-c69f-51c2-b8c5-adc463b9e422
+                  platform: LINKEDIN
+                  posts_30d: 18
+                  impressions: 64000
+                  engagements: 3400
+                - account_id: d364f316-32c7-5b70-acc1-f13470095b2a
+                  platform: THREADS
+                  posts_30d: 30
+                  impressions: 22000
+                  engagements: 600
+                leads_captured_30d: 12
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2317,6 +3527,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Engagement per connected account. Query: `from`, `to`.'
   /social/leads/capture:
     post:
       operationId: capture_social_lead
@@ -2329,6 +3540,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/SocialLeadCaptureRequest'
+            example:
+              platform: X
+              handle: Handle
+              display_name: Display name
+              email: priya.natarajan@northwindtraders.example
+              post_id: 090533ea-9c28-5a85-8974-4e4c4be7b668
+              interaction: COMMENT
+              text: Thanks for getting in touch.
+              utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
       responses:
         '201':
           description: Lead created or matched
@@ -2342,6 +3562,9 @@ paths:
                     format: uuid
                   matched_existing:
                     type: boolean
+              example:
+                lead_id: 8c42f135-110c-57a8-bfa6-c01026615082
+                matched_existing: false
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2361,6 +3584,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create a lead in crm/pipeline from a social interaction. Audited.
   /social/posts:
     get:
       operationId: list_social_posts
@@ -2397,7 +3621,60 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedSocialPost'
+                $ref: '#/components/schemas/SocialPostPage'
+              example:
+                items:
+                - id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                  status: PUBLISHED
+                  body: October release notes are out. Highlights in the thread.
+                  media: []
+                  targets:
+                  - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                    platform: X
+                    status: PUBLISHED
+                    permalink: https://x.example/acme/0
+                    error: Error
+                  scheduled_at: '2026-11-02T09:30:00+02:00'
+                  requires_approval: false
+                  source: alex
+                  created_by: alex
+                  created_at: '2026-10-28T16:00:00Z'
+                  updated_at: '2026-10-28T16:00:00Z'
+                - id: 9502bdab-c9a3-5d31-a3a0-836d1b2265a9
+                  status: PUBLISHED
+                  body: How Northwind cut onboarding time by 40% (case study).
+                  media: []
+                  targets:
+                  - account_id: 5bc54618-c69f-51c2-b8c5-adc463b9e422
+                    platform: LINKEDIN
+                    status: PUBLISHED
+                    permalink: https://linkedin.example/acme/1
+                    error: Error
+                  scheduled_at: '2026-11-02T12:00:00+02:00'
+                  requires_approval: false
+                  source: alex
+                  created_by: alex
+                  created_at: '2026-10-28T16:00:00Z'
+                  updated_at: '2026-10-28T16:00:00Z'
+                - id: 430fbf7a-0185-5395-8414-939caf4d4c78
+                  status: PUBLISHED
+                  body: 'Pre-market: three charts we are watching this week.'
+                  media: []
+                  targets:
+                  - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                    platform: X
+                    status: PUBLISHED
+                    permalink: https://x.example/acme/2
+                    error: Error
+                  scheduled_at: '2026-11-03T09:30:00+02:00'
+                  requires_approval: false
+                  source: alex
+                  created_by: alex
+                  created_at: '2026-10-29T16:00:00Z'
+                  updated_at: '2026-10-29T16:00:00Z'
+                total: 10
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2413,6 +3690,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'List posts. Paged (`page`, `limit` ≤ 100). Filters: `search`, `status`, `account_id`, `from`, `to`.'
     post:
       operationId: create_social_post
       summary: Create a post (draft or scheduled)
@@ -2424,6 +3702,18 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateSocialPostRequest'
+            example:
+              body: Body
+              media:
+              - url: https://northwindtraders.example/pricing
+                kind: IMAGE
+              link_url: https://northwindtraders.example/pricing
+              utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+              targets:
+              - account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
+              scheduled_at: '2026-11-05T16:00:00Z'
+              requires_approval: false
+              source: Source
       responses:
         '201':
           description: Created
@@ -2431,6 +3721,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2450,6 +3757,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create a post (draft or scheduled). Audited.
   /social/posts/{id}:
     get:
       operationId: get_social_post
@@ -2466,6 +3774,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2483,6 +3808,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Get a post with its per-platform results. 404 when the record does not exist in this workspace.
     put:
       operationId: update_social_post
       summary: Update a draft or scheduled post
@@ -2497,6 +3823,17 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateSocialPostRequest'
+            example:
+              body: Body
+              media:
+              - url: https://northwindtraders.example/pricing
+                kind: IMAGE
+              link_url: https://northwindtraders.example/pricing
+              utm_campaign_id: d60cc555-1aa8-57d4-b917-88bbd0d5b437
+              targets:
+              - account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
+              scheduled_at: '2026-11-05T16:00:00Z'
+              requires_approval: false
       responses:
         '200':
           description: Updated
@@ -2504,6 +3841,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2525,6 +3879,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Update a draft or scheduled post. Replaces the resource with the body; audited. 404 when the record does
+        not exist in this workspace.
     delete:
       operationId: delete_social_post
       summary: Delete a draft or scheduled post
@@ -2553,6 +3909,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Delete a draft or scheduled post. Audited. 409 while something still uses it. 404 when the record does
+        not exist in this workspace.
   /social/posts/{id}/approve:
     post:
       operationId: approve_social_post
@@ -2570,6 +3928,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2587,6 +3962,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Approve a post awaiting approval. A state change on one resource; audited. 404 when the record does not
+        exist in this workspace.
   /social/posts/{id}/engagement:
     get:
       operationId: get_post_engagement
@@ -2610,6 +3987,11 @@ paths:
                       $ref: '#/components/schemas/Engagement'
                 required:
                 - items
+              example:
+                items:
+                - account_id: b06c6126-3814-5778-9fd5-6fd9f1ad37bf
+                  platform: X
+                  fetched_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2627,6 +4009,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Engagement metrics for a post. 404 when the record does not exist in this workspace.
   /social/posts/{id}/publish:
     post:
       operationId: publish_social_post_now
@@ -2644,6 +4027,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2663,6 +4063,13 @@ paths:
       - owner
       - admin
       - marketer
+      description: 'Publish immediately. A state change on one resource; audited. 409 when the current state does not allow
+        it. 404 when the record does not exist in this workspace.
+
+
+        Publishes `social.post.published` on `crm.messaging.v1`.'
+      x-events:
+      - social.post.published
   /social/posts/{id}/skip:
     post:
       operationId: skip_social_post
@@ -2683,6 +4090,8 @@ paths:
               properties:
                 reason:
                   type: string
+            example:
+              reason: not_found
       responses:
         '200':
           description: Skipped
@@ -2690,6 +4099,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SocialPost'
+              example:
+                id: de4620a8-882f-5f9c-88b0-d57c19355d18
+                status: PUBLISHED
+                body: October release notes are out. Highlights in the thread.
+                media: []
+                targets:
+                - account_id: a41279e1-eaf5-5755-8860-1b6c8aebc4e3
+                  platform: X
+                  status: PUBLISHED
+                  permalink: https://x.example/acme/0
+                  error: Error
+                scheduled_at: '2026-11-02T09:30:00+02:00'
+                requires_approval: false
+                source: alex
+                created_by: alex
+                created_at: '2026-10-28T16:00:00Z'
+                updated_at: '2026-10-28T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2707,6 +4133,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Skip a scheduled post with a reason. A state change on one resource; audited. 404 when the record does
+        not exist in this workspace.
   /templates:
     get:
       operationId: list_templates
@@ -2732,7 +4160,93 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedTemplate'
+                $ref: '#/components/schemas/TemplatePage'
+              example:
+                items:
+                - id: 736685cb-324b-572c-b287-deb656a4d8de
+                  name: 'Welcome · day 0: what you can do today'
+                  channel: EMAIL
+                  kind: AUTOMATION
+                  subject: Welcome to {{sender.name}}
+                  preheader: ''
+                  body_format: MARKDOWN
+                  body: 'Hi {{contact.first_name}},
+
+
+                    Welcome · day 0: what you can do today.
+
+
+                    [Open your workspace](https://app.acme.example)
+
+
+                    ---
+
+                    {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                  version: 3
+                  merge_fields:
+                  - contact.first_name
+                  - sender.postal_address
+                  - links.unsubscribe
+                  is_archived: false
+                  created_at: '2026-07-08T16:00:00Z'
+                  updated_at: '2026-10-16T16:00:00Z'
+                - id: f248dd12-4837-5fde-aa51-2fba5a0e8227
+                  name: 'Welcome · day 2: three things to set up'
+                  channel: EMAIL
+                  kind: AUTOMATION
+                  subject: Three things worth setting up
+                  preheader: ''
+                  body_format: MARKDOWN
+                  body: 'Hi {{contact.first_name}},
+
+
+                    Welcome · day 2: three things to set up.
+
+
+                    [Open your workspace](https://app.acme.example)
+
+
+                    ---
+
+                    {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                  version: 2
+                  merge_fields:
+                  - contact.first_name
+                  - sender.postal_address
+                  - links.unsubscribe
+                  is_archived: false
+                  created_at: '2026-07-13T16:00:00Z'
+                  updated_at: '2026-10-17T16:00:00Z'
+                - id: 40072573-6c82-5100-8709-5ed36d8c6794
+                  name: Day 2 · resend with new subject
+                  channel: EMAIL
+                  kind: AUTOMATION
+                  subject: Still here? Three quick wins
+                  preheader: ''
+                  body_format: MARKDOWN
+                  body: 'Hi {{contact.first_name}},
+
+
+                    Day 2 · resend with new subject.
+
+
+                    [Open your workspace](https://app.acme.example)
+
+
+                    ---
+
+                    {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                  version: 1
+                  merge_fields:
+                  - contact.first_name
+                  - sender.postal_address
+                  - links.unsubscribe
+                  is_archived: false
+                  created_at: '2026-07-18T16:00:00Z'
+                  updated_at: '2026-10-18T16:00:00Z'
+                total: 16
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2748,6 +4262,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'List message templates. Paged (`page`, `limit` ≤ 100). Filters: `search`, `channel`, `kind`.'
     post:
       operationId: create_template
       summary: Create a message template
@@ -2759,18 +4274,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTemplateRequest'
-            examples:
-              default:
-                name: 'Onboarding day 7: your first week'
-                channel: EMAIL
-                kind: AUTOMATION
-                subject: 'Day 7: what you have set up so far'
-                preheader: A week in, and three things worth doing next
-                body_format: MARKDOWN
-                body: 'Hi {{contact.first_name}},
-
-
-                  A week ago you signed up...'
+            example:
+              name: Northwind Traders
+              channel: EMAIL
+              kind: CAMPAIGN
+              subject: October product update
+              preheader: Preheader
+              body_format: MARKDOWN
+              body: Body
+              text_body: Text body
+              design: {}
       responses:
         '201':
           description: Template created
@@ -2778,6 +4291,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Template'
+              example:
+                id: 736685cb-324b-572c-b287-deb656a4d8de
+                name: 'Welcome · day 0: what you can do today'
+                channel: EMAIL
+                kind: AUTOMATION
+                subject: Welcome to {{sender.name}}
+                preheader: ''
+                body_format: MARKDOWN
+                body: 'Hi {{contact.first_name}},
+
+
+                  Welcome · day 0: what you can do today.
+
+
+                  [Open your workspace](https://app.acme.example)
+
+
+                  ---
+
+                  {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                version: 3
+                merge_fields:
+                - contact.first_name
+                - sender.postal_address
+                - links.unsubscribe
+                is_archived: false
+                created_at: '2026-07-08T16:00:00Z'
+                updated_at: '2026-10-16T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2797,6 +4338,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create a message template. Audited.
   /templates/{id}:
     get:
       operationId: get_template
@@ -2813,6 +4355,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Template'
+              example:
+                id: 736685cb-324b-572c-b287-deb656a4d8de
+                name: 'Welcome · day 0: what you can do today'
+                channel: EMAIL
+                kind: AUTOMATION
+                subject: Welcome to {{sender.name}}
+                preheader: ''
+                body_format: MARKDOWN
+                body: 'Hi {{contact.first_name}},
+
+
+                  Welcome · day 0: what you can do today.
+
+
+                  [Open your workspace](https://app.acme.example)
+
+
+                  ---
+
+                  {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                version: 3
+                merge_fields:
+                - contact.first_name
+                - sender.postal_address
+                - links.unsubscribe
+                is_archived: false
+                created_at: '2026-07-08T16:00:00Z'
+                updated_at: '2026-10-16T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2830,6 +4400,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Get a template. 404 when the record does not exist in this workspace.
     put:
       operationId: update_template
       summary: Update a template (creates a new version)
@@ -2844,6 +4415,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTemplateRequest'
+            example:
+              name: Northwind Traders
+              subject: October product update
+              preheader: Preheader
+              body_format: MARKDOWN
+              body: Body
+              text_body: Text body
+              design: {}
       responses:
         '200':
           description: Updated
@@ -2851,6 +4430,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Template'
+              example:
+                id: 736685cb-324b-572c-b287-deb656a4d8de
+                name: 'Welcome · day 0: what you can do today'
+                channel: EMAIL
+                kind: AUTOMATION
+                subject: Welcome to {{sender.name}}
+                preheader: ''
+                body_format: MARKDOWN
+                body: 'Hi {{contact.first_name}},
+
+
+                  Welcome · day 0: what you can do today.
+
+
+                  [Open your workspace](https://app.acme.example)
+
+
+                  ---
+
+                  {{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})'
+                version: 3
+                merge_fields:
+                - contact.first_name
+                - sender.postal_address
+                - links.unsubscribe
+                is_archived: false
+                created_at: '2026-07-08T16:00:00Z'
+                updated_at: '2026-10-16T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2870,6 +4477,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Update a template (creates a new version). Replaces the resource with the body; audited. 404 when the record
+        does not exist in this workspace.
     delete:
       operationId: delete_template
       summary: Archive a template
@@ -2898,6 +4507,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Archive a template. Audited. 409 while something still uses it. 404 when the record does not exist in this
+        workspace.
   /templates/{id}/render:
     post:
       operationId: render_template
@@ -2914,6 +4525,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RenderRequest'
+            example:
+              contact_id: c891a339-996d-56b9-a022-244c570f48c9
+              sample:
+                key: Value
       responses:
         '200':
           description: Rendered message
@@ -2921,12 +4536,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RenderedMessage'
+              example:
+                subject: 'Day 7: what you have set up so far'
+                preheader: A week in, and three things worth doing next
+                html: <p>Hi Priya,</p><p>A week ago you signed up. Here is what you have set up so far at Northwind Traders,
+                  and three things worth doing next.</p><ul><li>Connect your data source</li><li>Invite a teammate</li><li>Turn
+                  on the weekly digest</li></ul><p><a href="#">Open your workspace</a></p>
+                text: 'Hi Priya,
+
+
+                  A week ago you signed up…'
+                unresolved: []
         '400':
-          description: Unresolvable merge field
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2960,6 +4582,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TestSendRequest'
+            example:
+              to:
+              - priya.natarajan@northwindtraders.example
+              contact_id: c891a339-996d-56b9-a022-244c570f48c9
       responses:
         '202':
           description: Queued
@@ -2967,6 +4593,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Send'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                channel: EMAIL
+                status: QUEUED
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -2986,6 +4618,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Send a template to a staff address. A state change on one resource; audited. 404 when the record does not
+        exist in this workspace.
   /tracking-domains:
     get:
       operationId: list_tracking_domains
@@ -2999,6 +4633,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrackingDomainPage'
+              example:
+                items:
+                - id: 7b8f77a3-8b75-51bb-a3b9-b7267f501814
+                  domain: mail.acme.example
+                  status: VERIFIED
+                  tls: true
+                  last_checked_at: '2026-11-05T15:56:00Z'
+                  records:
+                  - type: CNAME
+                    name: mail.acme.example
+                    value: edge.crm.example.net
+                    verified: true
+                  - type: TXT
+                    name: _crm-verify.mail.acme.example
+                    value: crm-verify=7c1e…
+                    verified: true
+                total: 1
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3018,6 +4671,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Tracking domains. Paged (`page`, `limit` ≤ 100).
     post:
       operationId: create_tracking_domain
       summary: Add a tracking domain
@@ -3030,6 +4684,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrackingDomain'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                domain: northwindtraders.example
+                status: PENDING
+                tls: false
+                last_checked_at: '2026-11-05T16:00:00Z'
+                records:
+                - {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3044,6 +4706,8 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTrackingDomainRequest'
+            example:
+              domain: northwindtraders.example
       x-required-role:
       - owner
       - admin
@@ -3052,6 +4716,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       security:
       - bearerAuth: []
+      description: Add a tracking domain. Audited.
   /tracking-domains/{id}/verify:
     post:
       operationId: verify_tracking_domain
@@ -3065,6 +4730,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TrackingDomain'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                domain: northwindtraders.example
+                status: PENDING
+                tls: false
+                last_checked_at: '2026-11-05T16:00:00Z'
+                records:
+                - {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -3084,6 +4757,8 @@ paths:
       - $ref: '#/components/parameters/Id'
       security:
       - bearerAuth: []
+      description: Re-check DNS and TLS. A state change on one resource; audited. 404 when the record does not exist in this
+        workspace.
   /transactional/send:
     post:
       operationId: send_transactional
@@ -3092,7 +4767,8 @@ paths:
 
         subscription state (a transactional message is not marketing). Requires a template of kind TRANSACTIONAL.
 
-        '
+
+        Publishes `message.sent` on `crm.messaging.v1`.'
       tags:
       - transactional
       requestBody:
@@ -3101,6 +4777,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/TransactionalSendRequestBody'
+            example:
+              template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+              to: To
+              contact_id: c891a339-996d-56b9-a022-244c570f48c9
+              merge:
+                key: Value
+              tag: Tag
       responses:
         '202':
           description: Queued
@@ -3108,16 +4791,37 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Send'
+              example:
+                id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                campaign_id: 94cb11b7-4223-5b33-bb8d-320012c437a0
+                variant_key: Variant key
+                workflow_id: f56c2ab8-e37f-57c9-80ee-b3c2d7d0cbe7
+                enrolment_id: a8314e09-6da8-5b0a-8ac0-8ffd966cf280
+                template_id: 9c360595-1b04-500b-ac1e-20f6330c4995
+                template_version: 3
+                channel: EMAIL
+                to: To
+                subject: October product update
+                status: QUEUED
+                provider: SES
+                provider_message_id: ext_e7e895df51
+                error: Error
+                opened_at: '2026-11-05T16:00:00Z'
+                clicked_at: '2026-11-05T16:00:00Z'
+                events:
+                - id: 3eb009b7-a99d-5a4c-956a-99e11d8dbb76
+                  send_id: a28a1db3-cee2-594e-adbd-25b5f5f34365
+                  contact_id: c891a339-996d-56b9-a022-244c570f48c9
+                  type: QUEUED
+                  at: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '422':
-          description: Recipient suppressed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Unprocessable'
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -3132,6 +4836,8 @@ paths:
       - owner
       - admin
       - marketer
+      x-events:
+      - message.sent
 components:
   schemas:
     ABTestConfig:
@@ -3398,7 +5104,7 @@ components:
             type: string
             format: uuid
         segment:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole
             list
         audience:
@@ -3481,7 +5187,8 @@ components:
           readOnly: true
         created_by:
           type: string
-          description: Staff user id
+          maxLength: 64
+          description: Staff user id. Sesame user id (the sub claim of the access token)
         created_at:
           type: string
           format: date-time
@@ -3508,7 +5215,7 @@ components:
         tag:
           type: string
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: An inline crm/contacts condition tree
     CampaignKind:
       type: string
@@ -3541,7 +5248,7 @@ components:
           - PERIOD_AVERAGE
           - CAMPAIGN_TYPE_AVERAGE
         campaigns:
-          $ref: '#/components/schemas/PaginatedCampaignPerformanceRow'
+          $ref: '#/components/schemas/CampaignPerformanceRowPage'
       required:
       - totals
       - campaigns
@@ -3594,8 +5301,10 @@ components:
           type: number
           format: double
         revenue:
-          type: number
+          type: string
           format: decimal
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Decimal string in the currency of the record.
       required:
       - campaign_id
       - name
@@ -3688,9 +5397,11 @@ components:
           items:
             $ref: '#/components/schemas/CampaignVariant'
         revenue:
-          type: number
+          type: string
           format: decimal
-          description: Attributed through crm/marketing campaign revenue when a UTM campaign is set
+          pattern: ^-?\d{1,15}(\.\d{1,4})?$
+          description: Attributed through crm/marketing campaign revenue when a UTM campaign is set. Decimal string in the
+            currency of the record.
         total_opens:
           type: integer
           format: int64
@@ -3951,8 +5662,9 @@ components:
           format: uuid
         user_id:
           type: string
-          format: uuid
-          description: Owner; shared mailboxes also list `shared_with_user_ids`
+          maxLength: 64
+          description: Owner; shared mailboxes also list `shared_with_user_ids`. Sesame user id (the sub claim of the access
+            token)
         address:
           type: string
           format: email
@@ -3988,7 +5700,8 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            maxLength: 64
+            description: Sesame user id (the sub claim of the access token)
         imap:
           $ref: '#/components/schemas/ImapConfig'
         last_sync_at:
@@ -4077,7 +5790,7 @@ components:
             type: string
             format: uuid
         segment:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
         utm_campaign_id:
           type: string
           format: uuid
@@ -4390,6 +6103,8 @@ components:
           type: string
         created_by:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         created_at:
           type: string
           format: date-time
@@ -4456,8 +6171,9 @@ components:
           format: uuid
         user_id:
           type: string
-          format: uuid
-          description: Owner; shared mailboxes also list `shared_with_user_ids`
+          maxLength: 64
+          description: Owner; shared mailboxes also list `shared_with_user_ids`. Sesame user id (the sub claim of the access
+            token)
         address:
           type: string
           format: email
@@ -4493,7 +6209,8 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            maxLength: 64
+            description: Sesame user id (the sub claim of the access token)
         imap:
           $ref: '#/components/schemas/ImapConfig'
         last_sync_at:
@@ -4734,216 +6451,6 @@ components:
         anonymous_open_rate:
           type: number
           format: double
-    PaginatedAuditEntry:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditEntry'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedCampaign:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Campaign'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedCampaignPerformanceRow:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CampaignPerformanceRow'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedCampaignReportContact:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/CampaignReportContact'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedMailbox:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Mailbox'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedMailboxMessage:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/MailboxMessage'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedMessageEvent:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/MessageEvent'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedSend:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Send'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedSocialPost:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/SocialPost'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-    PaginatedTemplate:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Template'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
     Platform:
       type: string
       enum:
@@ -5649,6 +7156,8 @@ components:
           default: false
         approved_by:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
           readOnly: true
         approved_at:
           type: string
@@ -5661,6 +7170,8 @@ components:
           description: Free text naming what generated the post (a person, an automation, an external worker)
         created_by:
           type: string
+          maxLength: 64
+          description: Sesame user id (the sub claim of the access token)
         created_at:
           type: string
           format: date-time
@@ -5876,7 +7387,7 @@ components:
             type: string
             format: uuid
         segment:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
         utm_campaign_id:
           type: string
           format: uuid
@@ -5913,7 +7424,8 @@ components:
           type: array
           items:
             type: string
-            format: uuid
+            maxLength: 64
+            description: Sesame user id (the sub claim of the access token)
         imap:
           $ref: '#/components/schemas/ImapConfig'
     UpdateSocialPostRequest:
@@ -5964,6 +7476,7 @@ components:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -5971,6 +7484,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -5993,6 +7511,11 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
     TransactionalSendRequestBody:
       type: object
       required:
@@ -6017,6 +7540,299 @@ components:
           type: string
           description: Free-text grouping for reporting (welcome, password_reset, alert_digest)
       description: TransactionalSendRequest (request body; idempotency_key come from the path or headers)
+    AuditEntryPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    CampaignPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campaign'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    CampaignPerformanceRowPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignPerformanceRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    CampaignReportContactPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignReportContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    MailboxPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mailbox'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    MailboxMessagePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailboxMessage'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    MessageEventPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageEvent'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    SendPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Send'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    SocialPostPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialPost'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    TemplatePage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    Condition:
+      type: object
+      required:
+      - subject
+      - operator
+      properties:
+        subject:
+          type: string
+          description: 'What is tested: field:<name>, custom:<key>, tag, list:<id>, score, engagement:opened:<days>,
+
+            engagement:clicked:<days>, engagement:any:<days>, deal:stage, deal:value, site:visited:<path>,
+
+            event:<name>, form:<id>, created_at, last_activity_at, timezone, country
+
+            '
+        operator:
+          type: string
+          enum:
+          - EQ
+          - NEQ
+          - CONTAINS
+          - NOT_CONTAINS
+          - STARTS_WITH
+          - GT
+          - GTE
+          - LT
+          - LTE
+          - IN
+          - NOT_IN
+          - IS_SET
+          - IS_NOT_SET
+          - HAS
+          - HAS_NOT
+          - BEFORE
+          - AFTER
+          - WITHIN_DAYS
+          - NOT_WITHIN_DAYS
+        value:
+          description: String, number, boolean, ISO date or array as the operator requires
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+      description: Defined by crm/audience; this is an identical copy.
+    ConditionGroup:
+      type: object
+      required:
+      - op
+      - items
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Condition'
+            - $ref: '#/components/schemas/ConditionSubgroup'
+      description: 'AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences: a group holds conditions
+        and sub-groups, a sub-group holds conditions (two levels). Defined by crm/audience; this is an identical copy.'
+    ConditionSubgroup:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+      required:
+      - op
+      - items
+      description: A nested AND/OR group of conditions inside a ConditionGroup. Defined by crm/audience; this is an identical
+        copy.
   parameters:
     Page:
       name: page

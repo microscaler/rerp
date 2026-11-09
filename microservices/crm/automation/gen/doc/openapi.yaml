@@ -47,6 +47,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/RecurringActionRequest'
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              schedule: Schedule
+              action_config: {}
         description: Schedule a recurring action with a defined interval
       responses:
         '201':
@@ -55,18 +59,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000026
-                  type: email
-                  scheduled_at: '2024-01-16T10:00:00Z'
-                  status: pending
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                scheduled_at: '2026-11-05T16:00:00Z'
+                status: PENDING
+                action_config: {}
+                executed_at: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -101,6 +103,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ScheduleActionRequest'
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              scheduled_at: '2026-11-05T16:00:00Z'
+              action_config: {}
         description: Schedule a one-time action at a specific time
       responses:
         '201':
@@ -109,18 +115,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000026
-                  type: email
-                  scheduled_at: '2024-01-16T10:00:00Z'
-                  status: pending
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                scheduled_at: '2026-11-05T16:00:00Z'
+                status: PENDING
+                action_config: {}
+                executed_at: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -161,12 +165,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ScheduledActionPage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  scheduled_at: '2026-11-05T16:00:00Z'
+                  status: PENDING
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -198,6 +204,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AutomationCatalog'
+              example:
+                triggers:
+                - type: TIME_BASED
+                  label: On a schedule
+                  group: Behaviors
+                - type: SUBSCRIBED_TO_LIST
+                  label: Subscribes to a list
+                  group: Email & messages
+                - type: UNSUBSCRIBED_FROM_LIST
+                  label: Unsubscribes from a list
+                  group: Email & messages
+                actions:
+                - type: SEND_MESSAGE
+                  label: Send email
+                  group: Sending
+                  kind: ACTION
+                - type: SEND_SMS
+                  label: Send SMS
+                  group: Sending
+                  kind: ACTION
+                - type: SEND_1TO1_EMAIL
+                  label: Send 1:1 email
+                  group: Sending
+                  kind: ACTION
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -215,6 +245,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Triggers and actions.
   /contacts/{id}/enrolments:
     get:
       operationId: list_contact_enrolments
@@ -238,6 +269,25 @@ paths:
                       $ref: '#/components/schemas/Enrolment'
                 required:
                 - items
+              example:
+                items:
+                - id: 7579e087-fd2f-568e-8835-12a76256ad3e
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  contact_email: priya.natarajan@northwindtraders.example
+                  status: WAITING
+                  current_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                  next_run_at: '2026-11-06T16:00:00Z'
+                  entered_by: alex
+                  history:
+                  - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                    kind: ACTION
+                    label: Send email
+                    at: '2026-11-03T16:00:00Z'
+                    outcome: DONE
+                  entered_at: '2026-11-03T16:00:00Z'
+                  ended_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -255,6 +305,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Every workflow a contact is or was in. 404 when the record does not exist in this workspace.
   /deals/{id}/enrolments:
     get:
       operationId: list_deal_enrolments
@@ -268,6 +319,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrolmentPage'
+              example:
+                items:
+                - id: 47ac623d-96a0-57aa-b8c2-0b8a230023a6
+                  workflow_id: f1f1bd07-238b-520a-b007-7846dac00c19
+                  workflow_name: Hot lead handoff
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  status: COMPLETED
+                  entered_at: '2026-11-01T16:00:00Z'
+                - id: 3b209ba1-4c06-5235-a6e7-0c74f4d40366
+                  workflow_id: b36c0bc7-7dae-56b4-af7f-9c1ef4673496
+                  workflow_name: Stalled deal nudge
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  status: WAITING
+                  entered_at: '2026-11-02T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -290,6 +358,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Automations a deal is in. Paged (`page`, `limit` ≤ 100). 404 when the record does not exist in this workspace.
   /enrolments/{id}:
     get:
       operationId: get_enrolment
@@ -306,6 +375,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+              example:
+                id: 7579e087-fd2f-568e-8835-12a76256ad3e
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                workflow_name: Welcome series (7 days)
+                contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                contact_email: priya.natarajan@northwindtraders.example
+                status: WAITING
+                current_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                next_run_at: '2026-11-06T16:00:00Z'
+                entered_by: alex
+                history:
+                - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  kind: ACTION
+                  label: Send email
+                  at: '2026-11-03T16:00:00Z'
+                  outcome: DONE
+                entered_at: '2026-11-03T16:00:00Z'
+                ended_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -323,6 +410,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: One contact's progress through a workflow. 404 when the record does not exist in this workspace.
   /enrolments/{id}/jump:
     post:
       operationId: jump_enrolment
@@ -344,6 +432,8 @@ paths:
                 step_id:
                   type: string
                   format: uuid
+            example:
+              step_id: cd9627a9-c1de-5aef-9be3-a38c1d7460bd
       responses:
         '200':
           description: Moved
@@ -351,6 +441,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+              example:
+                id: 7579e087-fd2f-568e-8835-12a76256ad3e
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                workflow_name: Welcome series (7 days)
+                contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                contact_email: priya.natarajan@northwindtraders.example
+                status: WAITING
+                current_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                next_run_at: '2026-11-06T16:00:00Z'
+                entered_by: alex
+                history:
+                - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  kind: ACTION
+                  label: Send email
+                  at: '2026-11-03T16:00:00Z'
+                  outcome: DONE
+                entered_at: '2026-11-03T16:00:00Z'
+                ended_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -370,6 +478,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Move a contact to a given step now. A state change on one resource; audited. 404 when the record does not
+        exist in this workspace.
   /enrolments/{id}/retry:
     post:
       operationId: retry_enrolment
@@ -383,6 +493,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                workflow_name: Workflow name
+                contact_id: 7970f5e9-e936-5cd5-b2cf-883a6f1433fc
+                contact_email: Contact email
+                status: ACTIVE
+                current_step_id: e73c31c1-5129-50f1-ad4a-d05281d2a22a
+                next_run_at: '2026-11-05T16:00:00Z'
+                entered_by: Entered by
+                trigger_id: 848ded80-ea6f-57b1-a733-796a8102a816
+                trigger_type: STAGE_CHANGE
+                trigger_subject: Trigger subject
+                exit_reason: UNSUBSCRIBED
+                split_paths: {}
+                goal_step_id: e9a62b94-9bdb-56da-9a42-0eacb6e57d28
+                history:
+                - step_id: cd9627a9-c1de-5aef-9be3-a38c1d7460bd
+                  kind: ACTION
+                  at: '2026-11-05T16:00:00Z'
+                  outcome: DONE
+                entered_at: '2026-11-05T16:00:00Z'
+                ended_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -421,6 +554,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Enrolment'
+              example:
+                id: 7579e087-fd2f-568e-8835-12a76256ad3e
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                workflow_name: Welcome series (7 days)
+                contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                contact_email: priya.natarajan@northwindtraders.example
+                status: WAITING
+                current_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                next_run_at: '2026-11-06T16:00:00Z'
+                entered_by: alex
+                history:
+                - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  kind: ACTION
+                  label: Send email
+                  at: '2026-11-03T16:00:00Z'
+                  outcome: DONE
+                entered_at: '2026-11-03T16:00:00Z'
+                ended_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -438,6 +589,13 @@ paths:
       - owner
       - admin
       - marketer
+      description: 'Remove a contact from the workflow. A state change on one resource; audited. 404 when the record does
+        not exist in this workspace.
+
+
+        Publishes `enrolment.stopped` on `crm.automation.v1`.'
+      x-events:
+      - enrolment.stopped
   /recipes:
     get:
       operationId: list_workflow_recipes
@@ -458,6 +616,11 @@ paths:
                       $ref: '#/components/schemas/WorkflowRecipe'
                 required:
                 - items
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  name: Northwind Traders
+                  category: WELCOME
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -475,6 +638,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: Starter workflows (welcome series, abandoned signup, re-engagement, post-purchase).
   /recipes/import:
     post:
       operationId: import_workflow_recipe
@@ -493,6 +657,9 @@ paths:
                   format: uri
                 definition:
                   type: object
+            example:
+              url: https://northwindtraders.example/pricing
+              definition: {}
       responses:
         '201':
           description: Recipe added
@@ -500,6 +667,23 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowRecipe'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                name: Northwind Traders
+                description: Example
+                category: WELCOME
+                trigger_types:
+                - STAGE_CHANGE
+                trigger_type: STAGE_CHANGE
+                parameters:
+                - key: snippet.signature
+                  kind: LIST
+                  label: Primary
+                source_url: https://northwindtraders.example/pricing
+                industry: Industry
+                definition: {}
+                step_count: 3
+                needs_templates: 3
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -520,6 +704,7 @@ paths:
       - owner
       - admin
       - marketer
+      description: Add a recipe to the workspace's library from a URL or an uploaded definition. Audited.
   /recipes/{id}/instantiate:
     post:
       operationId: instantiate_workflow_recipe
@@ -549,6 +734,11 @@ paths:
                   format: uuid
                   deprecated: true
                   description: Shorthand for bindings.list
+            example:
+              name: Northwind Traders
+              bindings:
+                key: Value
+              list_id: 1f3cd179-64de-54d4-a396-6cda091ad1ed
       responses:
         '201':
           description: Workflow created from the recipe
@@ -556,6 +746,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: 6b579986-98a1-52bc-b486-8c48e0820541
+                name: Welcome series
+                description: Five emails over seven days after a list subscription, ending early when the contact activates.
+                trigger_type: SUBSCRIBED_TO_LIST
+                is_active: true
+                sequence: 1
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -573,6 +771,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Create an inactive workflow from a recipe. A state change on one resource; audited. 404 when the record
+        does not exist in this workspace.
   /rules:
     get:
       operationId: list_rules
@@ -583,7 +783,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - name: filter_workflow_id
+      - name: workflow_id
         in: query
         schema:
           type: string
@@ -595,12 +795,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RulePage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                  condition_field: Condition field
+                  condition_operator: EQUALS
+                  is_active: true
+                  sequence: 1
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -630,16 +835,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRuleRequest'
-            examples:
-              default:
-                name: Assign to region A
-                condition:
-                  field: region
-                  operator: equals
-                  value: A
-                action:
-                  type: assign
-                  value: team-001
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              condition_field: Condition field
+              condition_operator: EQUALS
+              condition_value: Condition value
+              condition_value_type: TEXT
+              action_type: SEND_EMAIL
+              action_config: {}
+              is_active: true
+              sequence: 1
         description: Create a new workflow rule
       responses:
         '201':
@@ -648,27 +853,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000008
-                  name: Assign to region A
-                  condition:
-                    field: region
-                    operator: equals
-                    value: A
-                  action:
-                    type: assign
-                    value: team-001
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                condition_field: Condition field
+                condition_operator: EQUALS
+                condition_value: Condition value
+                condition_value_type: TEXT
+                action_type: SEND_EMAIL
+                action_config: {}
+                is_active: true
+                sequence: 1
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -708,6 +908,9 @@ paths:
                 lead_data:
                   type: object
                   description: Sample lead data for evaluation
+            example:
+              rule_id: 9fd16524-6914-54dc-a830-024bec1c8df0
+              lead_data: {}
         description: Test a workflow rule with sample data to verify conditions and actions
       responses:
         '200':
@@ -716,18 +919,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RuleTestResult'
-              examples:
-                default:
-                  rule_id: 00000000-0000-0000-0000-000000000008
-                  test_passed: true
-                  matched: true
-                  evaluation_time_ms: 12
+              example:
+                rule_id: 9fd16524-6914-54dc-a830-024bec1c8df0
+                condition_met: false
+                matching_conditions:
+                - Matching conditions
+                actions_to_fire:
+                - Actions to fire
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -740,6 +940,7 @@ paths:
             application/json:
               schema:
                 type: object
+              example: {}
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -777,19 +978,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000008
-                  name: Assign to region A
-                  condition:
-                    field: region
-                    operator: equals
-                    value: A
-                  action:
-                    type: assign
-                    value: team-001
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                condition_field: Condition field
+                condition_operator: EQUALS
+                condition_value: Condition value
+                condition_value_type: TEXT
+                action_type: SEND_EMAIL
+                action_config: {}
+                is_active: true
+                sequence: 1
+                created_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -827,16 +1027,15 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateRuleRequest'
-            examples:
-              default:
-                name: Assign to region A
-                condition:
-                  field: region
-                  operator: equals
-                  value: A
-                action:
-                  type: assign
-                  value: team-001
+            example:
+              condition_field: Condition field
+              condition_operator: EQUALS
+              condition_value: Condition value
+              condition_value_type: TEXT
+              action_type: SEND_EMAIL
+              action_config: {}
+              is_active: true
+              sequence: 1
         description: Update an existing rule
       responses:
         '200':
@@ -845,41 +1044,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000008
-                  name: Assign to region A
-                  condition:
-                    field: region
-                    operator: equals
-                    value: A
-                  action:
-                    type: assign
-                    value: team-001
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                condition_field: Condition field
+                condition_operator: EQUALS
+                condition_value: Condition value
+                condition_value_type: TEXT
+                action_type: SEND_EMAIL
+                action_config: {}
+                is_active: true
+                sequence: 1
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '204':
           description: Resource updated successfully
         '401':
@@ -915,17 +1101,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -948,7 +1126,7 @@ paths:
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - name: filter_type
+      - name: type
         in: query
         schema:
           type: string
@@ -960,7 +1138,7 @@ paths:
           - ON_CREATE
           - ON_UPDATE
           - ON_DELETE
-      - name: filter_enabled
+      - name: enabled
         in: query
         schema:
           type: boolean
@@ -971,12 +1149,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TriggerPage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                  type: STAGE_CHANGE
+                  entity: Entity
+                  enabled: true
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1006,11 +1188,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTriggerRequest'
-            examples:
-              default:
-                name: On Lead Create
-                event: lead.created
-                enabled: true
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              type: STAGE_CHANGE
+              entity: Entity
+              field: Field
+              schedule: Schedule
+              enabled: true
         description: Create a new workflow trigger
       responses:
         '201':
@@ -1019,22 +1203,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000009
-                  name: On Lead Create
-                  event: lead.created
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                type: STAGE_CHANGE
+                entity: Entity
+                field: Field
+                schedule: Schedule
+                enabled: true
+                last_fired: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1076,14 +1258,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000009
-                  name: On Lead Create
-                  event: lead.created
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                type: STAGE_CHANGE
+                entity: Entity
+                field: Field
+                schedule: Schedule
+                enabled: true
+                last_fired: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1121,11 +1305,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTriggerRequest'
-            examples:
-              default:
-                name: On Lead Create
-                event: lead.created
-                enabled: true
+            example:
+              enabled: true
+              schedule: Schedule
+              type: STAGE_CHANGE
+              entity: Entity
+              field: Field
         description: Update an existing trigger
       responses:
         '200':
@@ -1134,36 +1319,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Trigger'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000009
-                  name: On Lead Create
-                  event: lead.created
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                type: STAGE_CHANGE
+                entity: Entity
+                field: Field
+                schedule: Schedule
+                enabled: true
+                last_fired: '2026-11-05T16:00:00Z'
+                created_at: '2026-11-05T16:00:00Z'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '204':
           description: Resource updated successfully
         '401':
@@ -1199,17 +1374,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -1250,17 +1417,11 @@ paths:
                   workflows_fired:
                     type: integer
                     format: int32
-              examples:
-                default:
-                  success: true
-                  trigger_id: 00000000-0000-0000-0000-000000000008
-                  workflow_execution_id: 00000000-0000-0000-0000-000000000032
+              example:
+                executed: false
+                workflows_fired: 3
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -1273,6 +1434,7 @@ paths:
             application/json:
               schema:
                 type: object
+              example: {}
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -1298,11 +1460,11 @@ paths:
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/Search'
-      - name: filter_active
+      - name: active
         in: query
         schema:
           type: boolean
-      - name: filter_trigger_type
+      - name: trigger_type
         in: query
         schema:
           type: string
@@ -1319,12 +1481,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowPage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  name: Welcome series (7 days)
+                  description: ''
+                  is_active: true
+                  triggers:
+                  - type: SUBSCRIBED_TO_LIST
+                    config:
+                      label: Newsletter
+                  - type: FORM_SUBMITTED
+                    config:
+                      label: Website footer
+                  trigger_type: SUBSCRIBED_TO_LIST
+                  entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  reentry: ONCE
+                  status: ACTIVE
+                  active_enrolments: 1204
+                  completed_enrolments: 8311
+                  created_at: '2026-06-08T16:00:00Z'
+                  updated_at: '2026-11-02T16:00:00Z'
+                  last_run: '2026-11-05T15:58:00Z'
+                  sequence: 1
+                - id: 1114e157-f1ec-5dda-9063-79abf0255ee3
+                  name: Abandoned signup
+                  description: ''
+                  is_active: true
+                  triggers:
+                  - type: TAG_ADDED
+                    config:
+                      label: trial
+                  trigger_type: TAG_ADDED
+                  entry_step_id: 686016a9-b02e-5415-8f48-28549c0ca454
+                  reentry: ONCE
+                  status: ACTIVE
+                  active_enrolments: 318
+                  completed_enrolments: 2940
+                  created_at: '2026-06-18T16:00:00Z'
+                  updated_at: '2026-11-02T16:00:00Z'
+                  last_run: '2026-11-05T15:38:00Z'
+                  sequence: 1
+                - id: b36c0bc7-7dae-56b4-af7f-9c1ef4673496
+                  name: Re-engage · 90 days quiet
+                  description: ''
+                  is_active: true
+                  triggers:
+                  - type: TIME_BASED
+                    config:
+                      label: daily · segment Churn risk
+                  trigger_type: TIME_BASED
+                  entry_step_id: d8cdcb6a-61a1-563f-81fd-329e0ae430fd
+                  reentry: MULTIPLE
+                  status: ACTIVE
+                  active_enrolments: 2077
+                  completed_enrolments: 4120
+                  created_at: '2026-06-28T16:00:00Z'
+                  updated_at: '2026-11-02T16:00:00Z'
+                  last_run: '2026-11-05T15:18:00Z'
+                  sequence: 1
+                total: 6
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1354,11 +1572,30 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateWorkflowRequest'
-            examples:
-              default:
-                name: Lead Assignment
-                description: Auto-assign leads based on region
-                enabled: true
+            example:
+              name: Northwind Traders
+              description: Example
+              triggers:
+              - type: STAGE_CHANGE
+              exit_rules:
+                on_unsubscribe: false
+                on_conversion: false
+                on_goal_reached: false
+              unsubscribe_scope: TRIGGER_LISTS
+              access_group_ids:
+              - dc6ee68c-2507-556c-b8b1-5a79f0575f8c
+              reentry: ONCE
+              trigger_type: STAGE_CHANGE
+              trigger_config: {}
+              action_type: SEND_EMAIL
+              action_config: {}
+              conditions:
+                op: AND
+                items:
+                - subject: October product update
+                  operator: EQ
+              sequence: 1
+              is_active: true
         description: Create a new workflow automation
       responses:
         '201':
@@ -1367,22 +1604,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000007
-                  name: Lead Assignment
-                  description: Auto-assign leads based on region
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1424,14 +1671,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000007
-                  name: Lead Assignment
-                  description: Auto-assign leads based on region
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1469,11 +1730,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWorkflowRequest'
-            examples:
-              default:
-                name: Lead Assignment
-                description: Auto-assign leads based on region
-                enabled: true
+            example:
+              name: Northwind Traders
+              description: Example
+              triggers:
+              - type: STAGE_CHANGE
+              exit_rules:
+                on_unsubscribe: false
+                on_conversion: false
+                on_goal_reached: false
+              unsubscribe_scope: TRIGGER_LISTS
+              access_group_ids:
+              - dc6ee68c-2507-556c-b8b1-5a79f0575f8c
+              reentry: ONCE
+              tracking:
+                goal_id: 6f60683f-3bf5-5a28-b467-77189733bf5b
+                conversion_id: 30ae9dc3-8338-5da8-b1c5-632528d89c09
+              trigger_type: STAGE_CHANGE
+              trigger_config: {}
+              action_type: SEND_EMAIL
+              action_config: {}
+              conditions:
+                op: AND
+                items:
+                - subject: October product update
+                  operator: EQ
+              sequence: 1
+              is_active: true
         description: Update an existing workflow
       responses:
         '200':
@@ -1482,36 +1765,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000007
-                  name: Lead Assignment
-                  description: Auto-assign leads based on region
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Conflict'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '204':
           description: Resource updated successfully
         '401':
@@ -1547,17 +1832,9 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
         '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/Forbidden'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '429':
@@ -1582,6 +1859,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1599,6 +1898,33 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateWorkflowRequest'
+            example:
+              name: Northwind Traders
+              description: Example
+              triggers:
+              - type: STAGE_CHANGE
+              exit_rules:
+                on_unsubscribe: false
+                on_conversion: false
+                on_goal_reached: false
+              unsubscribe_scope: TRIGGER_LISTS
+              access_group_ids:
+              - dc6ee68c-2507-556c-b8b1-5a79f0575f8c
+              reentry: ONCE
+              tracking:
+                goal_id: 6f60683f-3bf5-5a28-b467-77189733bf5b
+                conversion_id: 30ae9dc3-8338-5da8-b1c5-632528d89c09
+              trigger_type: STAGE_CHANGE
+              trigger_config: {}
+              action_type: SEND_EMAIL
+              action_config: {}
+              conditions:
+                op: AND
+                items:
+                - subject: October product update
+                  operator: EQ
+              sequence: 1
+              is_active: true
       x-brrtrouter-impl: true
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
@@ -1626,6 +1952,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1645,6 +1993,13 @@ paths:
       - owner
       - admin
       - marketer
+      description: 'Set the workflow live. A state change on one resource; audited. 404 when the record does not exist in
+        this workspace.
+
+
+        Publishes `workflow.activated` on `crm.automation.v1`.'
+      x-events:
+      - workflow.activated
   /workflows/{id}/bindings:
     patch:
       operationId: bind_workflow_parameters
@@ -1662,6 +2017,8 @@ paths:
               type: object
               additionalProperties:
                 type: string
+            example:
+              key: Value
       responses:
         '200':
           description: The workflow with the parameters bound
@@ -1669,6 +2026,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                name: Northwind Traders
+                description: Example
+                is_active: true
+                triggers:
+                - type: STAGE_CHANGE
+                trigger_type: STAGE_CHANGE
+                trigger_config: {}
+                action_type: SEND_EMAIL
+                action_config: {}
+                conditions:
+                  op: AND
+                  items:
+                  - subject: October product update
+                    operator: EQ
+                exit_rules:
+                  on_unsubscribe: false
+                  on_conversion: false
+                  on_goal_reached: false
+                unsubscribe_scope: TRIGGER_LISTS
+                access_group_ids:
+                - dc6ee68c-2507-556c-b8b1-5a79f0575f8c
+                tracking:
+                  goal_id: 6f60683f-3bf5-5a28-b467-77189733bf5b
+                  conversion_id: 30ae9dc3-8338-5da8-b1c5-632528d89c09
+                recipe_id: ext_2aa648fff9
+                bindings:
+                  key: Value
+                unbound_parameters:
+                - key: snippet.signature
+                  kind: LIST
+                  label: Primary
+                notes:
+                - text: Thanks for getting in touch.
+                entry_step_id: 93404b0b-da88-5a3f-9bbc-46f4030b5dc2
+                reentry: ONCE
+                status: DRAFT
+                active_enrolments: 3
+                completed_enrolments: 3
+                sequence: 1
+                created_at: '2026-11-05T16:00:00Z'
+                updated_at: '2026-11-05T16:00:00Z'
+                run_count: 3
+                last_run: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1686,6 +2088,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Bind recipe parameters; references in triggers and steps are resolved in place. Changes only the fields
+        sent; the change is audited with before and after values. 404 when the record does not exist in this workspace.
   /workflows/{id}/duplicate:
     post:
       operationId: duplicate_workflow
@@ -1703,6 +2107,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1720,6 +2146,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Copy a workflow and its steps as a new inactive workflow. A state change on one resource; audited. 404
+        when the record does not exist in this workspace.
   /workflows/{id}/enrolments:
     get:
       operationId: list_workflow_enrolments
@@ -1746,7 +2174,63 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEnrolment'
+                $ref: '#/components/schemas/EnrolmentPage'
+              example:
+                items:
+                - id: 7579e087-fd2f-568e-8835-12a76256ad3e
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  contact_id: af512c4f-0beb-50b6-bf61-7a9d8bd417b5
+                  contact_email: priya.natarajan@northwindtraders.example
+                  status: WAITING
+                  current_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                  next_run_at: '2026-11-06T16:00:00Z'
+                  entered_by: alex
+                  history:
+                  - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                    kind: ACTION
+                    label: Send email
+                    at: '2026-11-03T16:00:00Z'
+                    outcome: DONE
+                  entered_at: '2026-11-03T16:00:00Z'
+                  ended_at: '2026-11-05T16:00:00Z'
+                - id: 4a88513a-fb6e-56c4-a4d0-7ec3692b5d6d
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  contact_id: 7ed65e2d-0bd7-5e4e-9071-f4dac3456426
+                  contact_email: tom.okafor@fabrikam.example
+                  status: ACTIVE
+                  current_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  next_run_at: '2026-11-05T16:00:00Z'
+                  entered_by: TRIGGER
+                  history:
+                  - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                    kind: ACTION
+                    label: Send email
+                    at: '2026-11-02T16:00:00Z'
+                    outcome: DONE
+                  entered_at: '2026-11-02T16:00:00Z'
+                  ended_at: '2026-11-05T16:00:00Z'
+                - id: af9f8ad1-8b8e-5dab-8831-9882125ee623
+                  workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                  workflow_name: Welcome series (7 days)
+                  contact_id: f25ace60-6582-5cc7-9226-f9367248776c
+                  contact_email: lena.fischer@contoso.example
+                  status: WAITING
+                  current_step_id: ef423ff6-5584-5017-b1b3-8408d7958b9e
+                  next_run_at: '2026-11-08T16:00:00Z'
+                  entered_by: TRIGGER
+                  history:
+                  - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                    kind: ACTION
+                    label: Send email
+                    at: '2026-11-01T16:00:00Z'
+                    outcome: DONE
+                  entered_at: '2026-11-01T16:00:00Z'
+                  ended_at: '2026-11-05T16:00:00Z'
+                total: 24
+                page: 1
+                limit: 100
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1764,10 +2248,16 @@ paths:
       - marketer
       - sales
       - read-only
+      description: 'Contacts enrolled in a workflow. Paged (`page`, `limit` ≤ 100). Filters: `status`, `step_id`. 404 when
+        the record does not exist in this workspace.'
     post:
       operationId: enrol_contacts
       summary: Enrol contacts by hand
-      description: Bypasses the trigger. Honors the workflow's re-entry rule; contacts already active are reported, not re-enrolled.
+      description: 'Bypasses the trigger. Honors the workflow''s re-entry rule; contacts already active are reported, not
+        re-enrolled.
+
+
+        Publishes `enrolment.started` on `crm.automation.v1`.'
       tags:
       - enrolments
       parameters:
@@ -1779,6 +2269,10 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/EnrolRequest'
+            example:
+              contact_ids:
+              - d65b50a4-d924-584c-b7e6-893ccd3d04a2
+              start_step_id: 230c8137-50e8-59a7-b5a0-c0523fec3649
       responses:
         '201':
           description: Enrolment result
@@ -1786,6 +2280,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EnrolResult'
+              example:
+                enrolled: 0
+                skipped:
+                - {}
+                already_active: 3
+                excluded: 3
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -1805,6 +2305,8 @@ paths:
       - owner
       - admin
       - marketer
+      x-events:
+      - enrolment.started
   /workflows/{id}/export:
     get:
       operationId: export_workflow_recipe
@@ -1821,6 +2323,7 @@ paths:
             application/json:
               schema:
                 type: object
+              example: {}
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1838,6 +2341,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: The workflow as a recipe document - references replaced by parameters, notes kept. 404 when the record
+        does not exist in this workspace.
   /workflows/{id}/map:
     get:
       operationId: get_workflow_map
@@ -1856,6 +2361,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowMap'
+              example:
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                active: 1204
+                completed: 8311
+                goal_reached: 1911
+                stopped: 89
+                steps:
+                - step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  kind: ACTION
+                  label: Send email
+                  waiting_now: 0
+                  passed: 9515
+                  branch_yes: 0
+                  branch_no: 0
+                  sent: 9515
+                  opened: 5899
+                  clicked: 1142
+                  failed: 2
+                - step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                  kind: WAIT
+                  label: Wait 2 days
+                  waiting_now: 402
+                  passed: 9513
+                  branch_yes: 0
+                  branch_no: 0
+                  sent: 0
+                  opened: 0
+                  clicked: 0
+                  failed: 0
+                - step_id: 94f0ecb3-8d57-54c0-937b-10c11b11cb2c
+                  kind: IF_ELSE
+                  label: Opened the previous email?
+                  waiting_now: 0
+                  passed: 9111
+                  branch_yes: 5640
+                  branch_no: 3471
+                  sent: 0
+                  opened: 0
+                  clicked: 0
+                  failed: 0
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1889,6 +2434,28 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Workflow'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                reentry: ONCE
+                status: ACTIVE
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
+                last_run: '2026-11-05T15:58:00Z'
+                sequence: 1
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -1906,6 +2473,13 @@ paths:
       - owner
       - admin
       - marketer
+      description: 'Pause the workflow (enrolments hold at their step). A state change on one resource; audited. 404 when
+        the record does not exist in this workspace.
+
+
+        Publishes `workflow.paused` on `crm.automation.v1`.'
+      x-events:
+      - workflow.paused
   /workflows/{id}/rules:
     get:
       operationId: list_workflow_rules
@@ -1929,12 +2503,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RulePage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                  condition_field: Condition field
+                  condition_operator: EQUALS
+                  is_active: true
+                  sequence: 1
+                total: 2
+                page: 1
+                limit: 25
         '404':
           $ref: '#/components/responses/NotFound'
         '401':
@@ -1972,16 +2551,16 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateRuleRequest'
-            examples:
-              default:
-                name: Assign to region A
-                condition:
-                  field: region
-                  operator: equals
-                  value: A
-                action:
-                  type: assign
-                  value: team-001
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              condition_field: Condition field
+              condition_operator: EQUALS
+              condition_value: Condition value
+              condition_value_type: TEXT
+              action_type: SEND_EMAIL
+              action_config: {}
+              is_active: true
+              sequence: 1
         description: Add a rule to a workflow
       responses:
         '201':
@@ -1990,29 +2569,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Rule'
-              examples:
-                default:
-                  id: 00000000-0000-0000-0000-000000000008
-                  name: Assign to region A
-                  condition:
-                    field: region
-                    operator: equals
-                    value: A
-                  action:
-                    type: assign
-                    value: team-001
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                is_active: true
+                created_at: '2026-06-08T16:00:00Z'
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                condition_field: Condition field
+                condition_operator: EQUALS
+                sequence: 1
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2051,21 +2621,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowExecutionResult'
-              examples:
-                default:
-                  workflow_id: 00000000-0000-0000-0000-000000000007
-                  status: completed
-                  started_at: '2024-01-15T10:30:00Z'
-                  completed_at: '2024-01-15T10:30:05Z'
-                  rules_triggered: 3
+              example:
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                executed: false
+                actions_ran: 3
+                errors:
+                - Errors
         '404':
           $ref: '#/components/responses/NotFound'
         '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+          $ref: '#/components/responses/InternalError'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '400':
@@ -2076,6 +2641,32 @@ paths:
             application/json:
               schema:
                 type: object
+              example:
+                id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                name: Welcome series (7 days)
+                description: ''
+                status: ACTIVE
+                is_active: true
+                triggers:
+                - type: SUBSCRIBED_TO_LIST
+                  config:
+                    label: Newsletter
+                - type: FORM_SUBMITTED
+                  config:
+                    label: Website footer
+                trigger_type: SUBSCRIBED_TO_LIST
+                reentry: ONCE
+                stop_on_unsubscribe: true
+                stop_on_conversion_id: 30eefab7-ff42-50cf-85bd-3a974b1ce548
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                step_count: 9
+                active_enrolments: 1204
+                completed_enrolments: 8311
+                goal_rate: 0.23
+                messages_sent: 31402
+                last_run: '2026-11-05T15:58:00Z'
+                created_at: '2026-06-08T16:00:00Z'
+                updated_at: '2026-11-02T16:00:00Z'
         '403':
           $ref: '#/components/responses/Forbidden'
         '429':
@@ -2113,12 +2704,14 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowRunPage'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  limit: 20
+              example:
+                items:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                  started_at: '2026-11-05T16:00:00Z'
+                total: 2
+                page: 1
+                limit: 25
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2164,6 +2757,12 @@ paths:
                     type: integer
                     format: int32
                     description: Parameters the recipe has in all, for "Step 1/3"
+              example:
+                parameters:
+                - key: snippet.signature
+                  kind: LIST
+                  label: Primary
+                total: 2
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2181,6 +2780,8 @@ paths:
       - marketer
       - sales
       - read-only
+      description: The setup wizard - the unbound recipe parameters, in order. 404 when the record does not exist in this
+        workspace.
   /workflows/{id}/steps:
     get:
       operationId: get_workflow_steps
@@ -2197,6 +2798,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowSteps'
+              example:
+                workflow_id: 22e49987-c27c-538a-9688-56d9ca17a7ec
+                entry_step_id: f1189b89-3e27-5826-bc93-e33f7450d394
+                steps:
+                - id: f1189b89-3e27-5826-bc93-e33f7450d394
+                  kind: ACTION
+                  label: Send email
+                  next_step_id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                  action_type: SEND_MESSAGE
+                  action_config:
+                    template_id: 736685cb-324b-572c-b287-deb656a4d8de
+                    template_name: 'Welcome · day 0: what you can do today'
+                - id: 6987f07d-c099-529a-bb28-e900ce5e5d00
+                  kind: WAIT
+                  label: Wait 2 days
+                  next_step_id: 94f0ecb3-8d57-54c0-937b-10c11b11cb2c
+                  wait:
+                    mode: DURATION
+                    seconds: 172800
+                    send_window:
+                      days:
+                      - MON
+                      - TUE
+                      - WED
+                      from_hour: 8
+                      to_hour: 18
+                - id: 94f0ecb3-8d57-54c0-937b-10c11b11cb2c
+                  kind: IF_ELSE
+                  label: Opened the previous email?
+                  conditions:
+                    op: AND
+                    items:
+                    - subject: engagement:opened:2
+                      operator: HAS
+                  yes_step_id: 27989e3e-01b9-5f9d-b481-ca400c08298b
+                  no_step_id: 05f191ea-4671-5e2e-b6d2-4ac551d5d22c
+                version: 7
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2214,6 +2852,7 @@ paths:
       - marketer
       - sales
       - read-only
+      description: The workflow's step graph. 404 when the record does not exist in this workspace.
     put:
       operationId: replace_workflow_steps
       summary: Replace the step graph
@@ -2235,6 +2874,13 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/WorkflowSteps'
+            example:
+              workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+              entry_step_id: 93404b0b-da88-5a3f-9bbc-46f4030b5dc2
+              steps:
+              - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                kind: ACTION
+              version: 3
       responses:
         '200':
           description: Saved
@@ -2242,6 +2888,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/WorkflowSteps'
+              example:
+                workflow_id: 7008f5a1-8ead-5a4f-8cd3-a3deab21a548
+                entry_step_id: 93404b0b-da88-5a3f-9bbc-46f4030b5dc2
+                steps:
+                - id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                  kind: ACTION
+                version: 3
         '400':
           description: Graph invalid
           content:
@@ -2291,6 +2944,8 @@ paths:
                 text:
                   type: string
                   maxLength: 2000
+            example:
+              text: Thanks for getting in touch.
       responses:
         '201':
           description: Note added
@@ -2298,6 +2953,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StepNote'
+              example:
+                id: c9e18116-9fea-5e6e-ac32-52580d2450b8
+                text: Thanks for getting in touch.
+                author: Author
+                created_at: '2026-11-05T16:00:00Z'
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -2315,6 +2975,8 @@ paths:
       - owner
       - admin
       - marketer
+      description: Add a note to a step (or to the workflow with step_id "workflow"). A state change on one resource; audited.
+        404 when the record does not exist in this workspace.
 components:
   schemas:
     ActionType:
@@ -2523,7 +3185,7 @@ components:
         action_config:
           type: object
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
         sequence:
           type: integer
           format: int32
@@ -2800,28 +3462,6 @@ components:
         track:
           type: boolean
           description: Record a goal event (crm/marketing conversions report) when a contact meets it
-    PaginatedEnrolment:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/Enrolment'
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: Paginated list of Enrolment records
     RecipeParameter:
       type: object
       required:
@@ -3350,7 +3990,7 @@ components:
         action_config:
           type: object
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
         sequence:
           type: integer
           format: int32
@@ -3407,7 +4047,7 @@ components:
               - WORKSPACE
               description: The contact's own timezone (falling back to the workspace's) or the workspace's
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: UNTIL_CONDITION; the condition tree (see WorkflowStep.conditions)
         date_field:
           type: string
@@ -3502,7 +4142,7 @@ components:
           type: object
           description: Action-specific configuration (JSON) for `action_type`
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: Additional AND/OR conditions (JSON)
         exit_rules:
           $ref: '#/components/schemas/ExitRules'
@@ -3871,7 +4511,7 @@ components:
         wait:
           $ref: '#/components/schemas/WaitConfig'
         conditions:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: 'IF_ELSE and GOAL; the crm/contacts condition tree (AND/OR groups of field / tag / list status / form
 
             submitted / engagement / site / deal / score predicates; `{"segment_id": ...}` reuses a saved segment).
@@ -3998,12 +4638,13 @@ components:
           description: Fire once per contact for this trigger, or every time the event happens (subject to the workflow's
             reentry rule)
         segment:
-          type: object
+          $ref: '#/components/schemas/ConditionGroup'
           description: Optional condition tree; only contacts matching it enter through this trigger
     ErrorResponse:
       type: object
       required:
       - code
+      - reason
       - message
       description: Every error, from every CRM service.
       properties:
@@ -4011,6 +4652,11 @@ components:
           type: integer
           format: int32
           description: HTTP status code
+        reason:
+          type: string
+          pattern: ^[a-z][a-z0-9_.]*$
+          description: Stable machine-readable reason, e.g. not_found, workspace_forbidden, owner_required, in_use, invalid_state.
+            Clients branch on this, not on message.
         message:
           type: string
           description: Human-readable message, safe to show
@@ -4033,6 +4679,94 @@ components:
                 type: string
               message:
                 type: string
+      example:
+        code: 409
+        reason: in_use
+        message: This snippet is used by 3 templates.
+        request_id: 01JC9V4M2Q8T7R6P5N4K3J2H1G
+    Condition:
+      type: object
+      required:
+      - subject
+      - operator
+      properties:
+        subject:
+          type: string
+          description: 'What is tested: field:<name>, custom:<key>, tag, list:<id>, score, engagement:opened:<days>,
+
+            engagement:clicked:<days>, engagement:any:<days>, deal:stage, deal:value, site:visited:<path>,
+
+            event:<name>, form:<id>, created_at, last_activity_at, timezone, country
+
+            '
+        operator:
+          type: string
+          enum:
+          - EQ
+          - NEQ
+          - CONTAINS
+          - NOT_CONTAINS
+          - STARTS_WITH
+          - GT
+          - GTE
+          - LT
+          - LTE
+          - IN
+          - NOT_IN
+          - IS_SET
+          - IS_NOT_SET
+          - HAS
+          - HAS_NOT
+          - BEFORE
+          - AFTER
+          - WITHIN_DAYS
+          - NOT_WITHIN_DAYS
+        value:
+          description: String, number, boolean, ISO date or array as the operator requires
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
+      description: Defined by crm/audience; this is an identical copy.
+    ConditionGroup:
+      type: object
+      required:
+      - op
+      - items
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/Condition'
+            - $ref: '#/components/schemas/ConditionSubgroup'
+      description: 'AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences: a group holds conditions
+        and sub-groups, a sub-group holds conditions (two levels). Defined by crm/audience; this is an identical copy.'
+    ConditionSubgroup:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+      required:
+      - op
+      - items
+      description: A nested AND/OR group of conditions inside a ConditionGroup. Defined by crm/audience; this is an identical
+        copy.
   parameters:
     Page:
       name: page
@@ -4121,6 +4855,15 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicts with the current state
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
     Unprocessable:
       description: Validation failed; see fields
       headers:
@@ -4137,6 +4880,15 @@ components:
           $ref: '#/components/headers/RequestId'
         Retry-After:
           $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalError:
+      description: Unexpected failure; retry with the same Idempotency-Key where there is one
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
       content:
         application/json:
           schema:

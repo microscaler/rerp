@@ -1,0 +1,469 @@
+# Generated with the OpenAPI document from the CRM event catalogue (openapi/crm/docs/10-events.md).
+asyncapi: 3.0.0
+info:
+  title: CRM Insights events
+  version: 1.0.0
+  description: 'Events crm/insights publishes on Pub/Sub topic `crm.insights.v1` and the events it consumes from other CRM
+    services. Every message is an envelope (event id, type, workspace, time, actor) around `data`. Delivery is at least once:
+    consumers are idempotent on `event_id`. Catalogue: openapi/crm/docs/10-events.md; decisions: ADR 003, ADR 004.'
+defaultContentType: application/json
+servers:
+  pubsub:
+    host: pubsub.googleapis.com
+    protocol: googlepubsub
+    description: Google Cloud Pub/Sub in the CRM plane project (topics and subscriptions are created by gcp-infrastructure
+      through Crossplane).
+channels:
+  published:
+    address: crm.insights.v1
+    title: crm.insights.v1
+    description: Everything crm/insights publishes.
+    messages:
+      scoreChanged:
+        $ref: '#/components/messages/scoreChanged'
+      erasureCompleted:
+        $ref: '#/components/messages/erasureCompleted'
+  from_acquisition:
+    address: crm.acquisition.v1
+    title: crm.acquisition.v1
+    description: Subscription `insights-acquisition` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      formSubmitted:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/formSubmitted
+      siteVisited:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/siteVisited
+      eventRecorded:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/eventRecorded
+      adClicked:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/adClicked
+      conversionRecorded:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/conversionRecorded
+      adAudienceSynced:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/adAudienceSynced
+      adBuyChanged:
+        $ref: ../acquisition/asyncapi.yaml#/components/messages/adBuyChanged
+  from_audience:
+    address: crm.audience.v1
+    title: crm.audience.v1
+    description: Subscription `insights-audience` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      contactCreated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactCreated
+      contactUpdated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactUpdated
+      contactMerged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactMerged
+      contactArchived:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactArchived
+      contactErased:
+        $ref: ../audience/asyncapi.yaml#/components/messages/contactErased
+      subscriptionChanged:
+        $ref: ../audience/asyncapi.yaml#/components/messages/subscriptionChanged
+      tagAdded:
+        $ref: ../audience/asyncapi.yaml#/components/messages/tagAdded
+      tagRemoved:
+        $ref: ../audience/asyncapi.yaml#/components/messages/tagRemoved
+      organisationCreated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/organisationCreated
+      organisationUpdated:
+        $ref: ../audience/asyncapi.yaml#/components/messages/organisationUpdated
+  from_automation:
+    address: crm.automation.v1
+    title: crm.automation.v1
+    description: Subscription `insights-automation` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      enrolmentStarted:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentStarted
+      enrolmentStepCompleted:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentStepCompleted
+      enrolmentGoalReached:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentGoalReached
+      enrolmentCompleted:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentCompleted
+      enrolmentStopped:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentStopped
+      enrolmentFailed:
+        $ref: ../automation/asyncapi.yaml#/components/messages/enrolmentFailed
+      workflowActivated:
+        $ref: ../automation/asyncapi.yaml#/components/messages/workflowActivated
+      workflowPaused:
+        $ref: ../automation/asyncapi.yaml#/components/messages/workflowPaused
+  from_messaging:
+    address: crm.messaging.v1
+    title: crm.messaging.v1
+    description: Subscription `insights-messaging` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      campaignScheduled:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/campaignScheduled
+      campaignCancelled:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/campaignCancelled
+      campaignSending:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/campaignSending
+      campaignSent:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/campaignSent
+      messageSent:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageSent
+      messageDelivered:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageDelivered
+      messageOpened:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageOpened
+      messageClicked:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageClicked
+      messageBounced:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageBounced
+      messageComplained:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageComplained
+      messageReplied:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/messageReplied
+      socialPostPublished:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/socialPostPublished
+      socialPostFailed:
+        $ref: ../messaging/asyncapi.yaml#/components/messages/socialPostFailed
+  from_sales:
+    address: crm.sales.v1
+    title: crm.sales.v1
+    description: Subscription `insights-sales` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      leadCreated:
+        $ref: ../sales/asyncapi.yaml#/components/messages/leadCreated
+      leadStageChanged:
+        $ref: ../sales/asyncapi.yaml#/components/messages/leadStageChanged
+      leadConverted:
+        $ref: ../sales/asyncapi.yaml#/components/messages/leadConverted
+      dealCreated:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealCreated
+      dealUpdated:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealUpdated
+      dealStageChanged:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealStageChanged
+      dealWon:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealWon
+      dealLost:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealLost
+      dealReopened:
+        $ref: ../sales/asyncapi.yaml#/components/messages/dealReopened
+      taskCreated:
+        $ref: ../sales/asyncapi.yaml#/components/messages/taskCreated
+      taskCompleted:
+        $ref: ../sales/asyncapi.yaml#/components/messages/taskCompleted
+      taskReopened:
+        $ref: ../sales/asyncapi.yaml#/components/messages/taskReopened
+  from_workspace:
+    address: crm.workspace.v1
+    title: crm.workspace.v1
+    description: Subscription `insights-workspace` (with a dead-letter topic) filtered on the event types below.
+    messages:
+      fieldDefined:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldDefined
+      fieldChanged:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/fieldChanged
+      erasureRequested:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/erasureRequested
+      workspaceCreated:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/workspaceCreated
+      memberChanged:
+        $ref: ../workspace/asyncapi.yaml#/components/messages/memberChanged
+operations:
+  publish:
+    action: send
+    channel:
+      $ref: '#/channels/published'
+    summary: crm/insights publishes its events
+    messages:
+    - $ref: '#/channels/published/messages/scoreChanged'
+    - $ref: '#/channels/published/messages/erasureCompleted'
+  consume_acquisition:
+    action: receive
+    channel:
+      $ref: '#/channels/from_acquisition'
+    summary: crm/insights consumes form.submitted, site.visited, event.recorded, ad.clicked, conversion.recorded, ad_audience.synced,
+      ad_buy.changed
+    messages:
+    - $ref: '#/channels/from_acquisition/messages/formSubmitted'
+    - $ref: '#/channels/from_acquisition/messages/siteVisited'
+    - $ref: '#/channels/from_acquisition/messages/eventRecorded'
+    - $ref: '#/channels/from_acquisition/messages/adClicked'
+    - $ref: '#/channels/from_acquisition/messages/conversionRecorded'
+    - $ref: '#/channels/from_acquisition/messages/adAudienceSynced'
+    - $ref: '#/channels/from_acquisition/messages/adBuyChanged'
+  consume_audience:
+    action: receive
+    channel:
+      $ref: '#/channels/from_audience'
+    summary: crm/insights consumes contact.created, contact.updated, contact.merged, contact.archived, contact.erased, subscription.changed,
+      tag.added, tag.removed, organisation.created, organisation.updated
+    messages:
+    - $ref: '#/channels/from_audience/messages/contactCreated'
+    - $ref: '#/channels/from_audience/messages/contactUpdated'
+    - $ref: '#/channels/from_audience/messages/contactMerged'
+    - $ref: '#/channels/from_audience/messages/contactArchived'
+    - $ref: '#/channels/from_audience/messages/contactErased'
+    - $ref: '#/channels/from_audience/messages/subscriptionChanged'
+    - $ref: '#/channels/from_audience/messages/tagAdded'
+    - $ref: '#/channels/from_audience/messages/tagRemoved'
+    - $ref: '#/channels/from_audience/messages/organisationCreated'
+    - $ref: '#/channels/from_audience/messages/organisationUpdated'
+  consume_automation:
+    action: receive
+    channel:
+      $ref: '#/channels/from_automation'
+    summary: crm/insights consumes enrolment.started, enrolment.step_completed, enrolment.goal_reached, enrolment.completed,
+      enrolment.stopped, enrolment.failed, workflow.activated, workflow.paused
+    messages:
+    - $ref: '#/channels/from_automation/messages/enrolmentStarted'
+    - $ref: '#/channels/from_automation/messages/enrolmentStepCompleted'
+    - $ref: '#/channels/from_automation/messages/enrolmentGoalReached'
+    - $ref: '#/channels/from_automation/messages/enrolmentCompleted'
+    - $ref: '#/channels/from_automation/messages/enrolmentStopped'
+    - $ref: '#/channels/from_automation/messages/enrolmentFailed'
+    - $ref: '#/channels/from_automation/messages/workflowActivated'
+    - $ref: '#/channels/from_automation/messages/workflowPaused'
+  consume_messaging:
+    action: receive
+    channel:
+      $ref: '#/channels/from_messaging'
+    summary: crm/insights consumes campaign.scheduled, campaign.cancelled, campaign.sending, campaign.sent, message.sent,
+      message.delivered, message.opened, message.clicked, message.bounced, message.complained, message.replied, social.post.published,
+      social.post.failed
+    messages:
+    - $ref: '#/channels/from_messaging/messages/campaignScheduled'
+    - $ref: '#/channels/from_messaging/messages/campaignCancelled'
+    - $ref: '#/channels/from_messaging/messages/campaignSending'
+    - $ref: '#/channels/from_messaging/messages/campaignSent'
+    - $ref: '#/channels/from_messaging/messages/messageSent'
+    - $ref: '#/channels/from_messaging/messages/messageDelivered'
+    - $ref: '#/channels/from_messaging/messages/messageOpened'
+    - $ref: '#/channels/from_messaging/messages/messageClicked'
+    - $ref: '#/channels/from_messaging/messages/messageBounced'
+    - $ref: '#/channels/from_messaging/messages/messageComplained'
+    - $ref: '#/channels/from_messaging/messages/messageReplied'
+    - $ref: '#/channels/from_messaging/messages/socialPostPublished'
+    - $ref: '#/channels/from_messaging/messages/socialPostFailed'
+  consume_sales:
+    action: receive
+    channel:
+      $ref: '#/channels/from_sales'
+    summary: crm/insights consumes lead.created, lead.stage_changed, lead.converted, deal.created, deal.updated, deal.stage_changed,
+      deal.won, deal.lost, deal.reopened, task.created, task.completed, task.reopened
+    messages:
+    - $ref: '#/channels/from_sales/messages/leadCreated'
+    - $ref: '#/channels/from_sales/messages/leadStageChanged'
+    - $ref: '#/channels/from_sales/messages/leadConverted'
+    - $ref: '#/channels/from_sales/messages/dealCreated'
+    - $ref: '#/channels/from_sales/messages/dealUpdated'
+    - $ref: '#/channels/from_sales/messages/dealStageChanged'
+    - $ref: '#/channels/from_sales/messages/dealWon'
+    - $ref: '#/channels/from_sales/messages/dealLost'
+    - $ref: '#/channels/from_sales/messages/dealReopened'
+    - $ref: '#/channels/from_sales/messages/taskCreated'
+    - $ref: '#/channels/from_sales/messages/taskCompleted'
+    - $ref: '#/channels/from_sales/messages/taskReopened'
+  consume_workspace:
+    action: receive
+    channel:
+      $ref: '#/channels/from_workspace'
+    summary: crm/insights consumes field.defined, field.changed, erasure.requested, workspace.created, member.changed
+    messages:
+    - $ref: '#/channels/from_workspace/messages/fieldDefined'
+    - $ref: '#/channels/from_workspace/messages/fieldChanged'
+    - $ref: '#/channels/from_workspace/messages/erasureRequested'
+    - $ref: '#/channels/from_workspace/messages/workspaceCreated'
+    - $ref: '#/channels/from_workspace/messages/memberChanged'
+components:
+  messages:
+    scoreChanged:
+      name: score.changed
+      title: score.changed
+      summary: A contact or deal score changed band or value.
+      description: 'A contact or deal score changed band or value.
+
+
+        Published by: `POST /scores/{id}/recalculate`
+
+
+        Consumed by: crm/audience, crm/automation.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: score.changed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/insights
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ScoreChange'
+    erasureCompleted:
+      name: erasure.completed
+      title: erasure.completed
+      summary: A service erased its copy for a data request.
+      description: 'A service erased its copy for a data request.
+
+
+        Published by the service''s workers.
+
+
+        Consumed by: crm/workspace.'
+      traits:
+      - $ref: '#/components/messageTraits/envelope'
+      payload:
+        type: object
+        required:
+        - event_id
+        - event_type
+        - workspace_id
+        - occurred_at
+        - producer
+        - data
+        properties:
+          event_id:
+            type: string
+            format: uuid
+            description: Idempotency key for consumers
+          event_type:
+            type: string
+            const: erasure.completed
+          workspace_id:
+            type: string
+            format: uuid
+          occurred_at:
+            type: string
+            format: date-time
+          producer:
+            type: string
+            const: crm/<service>
+          actor:
+            type: object
+            properties:
+              kind:
+                type: string
+                enum:
+                - USER
+                - API_KEY
+                - SYSTEM
+                - CONTACT
+                - ANONYMOUS
+              id:
+                type: string
+                description: Sesame user id, API key id, or contact id
+          request_id:
+            type: string
+            description: X-Request-Id of the call that caused it, when there was one
+          entity_id:
+            type: string
+            description: Id of the entity the event is about (also the ordering key)
+          data:
+            $ref: '#/components/schemas/ErasureCompleted'
+  schemas:
+    ScoreChange:
+      type: object
+      required:
+      - score_id
+      - entity
+      - entity_id
+      - score
+      - band
+      properties:
+        score_id:
+          type: string
+          format: uuid
+        score_name:
+          type: string
+        entity:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+        entity_id:
+          type: string
+          format: uuid
+        score:
+          type: integer
+        previous_score:
+          type: integer
+        band:
+          type: string
+          enum:
+          - COLD
+          - WARM
+          - HOT
+        previous_band:
+          type: string
+          enum:
+          - COLD
+          - WARM
+          - HOT
+    ErasureCompleted:
+      type: object
+      required:
+      - data_request_id
+      - service
+      - rows_erased
+      properties:
+        data_request_id:
+          type: string
+          format: uuid
+        service:
+          type: string
+        rows_erased:
+          type: integer
+          format: int64
+  messageTraits:
+    envelope:
+      bindings:
+        googlepubsub:
+          bindingVersion: 0.2.0
+          orderingKey: entity id (per-entity ordering)
+          attributes:
+            type: object
+            required:
+            - event_type
+            - workspace_id
+            properties:
+              event_type:
+                type: string
+              workspace_id:
+                type: string
+                format: uuid
+              schema_version:
+                type: string
+                const: '1'

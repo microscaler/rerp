@@ -1,5 +1,7 @@
 # CRM System Architecture Design
 
+> **Historical (superseded 2026-11-09):** the 11-service topology, four databases and gateway routing described here are replaced by seven services, the edge and intake on GCP ([08](08-service-decomposition.md), [ADR 004](../../../docs/adrs/004-crm-capture-intake-and-workspaces.md)). Still useful: the authentication flow (§8) in outline. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Version:** 1.0.0
 > **Scope:** High-level architecture, service boundaries, deployment topology, and communication patterns
 > **Status:** Active design spec

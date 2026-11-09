@@ -1,5 +1,7 @@
 # RERP CRM vs Odoo CRM: Deep-Dive Field-by-Field Comparison
 
+> **Historical (superseded 2026-11-09):** a May 2026 field-by-field comparison with Odoo; still a good reference for lead, pipeline and team fields in sales. Current design: [DESIGN.md](../DESIGN.md).
+
 > **Date:** 2026-05-10  
 > **Sources:** RERP OpenAPI specs, Odoo Community v19.0 CRM (2,877 lines crm_lead.py + 6 additional model files)  
 > **Scope:** Field-by-field, model-by-model, business logic analysis

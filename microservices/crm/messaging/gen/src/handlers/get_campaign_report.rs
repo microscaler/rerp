@@ -30,7 +30,7 @@ pub struct Response {
     pub audience: Option<serde_json::Value>,
 
     #[serde(rename = "bounced")]
-    pub bounced: i32,
+    pub bounced: i64,
 
     #[serde(rename = "campaign_id")]
     pub campaign_id: String,
@@ -44,13 +44,13 @@ pub struct Response {
     pub click_to_open_rate: Option<f64>,
 
     #[serde(rename = "clicked")]
-    pub clicked: i32,
+    pub clicked: i64,
 
     #[serde(rename = "complained")]
-    pub complained: i32,
+    pub complained: i64,
 
     #[serde(rename = "delivered")]
-    pub delivered: i32,
+    pub delivered: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "email_clients")]
@@ -58,7 +58,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "forwarded")]
-    pub forwarded: Option<i32>,
+    pub forwarded: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "from")]
@@ -73,7 +73,7 @@ pub struct Response {
     pub open_rate: Option<f64>,
 
     #[serde(rename = "opened")]
-    pub opened: i32,
+    pub opened: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "opens_by_date")]
@@ -89,14 +89,14 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "replied")]
-    pub replied: Option<i32>,
+    pub replied: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "revenue")]
-    pub revenue: Option<rust_decimal::Decimal>,
+    pub revenue: Option<String>,
 
     #[serde(rename = "sent")]
-    pub sent: i32,
+    pub sent: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "sent_at")]
@@ -112,22 +112,22 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_clicks")]
-    pub total_clicks: Option<i32>,
+    pub total_clicks: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "total_opens")]
-    pub total_opens: Option<i32>,
+    pub total_opens: Option<i64>,
 
     #[serde(rename = "unsubscribed")]
-    pub unsubscribed: i32,
+    pub unsubscribed: i64,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "unverified_opens")]
-    pub unverified_opens: Option<i32>,
+    pub unverified_opens: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "updated")]
-    pub updated: Option<i32>,
+    pub updated: Option<i64>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "variants")]
@@ -135,7 +135,7 @@ pub struct Response {
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "verified_opens")]
-    pub verified_opens: Option<i32>,
+    pub verified_opens: Option<i64>,
 }
 
 impl TryFrom<HandlerRequest> for Request {
@@ -147,14 +147,12 @@ impl TryFrom<HandlerRequest> for Request {
         let mut data_map = Map::new();
 
         if let Some(v) = req.get_header("x-workspace-id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "X-Workspace-Id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!(
@@ -163,14 +161,12 @@ impl TryFrom<HandlerRequest> for Request {
         }
 
         if let Some(v) = req.get_path_param("id") {
+            // Built once, not per request: decode_param_value reads only its types.
+            static SCHEMA: std::sync::LazyLock<Value> =
+                std::sync::LazyLock::new(|| serde_json::json!({"format":"uuid","type":"string"}));
             data_map.insert(
                 "id".to_string(),
-                brrtrouter::server::request::decode_param_value(
-                    v,
-                    Some(&serde_json::json!({"format":"uuid","type":"string"})),
-                    None,
-                    None,
-                ),
+                brrtrouter::server::request::decode_param_value(v, Some(&*SCHEMA), None, None),
             );
         } else {
             return Err(anyhow::anyhow!("Missing required parameter 'id'"));
