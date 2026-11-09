@@ -1,6 +1,6 @@
 # 08 — CRM service decomposition
 
-> **Status:** Proposal for review, 2026-11-09. **Decides:** which microservices the CRM becomes and which operations each
+> **Status:** Accepted 2026-11-09, with the store, tenancy, edge and runtime decisions recorded in ADR 004. **Decides:** which microservices the CRM becomes and which operations each
 > one owns, before any OpenAPI spec is written or rewritten. **Inputs:** every API operation the platform portal calls
 > (PriceWhisperer `ui/platform`, Epic 55), the 14 specs under `openapi/crm/`, ADR 003 (the funnel stays outside RERP),
 > `06-marketing-feature-map.md` and `07-ad-buying-landscape.md`.
@@ -13,8 +13,8 @@
 
 The portal's CRM screens make **237 distinct API operations** (233 through the CRM client plus 4 on the website-leads
 board). Today they are spread over 11 of the 14 spec folders, and 53 of them are in no spec at all. Grouping them by
-what data they own, how they run and which trust boundary they sit behind gives **seven services and one public
-edge**, down from fourteen folders:
+what data they own, how they run and which trust boundary they sit behind gives **seven services, a public edge and an
+intake worker**, down from fourteen folders:
 
 | Service | Owns | Ops | Runs as |
 |---|---|---|---|
@@ -25,10 +25,13 @@ edge**, down from fourteen folders:
 | **crm/acquisition** | Where contacts come from and what they are worth: forms, site tracking, conversions and goals, ad accounts, audiences, buys, tracking, attribution | 51 | API + platform adapters |
 | **crm/insights** | What it adds up to: reports, dashboards, rule-based scores | 30 | read models + jobs |
 | **crm/workspace** | How the workspace is run: custom field definitions, API keys, webhooks, notifications, compliance, data requests, brand kit, import / export jobs | 24 | API + job runner |
-| **crm/edge** | Every unauthenticated request (form submits, tracking, pixels, clicks, unsubscribe, provider webhooks), validated and turned into messages | — | stateless, no database |
+| **crm/edge** | Every unauthenticated request (form submits, confirmation clicks, tracking, pixels, clicks, unsubscribe, provider and ad-platform webhooks), validated and turned into messages | — | stateless, no database |
+| **crm/intake** | Anonymous submissions until they are confirmed (subscriptions) or validated (enquiries); confirmation emails; admission into the CRM store (ADR 004) | 4 | worker + quarantine database |
 
 `crm/accounts` stays where ADR 003 put it: the customer master inside RERP's tenant database, reached only by signed
 conversion messages. `crm/livechat` and `crm/engagement` have no consumer yet and are parked (§10.5).
+
+Every service is scoped to a **workspace** (one per brand), named on each call by `X-Workspace-Id` (ADR 004).
 
 Seven is more than the three or four first expected. §3 shows the smaller cuts and why each one forces a shared
 database, a shared failure domain or an unauthenticated path into a service that holds personal data.
@@ -157,7 +160,7 @@ be consolidated later without changing an API.
 
 | | |
 |---|---|
-| **Owns** | Custom field definitions and groups (values live with the owning entity), API keys, outgoing webhooks and delivery logs, notification rules, compliance settings, data requests (access and erasure) and their orchestration, brand kit, import / export jobs, the audit log, a read facade over team members and roles. |
+| **Owns** | Workspaces (one per brand) and memberships with a role per workspace, custom field definitions and groups (values live with the owning entity), API keys, outgoing webhooks and delivery logs, notification rules, compliance settings, data requests (access and erasure) and their orchestration, brand kit, import / export jobs, the audit log, a read facade over team members and roles. |
 | **Does not own** | Users and roles (identity plane). |
 | **Publishes** | `field.defined / changed`, `erasure.requested` (each service erases and replies `erasure.completed`), `webhook.delivery.failed`. |
 | **Runtime** | API plus a job runner (imports, exports, webhook delivery, erasure saga). |
@@ -169,17 +172,28 @@ signs or verifies tokens, and publishes to Pub/Sub. The owning service pulls and
 
 | Public operation | Today | Becomes a message for |
 |---|---|---|
-| `POST /forms/{id}/submit` | ❌ gap | acquisition (form), then audience (contact, consent) |
+| `POST /forms/{id}/submit` | ❌ gap | intake (quarantined until confirmed or validated), then audience and acquisition |
+| `GET /confirm/{token}` (double opt-in) | outreach `/public/confirm` ✅ | intake, which admits the contact |
 | `POST /track` (page view, custom event) | marketing `POST /analytics/track` | acquisition |
 | `POST /ads/clicks` (landing with click ids) | marketing ✅ | acquisition; edge sets the first-party cookie |
 | `POST /ads/conversions` (server-side events) | marketing ✅ | acquisition |
 | `POST /ads/calls` (call tracking) | marketing ✅ | acquisition |
 | `GET /o/{token}` open pixel · `GET /c/{token}` click redirect · `GET /view/{token}` | outreach `/public/*` ✅ | messaging |
-| `GET` / `POST /u/{token}` one-click unsubscribe · `GET` / `POST /p/{token}` preferences · `GET /confirm/{token}` | outreach `/public/*` ✅ | audience |
+| `GET` / `POST /u/{token}` one-click unsubscribe · `GET` / `POST /p/{token}` preferences | outreach `/public/*` ✅ | audience |
 | `POST /webhooks/provider/{provider}` (bounces, complaints, inbound SMS STOP) | outreach ✅ | messaging, audience |
 | `GET /calendars/{token}.ics` | tasks ✅ | served from a signed snapshot sales publishes |
 | `POST /surveys/submit`, `POST /events/register` | marketing ✅ | acquisition (parked features) |
 | OAuth callbacks (mailboxes, ad accounts, social) | platform `POST /mailboxes/oauth/callback` ✅, others ❌ | the service that started the flow (state is signed) |
+| `POST /webhooks/ads/{platform}` (lead forms and other ad-platform pushes) | ❌ new | acquisition (lead forms go through intake like any other form) |
+
+### 4.9 crm/intake — the quarantine (ADR 004)
+
+| | |
+|---|---|
+| **Owns** | Pending submissions in their own small database: the fields, consent text shown, form and workspace, submission IP and time, the confirmation token and its expiry; the decision (admitted, rejected, expired). |
+| **Does** | Consumes `form.submission.received` from the edge; screens (honeypot, rate per address and IP, syntax and disposable domains); sends the double opt-in email for subscriptions; on `confirmation.received` (or immediately, for an enquiry) publishes `intake.admitted` with the submission and its evidence. Until the website's forms post to the edge, it also reads the EPIC-32 Supabase capture tables. |
+| **Never** | Writes to the CRM store, or keeps anything past 7 days pending or 30 days decided. |
+| **API** | Staff-only, workspace-scoped: list pending submissions, re-send a confirmation, discard one. Nothing on the internet. |
 
 Click redirects and the preference page must answer immediately: the edge resolves them from the signed token alone (the
 token carries the target URL or the subscription id), never by asking a service.
@@ -201,9 +215,10 @@ flowchart LR
         UI[/crm/* screens/]
     end
     GW[API gateway<br/>/api/v1/crm/*<br/>Sesame JWT]
-    subgraph Funnel["Marketing store plane (ADR 003), outside RERP's tenant DB"]
+    subgraph Funnel["CRM plane on GCP (ADR 003, ADR 004), outside RERP's tenant DB"]
         EDGE[crm/edge<br/>no DB credentials]
         BUS{{Pub/Sub topics}}
+        INTAKE[crm/intake<br/>quarantine DB]
         subgraph SVC["CRM services, one schema each"]
             AUD[crm/audience]
             MSG[crm/messaging]
@@ -222,7 +237,11 @@ flowchart LR
 
     V -- forms, tracking, pixels, unsubscribe --> EDGE
     P -- delivery webhooks --> EDGE
+    AP -- lead forms, webhooks --> EDGE
     EDGE -- untrusted messages --> BUS
+    BUS -- submissions, confirmations --> INTAKE
+    INTAKE -- intake.admitted --> BUS
+    INTAKE -- confirmation email --> P
     UI --> GW --> SVC
     BUS -- pull --> SVC
     SVC -- domain events --> BUS
@@ -253,6 +272,8 @@ flowchart TB
 
 ### 5.3 Gateway routes
 
+Every route except the edge requires `X-Workspace-Id`; the gateway checks it against the caller's memberships.
+
 | Prefix | Service | Auth |
 |---|---|---|
 | `/api/v1/crm/audience/*` | crm/audience | Sesame JWT |
@@ -268,8 +289,9 @@ flowchart TB
 
 | Store | Schemas | Notes |
 |---|---|---|
-| Marketing store, OLTP (Postgres) | `audience`, `messaging`, `automation`, `sales`, `acquisition`, `workspace` | One schema per service, owned by its role; no cross-schema reads. Row-level security on `workspace_id` in every table. |
-| Marketing store, analytics (Postgres) | `insights` | Read models only; rebuildable from events. |
+| CRM store, OLTP (Postgres on GCP, Crossplane) | `audience`, `messaging`, `automation`, `sales`, `acquisition`, `workspace` | ADR 003's marketing store, on GCP (ADR 004). One schema per service, owned by its role; no cross-schema reads. Row-level security on `workspace_id` in every table. |
+| CRM store, analytics (Postgres on GCP) | `insights` | Read models only; rebuildable from events. |
+| Intake store (Postgres on GCP) | `intake` | Pending submissions only; 7-day expiry. Written only by crm/intake. |
 | RERP tenant database | `crm_accounts` | Customer master and the conversion ledger (ADR 003). |
 | Object storage | assets, deal files, exports | Signed, expiring URLs. |
 | Secrets service | provider keys, OAuth tokens, ad developer tokens, webhook secrets | Never in a table. |
@@ -815,7 +837,7 @@ flowchart TB
     W -- lost --> LR[Lost reason recorded<br/>contact returns to nurture]
 ```
 
-### 7.3 Form submission to welcome email
+### 7.3 Form submission, confirmation and welcome email (ADR 004)
 
 ```mermaid
 sequenceDiagram
@@ -823,30 +845,35 @@ sequenceDiagram
     participant V as Visitor
     participant E as crm/edge
     participant B as Pub/Sub
-    participant Q as crm/acquisition
+    participant N as crm/intake
     participant A as crm/audience
+    participant Q as crm/acquisition
     participant W as crm/automation
     participant M as crm/messaging
-    participant P as Email provider
-    V->>E: POST /forms/{id}/submit (fields, consent text, attribution)
+    V->>E: POST /forms/{id}/submit (fields, consent text, visitor id)
     E->>E: origin, honeypot, rate limit, size, schema
     E->>B: form.submission.received
-    E-->>V: 202 + success message
-    B->>Q: pull
-    Q->>Q: re-validate against form definition, store submission, join visitor and click
-    Q->>A: upsert contact + subscription (consent source FORM, text, IP)
-    A-->>Q: contact_id, PENDING or SUBSCRIBED
-    Q->>B: form.submitted, conversion.recorded
+    E-->>V: 202, "check your inbox"
+    B->>N: pull
+    N->>N: screen, store PENDING (quarantine DB)
+    N->>V: confirmation email (signed link, 7 days)
+    V->>E: GET /confirm/{token}
+    E->>B: confirmation.received
+    E-->>V: confirmed page
+    B->>N: pull
+    N->>N: match token, mark CONFIRMED
+    N->>B: intake.admitted (submission + consent evidence)
+    B->>A: pull
+    A->>A: contact + SUBSCRIBED subscription, one transaction, once per submission
     A->>B: contact.created, subscription.changed
+    B->>Q: intake.admitted (form, attribution)
+    Q->>Q: store submission, join visitor and ad click
+    Q->>B: form.submitted, conversion.recorded
     B->>W: subscription.changed (trigger)
-    W->>W: enrol, step 1 = send welcome
-    W->>M: send template to contact (idempotency key = enrolment step)
+    W->>M: send welcome (idempotency key = enrolment step)
     M->>A: contactable on this list?
     A-->>M: yes
-    M->>P: send
-    P->>E: delivery webhook
-    E->>B: provider.event
-    B->>M: message.delivered
+    Note over N: never confirmed → deleted after 7 days, nothing in the CRM store
 ```
 
 ### 7.4 Campaign send
@@ -987,7 +1014,7 @@ sequenceDiagram
     participant AP as Ad platforms
     O->>WS: approve erasure request
     WS->>B: erasure.requested (subject hash, request id)
-    B->>S: audience, messaging, automation, sales, acquisition, insights
+    B->>S: intake, audience, messaging, automation, sales, acquisition, insights
     S->>S: delete or anonymise personal data, keep tombstone hash
     Q->>AP: remove from every ad audience
     S->>B: erasure.completed (service, request id)
@@ -1410,6 +1437,8 @@ ways; the spec has one.
 - OpenAPI 3.1, one file per service at `openapi/crm/<service>/openapi.yaml`, header comment
   `x-brrtrouter-stack-size: 128KiB`, `x-brrtrouter-impl: true` on every operation.
 - Base path `/api/v1/crm/<service>`; resources plural; ids are UUIDs; verbs as `POST /<resource>/{id}/<verb>`.
+- `X-Workspace-Id` (UUID) required on every operation except the edge's; a foreign workspace is 403, a record in
+  another workspace is 404 (ADR 004).
 - Paging `page`, `limit` (≤ 100) → `items`, `total`, `page`, `limit`; filters `field=value`; free text `search`.
 - Errors: one shared `Error` schema (`code`, `message`, `request_id`, `fields[]`) for 400, 401, 403, 404, 409, 422,
   429, 5xx; `X-Request-Id` on every response.
@@ -1432,13 +1461,15 @@ ways; the spec has one.
 | acquisition | `marketing` | conversions (list, create), goals, form detail, submissions across forms, live visitors; form submit goes to the edge | none beyond the base path |
 | insights | `reporting`, `intelligence` (scoring) | named scores (5 operations), automations analytics, list growth | `/intelligence/scores` → `/scores` |
 | workspace | `platform` (minus mailboxes, providers) | team facade, field groups, custom field update, notification rules, compliance, data requests, brand kit | none beyond the base path |
-| edge | public paths from `outreach`, `marketing`, `tasks`, `platform` | form submit, OAuth callbacks for ad accounts and social | `/public/o/{token}` → `/o/{token}` (short links on the tracking domain) |
+| edge | public paths from `outreach`, `marketing`, `tasks`, `platform` | form submit, OAuth callbacks for ad accounts and social, ad-platform webhooks | `/public/o/{token}` → `/o/{token}` (short links on the tracking domain) |
+| intake | new (ADR 004) | staff view of pending submissions | none |
 
 ### 10.3 Order
 
 1. **audience** (everything else reads it; the condition tree lives here) and **workspace** (field definitions, roles
    facade, audit).
-2. **edge** (so no public endpoint is ever served by a data-holding service).
+2. **edge** and **intake** (so no public endpoint is ever served by a data-holding service, and nothing unconfirmed
+   reaches the CRM store).
 3. **messaging**, then **automation** (depends on audience and messaging).
 4. **sales** (extends the implemented `crm/pipeline`).
 5. **acquisition**, then **insights** (both consume events from the others).
@@ -1473,16 +1504,17 @@ yet.
 
 | ID | Decision | Status |
 |---|---|---|
-| D1 | Prospect companies are **organisations** in audience; RERP `crm/accounts` stays the customer master; an organisation gains `customer_account_id` on conversion. | Proposed |
-| D2 | Audience owns every "can we contact this person?" fact: subscriptions, consent history, suppressions, erasure tombstones. Messaging and acquisition ask; they never decide. | Proposed |
-| D3 | Field **definitions** live in workspace; **values** live with the entity's owner (contact fields in audience, deal fields in sales). | Proposed |
-| D4 | Team members and roles come from the identity plane; workspace exposes a read facade (`GET /team`) and never stores users. | Proposed |
-| D5 | Rule-based named scores (insights) replace the single implicit score; Bayesian scoring and enrichment in `intelligence` are deferred. | Proposed |
-| D6 | All anonymous traffic goes through `crm/edge`, which has no database credentials and publishes to Pub/Sub. | Proposed |
-| D7 | Insights keeps read models in their own analytics database, rebuilt from events. | Proposed |
-| D8 | Deals are won or lost with `PATCH /deals/{id}/status`; the portal drops the mock's `win` / `lose` verbs. | Proposed |
-| D9 | `engagement` and `livechat` are parked until a screen needs them. | Proposed |
-| Q1 | Where does the marketing store run: the website's Supabase project (as ADR 003 describes it today), or a Postgres instance on the GCP platform under Crossplane? | **Open** |
-| Q2 | One funnel per brand (ADR 003 assumption) or several workspaces in one store with `workspace_id` RLS? This document assumes RLS on `workspace_id` either way. | **Open** |
-| Q3 | Should the edge also front the ad-platform webhooks (lead forms from Meta / LinkedIn)? | **Open** |
-| Q4 | Insights and workspace on a shared node pool at first, or separate from day one? | **Open** |
+| D1 | Prospect companies are **organisations** in audience; RERP `crm/accounts` stays the customer master; an organisation gains `customer_account_id` on conversion. | Accepted |
+| D2 | Audience owns every "can we contact this person?" fact: subscriptions, consent history, suppressions, erasure tombstones. Messaging and acquisition ask; they never decide. | Accepted |
+| D3 | Field **definitions** live in workspace; **values** live with the entity's owner (contact fields in audience, deal fields in sales). | Accepted |
+| D4 | Team members and roles come from the identity plane; workspace exposes a read facade (`GET /team`) and never stores users. | Accepted |
+| D5 | Rule-based named scores (insights) replace the single implicit score; Bayesian scoring and enrichment in `intelligence` are deferred. | Accepted |
+| D6 | All anonymous traffic goes through `crm/edge`, which has no database credentials and publishes to Pub/Sub. | Accepted |
+| D7 | Insights keeps read models in their own analytics database, rebuilt from events. | Accepted |
+| D8 | Deals are won or lost with `PATCH /deals/{id}/status`; the portal drops the mock's `win` / `lose` verbs. | Accepted |
+| D9 | `engagement` and `livechat` are parked until a screen needs them. | Accepted |
+| D10 | The CRM store is Postgres on GCP, provisioned through Crossplane, separate from RERP's tenant database (ADR 004). | Accepted |
+| D11 | Anonymous submissions are quarantined in `crm/intake` until confirmed (subscriptions) or validated (enquiries); only then are they admitted to the CRM store (ADR 004). | Accepted |
+| D12 | Several workspaces (brands) per organisation; `workspace_id` with RLS everywhere; `X-Workspace-Id` on every call (ADR 004). | Accepted |
+| D13 | The edge receives all public traffic, including ad-platform webhooks, and only publishes to Pub/Sub. | Accepted |
+| D14 | Every component is its own Deployment on GKE Autopilot; the edge scales on request rate, workers on subscription backlog. | Accepted |

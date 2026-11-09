@@ -6,9 +6,13 @@ RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship
 
 **Architecture:** 13 services, 5 databases, event-driven communication.
 
-> **Proposed restructuring (2026-11-09):** [docs/08-service-decomposition.md](docs/08-service-decomposition.md) regroups these
-> folders into seven services and a public edge, from the operations the platform portal actually calls. It is the
-> input for the next round of specs; until it is accepted, the folders below remain the specs of record.
+> **Restructuring (accepted 2026-11-09):** [docs/08-service-decomposition.md](docs/08-service-decomposition.md) and
+> [ADR 004](../../docs/adrs/004-crm-capture-intake-and-workspaces.md) regroup the CRM into seven services
+> (`audience`, `messaging`, `automation`, `sales`, `acquisition`, `insights`, `workspace`), the public `edge` and the
+> `intake` quarantine. Their specs are the contracts of record for new work. The older folders (`contacts`, `outreach`,
+> `social`, `platform`, `teams`, `tasks`, `marketing`, `reporting`) are **deprecated** and stay only until each new
+> service is implemented; `pipeline` and `accounts` remain in use by the running services (`accounts` stays the
+> customer master, ADR 003).
 
 ## Architecture
 

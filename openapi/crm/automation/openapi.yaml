@@ -5,1087 +5,36 @@ x-brrtrouter-stack-size: 128KiB
 info:
   title: CRM Automation
   version: v1.0.0
-  description: Workflow automation service for CRM pipelines with triggers, rules,
-    and scheduled actions.
-  x-api-version: CRM Automation API v1.0.0
-  x-crm-api-version: v1.0.0
-  termsOfService: https://rerp.example.com/terms
-  contact:
-    name: RERP API Support
-    url: https://docs.rerp.com/support
-    email: api-support@rerp.example.com
-  license:
-    name: MIT
-    url: https://opensource.org/licenses/MIT
+  description: 'What happens next: workflows and their versioned step graphs, the trigger and action catalogue, recipes, enrolments
+    with step history and durable timers.'
   x-api-docs:
     service: automation
     openapi_version: 3.1.0
     brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
 - url: http://localhost:10352/api/v1/crm/automation
-  description: Local development (direct to service, port from port-registry)
+  description: Local development (port from port-registry)
 - url: /api/v1/crm/automation
-  description: Automation API
+  description: CRM Automation API
 tags:
-- name: enrolments
-  description: Contacts moving through workflows
-- name: workflow-steps
-  description: The step graph of a workflow (wait, if/else, split, goal)
 - name: actions
   description: Scheduled and manual actions
 - name: automation-execution
   description: Workflow execution and run history
+- name: enrolments
+  description: Contacts moving through workflows
 - name: rules
   description: Condition-action rules within workflows
 - name: triggers
   description: Event hooks that fire workflows
+- name: workflow-steps
+  description: The step graph of a workflow (wait, if/else, split, goal)
 - name: workflows
   description: Workflow definitions and management
 paths:
-  /workflows:
-    get:
-      operationId: list_workflows
-      summary: List workflows
-      tags:
-      - workflows
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Search'
-      - name: filter_active
-        in: query
-        schema:
-          type: boolean
-      - name: filter_trigger_type
-        in: query
-        schema:
-          type: string
-          enum:
-          - STAGE_CHANGE
-          - FIELD_CHANGE
-          - TIME_BASED
-          - WEBHOOK
-          - MANUAL
-      responses:
-        '200':
-          description: List of workflows
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  per_page: 20
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource not found
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: List all workflows
-      x-operation-id: get_workflows_list
-      x-controller: rerp_crm::automation::controller::workflows
-      x-handler-name: workflows
-    post:
-      operationId: create_workflow
-      summary: Create a new workflow
-      tags:
-      - workflows
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateWorkflowRequest'
-            examples:
-              default: &id002
-                name: Lead Assignment
-                description: Auto-assign leads based on region
-                enabled: true
-        description: Create a new workflow automation
-      responses:
-        '201':
-          description: Workflow created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-              examples:
-                default: &id001
-                  id: 00000000-0000-0000-0000-000000000007
-                  name: Lead Assignment
-                  description: Auto-assign leads based on region
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
-        '400':
-          description: Invalid request
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Create a new workflows
-      x-operation-id: post_workflows_list
-      x-controller: rerp_crm::automation::controller::workflows
-      x-handler-name: workflows
-  /workflows/{id}:
-    get:
-      operationId: get_workflow
-      summary: Get workflow by id
-      tags:
-      - workflows
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Workflow details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-              examples:
-                default: *id001
-        '404':
-          description: Not found
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get workflows by ID
-      x-operation-id: get_id_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id
-      x-handler-name: workflows_id
-    put:
-      operationId: update_workflow
-      summary: Update workflow
-      tags:
-      - workflows
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateWorkflowRequest'
-            examples:
-              default: *id002
-        description: Update an existing workflow
-      responses:
-        '200':
-          description: Workflow updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-              examples:
-                default: *id001
-        '400':
-          description: Invalid request
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '204':
-          description: Resource updated successfully
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Update workflows by ID
-      x-operation-id: put_id_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id
-      x-handler-name: workflows_id
-    delete:
-      operationId: delete_workflow
-      summary: Delete workflow
-      tags:
-      - workflows
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Workflow deleted
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      description: Delete workflows by ID
-      x-operation-id: delete_id_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id
-      x-handler-name: workflows_id
-  /workflows/{id}/rules:
-    get:
-      operationId: list_workflow_rules
-      summary: List rules for a workflow
-      tags:
-      - rules
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      responses:
-        '200':
-          description: List of rules
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  per_page: 20
-        '404':
-          description: Workflow not found
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get workflow rules
-      x-operation-id: get_rules_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id::rules
-      x-handler-name: workflows_id_rules
-    post:
-      operationId: create_workflow_rule
-      summary: Add a rule to a workflow
-      tags:
-      - rules
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateRuleRequest'
-            examples:
-              default: &id003
-                name: Assign to region A
-                condition:
-                  field: region
-                  operator: equals
-                  value: A
-                action:
-                  type: assign
-                  value: team-001
-        description: Add a rule to a workflow
-      responses:
-        '201':
-          description: Rule created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rule'
-              examples:
-                default: &id004
-                  id: 00000000-0000-0000-0000-000000000008
-                  name: Assign to region A
-                  condition:
-                    field: region
-                    operator: equals
-                    value: A
-                  action:
-                    type: assign
-                    value: team-001
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
-        '400':
-          description: Invalid request
-        '404':
-          description: Workflow not found
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Get workflow rules
-      x-operation-id: post_rules_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id::rules
-      x-handler-name: workflows_id_rules
-  /workflows/{id}/run:
-    post:
-      operationId: run_workflow
-      summary: Manually trigger a workflow for testing
-      tags:
-      - workflows
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Workflow execution result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowExecutionResult'
-              examples:
-                default:
-                  workflow_id: 00000000-0000-0000-0000-000000000007
-                  status: completed
-                  started_at: '2024-01-15T10:30:00Z'
-                  completed_at: '2024-01-15T10:30:05Z'
-                  rules_triggered: 3
-        '404':
-          description: Not found
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '400':
-          description: Bad request - Invalid request body or parameters
-        '201':
-          description: Resource created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Run a workflow manually
-      x-operation-id: post_workflows_run
-      x-controller: rerp_crm::automation::controller::workflows::id::run
-      x-handler-name: workflows_id_run
-  /workflows/{id}/run-history:
-    get:
-      operationId: list_workflow_run_history
-      summary: View execution history for a workflow
-      tags:
-      - workflows
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      responses:
-        '200':
-          description: Workflow run history
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  per_page: 20
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '404':
-          description: Resource not found
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get workflow execution history
-      x-operation-id: get_run-history_by_id
-      x-controller: rerp_crm::automation::controller::workflows::id::run-history
-      x-handler-name: workflows_id_run-history
-  /rules:
-    get:
-      operationId: list_rules
-      summary: List all rules across workflows
-      tags:
-      - rules
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - name: filter_workflow_id
-        in: query
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: List of rules
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  per_page: 20
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource not found
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get workflow rules
-      x-operation-id: get_rules_list
-      x-controller: rerp_crm::automation::controller::rules
-      x-handler-name: rules
-    post:
-      operationId: create_rule
-      summary: Create a standalone rule (adds to a workflow)
-      tags:
-      - rules
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateRuleRequest'
-            examples:
-              default: *id003
-        description: Create a new workflow rule
-      responses:
-        '201':
-          description: Rule created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rule'
-              examples:
-                default: *id004
-        '400':
-          description: Invalid request
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Get workflow rules
-      x-operation-id: post_rules_list
-      x-controller: rerp_crm::automation::controller::rules
-      x-handler-name: rules
-  /rules/{id}:
-    get:
-      operationId: get_rule
-      summary: Get rule by id
-      tags:
-      - rules
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Rule details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rule'
-              examples:
-                default: *id004
-        '404':
-          description: Not found
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get workflow rules
-      x-operation-id: get_id_by_id
-      x-controller: rerp_crm::automation::controller::rules::id
-      x-handler-name: rules_id
-    put:
-      operationId: update_rule
-      summary: Update rule
-      tags:
-      - rules
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateRuleRequest'
-            examples:
-              default: *id003
-        description: Update an existing rule
-      responses:
-        '200':
-          description: Rule updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Rule'
-              examples:
-                default: *id004
-        '400':
-          description: Invalid request
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '204':
-          description: Resource updated successfully
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Get workflow rules
-      x-operation-id: put_id_by_id
-      x-controller: rerp_crm::automation::controller::rules::id
-      x-handler-name: rules_id
-    delete:
-      operationId: delete_rule
-      summary: Delete rule
-      tags:
-      - rules
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Rule deleted
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      description: Get workflow rules
-      x-operation-id: delete_id_by_id
-      x-controller: rerp_crm::automation::controller::rules::id
-      x-handler-name: rules_id
-  /rules/test:
-    post:
-      operationId: test_rule
-      summary: Test a rule against a sample lead
-      tags:
-      - rules
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                rule_id:
-                  type: string
-                  format: uuid
-                lead_data:
-                  type: object
-                  description: Sample lead data for evaluation
-        description: Test a workflow rule with sample data to verify conditions and
-          actions
-      responses:
-        '200':
-          description: Rule test result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/RuleTestResult'
-              examples:
-                default:
-                  rule_id: 00000000-0000-0000-0000-000000000008
-                  test_passed: true
-                  matched: true
-                  evaluation_time_ms: 12
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '400':
-          description: Bad request - Invalid request body or parameters
-        '404':
-          description: Not found
-        '201':
-          description: Resource created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Get workflow rules
-      x-operation-id: post_test
-      x-controller: rerp_crm::automation::controller::rules::test
-      x-handler-name: rules_test
-  /triggers:
-    get:
-      operationId: list_triggers
-      summary: List all triggers
-      tags:
-      - triggers
-      parameters:
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - name: filter_type
-        in: query
-        schema:
-          type: string
-          enum:
-          - STAGE_CHANGE
-          - FIELD_CHANGE
-          - TIME_BASED
-          - WEBHOOK
-          - ON_CREATE
-          - ON_UPDATE
-          - ON_DELETE
-      - name: filter_enabled
-        in: query
-        schema:
-          type: boolean
-      responses:
-        '200':
-          description: List of triggers
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PaginatedResponse'
-              examples:
-                default:
-                  items: []
-                  total: 0
-                  page: 1
-                  per_page: 20
-        '401':
-          description: Unauthorized
-        '404':
-          description: Resource not found
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: List all triggers
-      x-operation-id: get_triggers_list
-      x-controller: rerp_crm::automation::controller::triggers
-      x-handler-name: triggers
-    post:
-      operationId: create_trigger
-      summary: Create a new trigger
-      tags:
-      - triggers
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateTriggerRequest'
-            examples:
-              default: &id006
-                name: On Lead Create
-                event: lead.created
-                enabled: true
-        description: Create a new workflow trigger
-      responses:
-        '201':
-          description: Trigger created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trigger'
-              examples:
-                default: &id005
-                  id: 00000000-0000-0000-0000-000000000009
-                  name: On Lead Create
-                  event: lead.created
-                  enabled: true
-                  created_at: '2024-01-15T10:30:00Z'
-                  updated_at: '2024-01-15T10:30:00Z'
-        '400':
-          description: Invalid request
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Create a new triggers
-      x-operation-id: post_triggers_list
-      x-controller: rerp_crm::automation::controller::triggers
-      x-handler-name: triggers
-  /triggers/{id}:
-    get:
-      operationId: get_trigger
-      summary: Get trigger by id
-      tags:
-      - triggers
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Trigger details
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trigger'
-              examples:
-                default: *id005
-        '404':
-          description: Not found
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '500':
-          description: Internal server error
-      security:
-      - bearerAuth: []
-      description: Get triggers by ID
-      x-operation-id: get_id_by_id
-      x-controller: rerp_crm::automation::controller::triggers::id
-      x-handler-name: triggers_id
-    put:
-      operationId: update_trigger
-      summary: Update trigger (enable/disable, schedule)
-      tags:
-      - triggers
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTriggerRequest'
-            examples:
-              default: *id006
-        description: Update an existing trigger
-      responses:
-        '200':
-          description: Trigger updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trigger'
-              examples:
-                default: *id005
-        '400':
-          description: Invalid request
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '409':
-          description: Conflict — resource version mismatch or duplicate
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '204':
-          description: Resource updated successfully
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Update triggers by ID
-      x-operation-id: put_id_by_id
-      x-controller: rerp_crm::automation::controller::triggers::id
-      x-handler-name: triggers_id
-    delete:
-      operationId: delete_trigger
-      summary: Delete trigger
-      tags:
-      - triggers
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '204':
-          description: Trigger deleted
-        '404':
-          description: Not found
-        '403':
-          description: Forbidden — insufficient permissions
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-      security:
-      - bearerAuth: []
-      description: Delete triggers by ID
-      x-operation-id: delete_id_by_id
-      x-controller: rerp_crm::automation::controller::triggers::id
-      x-handler-name: triggers_id
-  /triggers/{id}/fire:
-    post:
-      operationId: fire_trigger
-      summary: Manually fire a trigger for testing
-      tags:
-      - triggers
-      parameters:
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        '200':
-          description: Trigger fired successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  executed:
-                    type: boolean
-                  workflows_fired:
-                    type: integer
-                    format: int32
-              examples:
-                default:
-                  success: true
-                  trigger_id: 00000000-0000-0000-0000-000000000008
-                  workflow_execution_id: 00000000-0000-0000-0000-000000000032
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '400':
-          description: Bad request - Invalid request body or parameters
-        '404':
-          description: Not found
-        '201':
-          description: Resource created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Fire a trigger manually
-      x-operation-id: post_triggers_fire
-      x-controller: rerp_crm::automation::controller::triggers::id::fire
-      x-handler-name: triggers_id_fire
-  /actions/schedule:
-    post:
-      operationId: schedule_action
-      summary: Schedule a one-time action
-      tags:
-      - actions
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ScheduleActionRequest'
-        description: Schedule a one-time action at a specific time
-      responses:
-        '201':
-          description: Action scheduled
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ScheduledAction'
-              examples:
-                default: &id007
-                  id: 00000000-0000-0000-0000-000000000026
-                  type: email
-                  scheduled_at: '2024-01-16T10:00:00Z'
-                  status: pending
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-        '401':
-          description: Unauthorized - Invalid or missing authentication token
-        '400':
-          description: Bad request - Invalid request body or parameters
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-      description: Schedule a report to run on a recurring basis
-      x-operation-id: post_schedule
-      x-controller: rerp_crm::automation::controller::actions::schedule
-      x-handler-name: actions_schedule
   /actions/recurring:
     post:
       operationId: schedule_recurring_action
@@ -1107,7 +56,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/ScheduledAction'
               examples:
-                default: *id007
+                default:
+                  id: 00000000-0000-0000-0000-000000000026
+                  type: email
+                  scheduled_at: '2024-01-16T10:00:00Z'
+                  status: pending
         '500':
           description: Internal server error
           content:
@@ -1115,18 +68,82 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
         '401':
-          description: Unauthorized - Invalid or missing authentication token
+          $ref: '#/components/responses/Unauthorized'
         '400':
-          description: Bad request - Invalid request body or parameters
+          $ref: '#/components/responses/BadRequest'
         '404':
-          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
       description: Create a new actions
-      x-operation-id: post_recurring
-      x-controller: rerp_crm::automation::controller::actions::recurring
-      x-handler-name: actions_recurring
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /actions/schedule:
+    post:
+      operationId: schedule_action
+      summary: Schedule a one-time action
+      tags:
+      - actions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleActionRequest'
+        description: Schedule a one-time action at a specific time
+      responses:
+        '201':
+          description: Action scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScheduledAction'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000026
+                  type: email
+                  scheduled_at: '2024-01-16T10:00:00Z'
+                  status: pending
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Schedule a report to run on a recurring basis
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
   /actions/upcoming:
     get:
       operationId: list_upcoming_actions
@@ -1134,6 +151,7 @@ paths:
       tags:
       - actions
       parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
       responses:
@@ -1142,235 +160,144 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedResponse'
+                $ref: '#/components/schemas/ScheduledActionPage'
               examples:
                 default:
                   items: []
                   total: 0
                   page: 1
-                  per_page: 20
+                  limit: 20
         '401':
-          description: Unauthorized - Invalid or missing authentication token
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Resource not found
-        '500':
-          description: Internal server error
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
       security:
       - bearerAuth: []
       description: List all actions
-      x-operation-id: get_upcoming
-      x-controller: rerp_crm::automation::controller::actions::upcoming
-      x-handler-name: actions_upcoming
-  /workflows/{id}/steps:
-    get:
-      operationId: get_workflow_steps
-      summary: The workflow's step graph
-      tags:
-      - workflow-steps
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Ordered steps with branches
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowSteps'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-    put:
-      operationId: replace_workflow_steps
-      summary: Replace the step graph
-      description: |
-        The whole graph is replaced atomically and validated (every branch reaches an END or a GOAL, no
-        orphan steps, every SEND_MESSAGE names an AUTOMATION template). Contacts mid-way keep their
-        current step by id; a removed step moves them to its successor.
-      tags:
-      - workflow-steps
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/WorkflowSteps'
-      responses:
-        '200':
-          description: Saved
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowSteps'
-        '400':
-          description: Graph invalid
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StepGraphValidation'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
       x-brrtrouter-impl: true
-  /workflows/{id}/activate:
-    post:
-      operationId: activate_workflow
-      summary: Set the workflow live
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /catalog:
+    get:
+      operationId: get_automation_catalog
+      summary: Triggers and actions
       tags:
       - workflows
-      parameters:
-      - $ref: '#/components/parameters/Id'
       responses:
         '200':
-          description: Active
+          description: Catalog
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Workflow'
-        '400':
-          description: Graph invalid or no trigger
+                $ref: '#/components/schemas/AutomationCatalog'
         '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
       x-brrtrouter-impl: true
-  /workflows/{id}/pause:
-    post:
-      operationId: pause_workflow
-      summary: Pause the workflow (enrolments hold at their step)
-      tags:
-      - workflows
       parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Paused
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
+      - $ref: '#/components/parameters/WorkspaceId'
       security:
       - bearerAuth: []
-      x-brrtrouter-impl: true
-  /workflows/{id}/duplicate:
-    post:
-      operationId: duplicate_workflow
-      summary: Copy a workflow and its steps as a new inactive workflow
-      tags:
-      - workflows
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-      x-brrtrouter-impl: true
-  /workflows/{id}/map:
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/{id}/enrolments:
     get:
-      operationId: get_workflow_map
-      summary: Contacts at each step, and step outcomes
-      description: The live view behind an automations map - how many contacts sit at each step now, how many have passed through, and per-step send/open/click counts.
-      tags:
-      - automation-execution
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Map
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WorkflowMap'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-  /workflows/{id}/enrolments:
-    get:
-      operationId: list_workflow_enrolments
-      summary: Contacts enrolled in a workflow
+      operationId: list_contact_enrolments
+      summary: Every workflow a contact is or was in
       tags:
       - enrolments
       parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Id'
-      - $ref: '#/components/parameters/Page'
-      - $ref: '#/components/parameters/Limit'
-      - name: status
-        in: query
-        schema:
-          $ref: '#/components/schemas/EnrolmentStatus'
-      - name: step_id
-        in: query
-        schema:
-          type: string
-          format: uuid
       responses:
         '200':
           description: Enrolments
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PaginatedEnrolment'
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Enrolment'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-    post:
-      operationId: enrol_contacts
-      summary: Enrol contacts by hand
-      description: Bypasses the trigger. Honors the workflow's re-entry rule; contacts already active are reported, not re-enrolled.
-      tags:
-      - enrolments
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/EnrolRequest'
-      responses:
-        '201':
-          description: Enrolment result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EnrolResult'
-        '400':
-          description: Invalid request
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
+          $ref: '#/components/responses/NotFound'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /deals/{id}/enrolments:
+    get:
+      operationId: list_deal_enrolments
+      summary: Automations a deal is in
+      tags:
+      - enrolments
+      responses:
+        '200':
+          description: Page of enrolments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrolmentPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Id'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
   /enrolments/{id}:
     get:
       operationId: get_enrolment
@@ -1378,6 +305,7 @@ paths:
       tags:
       - enrolments
       parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Id'
       responses:
         '200':
@@ -1387,33 +315,22 @@ paths:
               schema:
                 $ref: '#/components/schemas/Enrolment'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-  /enrolments/{id}/stop:
-    post:
-      operationId: stop_enrolment
-      summary: Remove a contact from the workflow
-      tags:
-      - enrolments
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Stopped
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Enrolment'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
   /enrolments/{id}/jump:
     post:
       operationId: jump_enrolment
@@ -1421,6 +338,7 @@ paths:
       tags:
       - enrolments
       parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Id'
       requestBody:
         required: true
@@ -1442,38 +360,92 @@ paths:
               schema:
                 $ref: '#/components/schemas/Enrolment'
         '400':
-          description: Unknown step
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
-  /contacts/{id}/enrolments:
-    get:
-      operationId: list_contact_enrolments
-      summary: Every workflow a contact is or was in
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /enrolments/{id}/retry:
+    post:
+      operationId: retry_enrolment
+      summary: Retry a failed enrolment from its failing step
       tags:
       - enrolments
-      parameters:
-      - $ref: '#/components/parameters/Id'
       responses:
-        '200':
-          description: Enrolments
+        '202':
+          description: Retrying
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  items:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Enrolment'
+                $ref: '#/components/schemas/Enrolment'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: 409 unless the enrolment is FAILED. Earlier steps are not repeated.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
       security:
       - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /enrolments/{id}/stop:
+    post:
+      operationId: stop_enrolment
+      summary: Remove a contact from the workflow
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Stopped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrolment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
   /recipes:
     get:
       operationId: list_workflow_recipes
@@ -1493,9 +465,22 @@ paths:
                     items:
                       $ref: '#/components/schemas/WorkflowRecipe'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
       security:
       - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
   /recipes/import:
     post:
       operationId: import_workflow_recipe
@@ -1522,133 +507,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/WorkflowRecipe'
         '400':
-          description: Not a recipe document
+          $ref: '#/components/responses/BadRequest'
         '401':
-          description: Unauthorized
-      security:
-      - bearerAuth: []
-  /workflows/{id}/export:
-    get:
-      operationId: export_workflow_recipe
-      summary: The workflow as a recipe document - references replaced by parameters, notes kept
-      tags:
-      - workflows
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Recipe document
-          content:
-            application/json:
-              schema:
-                type: object
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-  /workflows/{id}/setup:
-    get:
-      operationId: get_workflow_setup
-      summary: The setup wizard - the unbound recipe parameters, in order
-      tags:
-      - workflows
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      responses:
-        '200':
-          description: Parameters still to bind
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                - parameters
-                properties:
-                  parameters:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/RecipeParameter'
-                  total:
-                    type: integer
-                    format: int32
-                    description: Parameters the recipe has in all, for "Step 1/3"
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
-  /workflows/{id}/bindings:
-    patch:
-      operationId: bind_workflow_parameters
-      summary: Bind recipe parameters; references in triggers and steps are resolved in place
-      tags:
-      - workflows
-      parameters:
-      - $ref: '#/components/parameters/Id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              additionalProperties:
-                type: string
-      responses:
-        '200':
-          description: The workflow with the parameters bound
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Workflow'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
         '422':
-          description: A value does not exist or has the wrong kind
+          $ref: '#/components/responses/Unprocessable'
       security:
       - bearerAuth: []
-  /workflows/{id}/steps/{step_id}/notes:
-    post:
-      operationId: add_step_note
-      summary: Add a note to a step (or to the workflow with step_id "workflow")
-      tags:
-      - workflows
+      x-brrtrouter-impl: true
       parameters:
-      - $ref: '#/components/parameters/Id'
-      - name: step_id
-        in: path
-        required: true
-        schema:
-          type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-              - text
-              properties:
-                text:
-                  type: string
-                  maxLength: 2000
-      responses:
-        '201':
-          description: Note added
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StepNote'
-        '401':
-          description: Unauthorized
-        '404':
-          description: Not found
-      security:
-      - bearerAuth: []
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
   /recipes/{id}/instantiate:
     post:
       operationId: instantiate_workflow_recipe
@@ -1656,7 +533,9 @@ paths:
       tags:
       - workflows
       parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
       requestBody:
         required: false
         content:
@@ -1684,48 +563,2894 @@ paths:
               schema:
                 $ref: '#/components/schemas/Workflow'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/Unauthorized'
         '404':
-          description: Not found
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
       security:
       - bearerAuth: []
       x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /rules:
+    get:
+      operationId: list_rules
+      summary: List all rules across workflows
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_workflow_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RulePage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflow rules
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_rule
+      summary: Create a standalone rule (adds to a workflow)
+      tags:
+      - rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleRequest'
+            examples:
+              default:
+                name: Assign to region A
+                condition:
+                  field: region
+                  operator: equals
+                  value: A
+                action:
+                  type: assign
+                  value: team-001
+        description: Create a new workflow rule
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000008
+                  name: Assign to region A
+                  condition:
+                    field: region
+                    operator: equals
+                    value: A
+                  action:
+                    type: assign
+                    value: team-001
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Get workflow rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /rules/test:
+    post:
+      operationId: test_rule
+      summary: Test a rule against a sample lead
+      tags:
+      - rules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rule_id:
+                  type: string
+                  format: uuid
+                lead_data:
+                  type: object
+                  description: Sample lead data for evaluation
+        description: Test a workflow rule with sample data to verify conditions and actions
+      responses:
+        '200':
+          description: Rule test result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RuleTestResult'
+              examples:
+                default:
+                  rule_id: 00000000-0000-0000-0000-000000000008
+                  test_passed: true
+                  matched: true
+                  evaluation_time_ms: 12
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Get workflow rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /rules/{id}:
+    get:
+      operationId: get_rule
+      summary: Get rule by id
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Rule details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000008
+                  name: Assign to region A
+                  condition:
+                    field: region
+                    operator: equals
+                    value: A
+                  action:
+                    type: assign
+                    value: team-001
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflow rules
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_rule
+      summary: Update rule
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRuleRequest'
+            examples:
+              default:
+                name: Assign to region A
+                condition:
+                  field: region
+                  operator: equals
+                  value: A
+                action:
+                  type: assign
+                  value: team-001
+        description: Update an existing rule
+      responses:
+        '200':
+          description: Rule updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000008
+                  name: Assign to region A
+                  condition:
+                    field: region
+                    operator: equals
+                    value: A
+                  action:
+                    type: assign
+                    value: team-001
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch or duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Get workflow rules
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_rule
+      summary: Delete rule
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Rule deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflow rules
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /triggers:
+    get:
+      operationId: list_triggers
+      summary: List all triggers
+      tags:
+      - triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: filter_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - STAGE_CHANGE
+          - FIELD_CHANGE
+          - TIME_BASED
+          - WEBHOOK
+          - ON_CREATE
+          - ON_UPDATE
+          - ON_DELETE
+      - name: filter_enabled
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: List of triggers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: List all triggers
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_trigger
+      summary: Create a new trigger
+      tags:
+      - triggers
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTriggerRequest'
+            examples:
+              default:
+                name: On Lead Create
+                event: lead.created
+                enabled: true
+        description: Create a new workflow trigger
+      responses:
+        '201':
+          description: Trigger created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000009
+                  name: On Lead Create
+                  event: lead.created
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Create a new triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /triggers/{id}:
+    get:
+      operationId: get_trigger
+      summary: Get trigger by id
+      tags:
+      - triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Trigger details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000009
+                  name: On Lead Create
+                  event: lead.created
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get triggers by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_trigger
+      summary: Update trigger (enable/disable, schedule)
+      tags:
+      - triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTriggerRequest'
+            examples:
+              default:
+                name: On Lead Create
+                event: lead.created
+                enabled: true
+        description: Update an existing trigger
+      responses:
+        '200':
+          description: Trigger updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trigger'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000009
+                  name: On Lead Create
+                  event: lead.created
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch or duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Update triggers by ID
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_trigger
+      summary: Delete trigger
+      tags:
+      - triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Trigger deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Delete triggers by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /triggers/{id}/fire:
+    post:
+      operationId: fire_trigger
+      summary: Manually fire a trigger for testing
+      tags:
+      - triggers
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Trigger fired successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  executed:
+                    type: boolean
+                  workflows_fired:
+                    type: integer
+                    format: int32
+              examples:
+                default:
+                  success: true
+                  trigger_id: 00000000-0000-0000-0000-000000000008
+                  workflow_execution_id: 00000000-0000-0000-0000-000000000032
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Fire a trigger manually
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows:
+    get:
+      operationId: list_workflows
+      summary: List workflows
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: filter_active
+        in: query
+        schema:
+          type: boolean
+      - name: filter_trigger_type
+        in: query
+        schema:
+          type: string
+          enum:
+          - STAGE_CHANGE
+          - FIELD_CHANGE
+          - TIME_BASED
+          - WEBHOOK
+          - MANUAL
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: List all workflows
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_workflow
+      summary: Create a new workflow
+      tags:
+      - workflows
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkflowRequest'
+            examples:
+              default:
+                name: Lead Assignment
+                description: Auto-assign leads based on region
+                enabled: true
+        description: Create a new workflow automation
+      responses:
+        '201':
+          description: Workflow created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000007
+                  name: Lead Assignment
+                  description: Auto-assign leads based on region
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Create a new workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}:
+    get:
+      operationId: get_workflow
+      summary: Get workflow by id
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000007
+                  name: Lead Assignment
+                  description: Auto-assign leads based on region
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflows by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_workflow
+      summary: Update workflow
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowRequest'
+            examples:
+              default:
+                name: Lead Assignment
+                description: Auto-assign leads based on region
+                enabled: true
+        description: Update an existing workflow
+      responses:
+        '200':
+          description: Workflow updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000007
+                  name: Lead Assignment
+                  description: Auto-assign leads based on region
+                  enabled: true
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch or duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Update workflows by ID
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_workflow
+      summary: Delete workflow
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Workflow deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Delete workflows by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    patch:
+      operationId: patch_workflow
+      summary: Change a workflow's name or settings
+      tags:
+      - workflows
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Steps are replaced with PUT /workflows/{id}/steps.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/activate:
+    post:
+      operationId: activate_workflow
+      summary: Set the workflow live
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/bindings:
+    patch:
+      operationId: bind_workflow_parameters
+      summary: Bind recipe parameters; references in triggers and steps are resolved in place
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties:
+                type: string
+      responses:
+        '200':
+          description: The workflow with the parameters bound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/duplicate:
+    post:
+      operationId: duplicate_workflow
+      summary: Copy a workflow and its steps as a new inactive workflow
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/enrolments:
+    get:
+      operationId: list_workflow_enrolments
+      summary: Contacts enrolled in a workflow
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/EnrolmentStatus'
+      - name: step_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Enrolments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEnrolment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: enrol_contacts
+      summary: Enrol contacts by hand
+      description: Bypasses the trigger. Honors the workflow's re-entry rule; contacts already active are reported, not re-enrolled.
+      tags:
+      - enrolments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrolRequest'
+      responses:
+        '201':
+          description: Enrolment result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EnrolResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/export:
+    get:
+      operationId: export_workflow_recipe
+      summary: The workflow as a recipe document - references replaced by parameters, notes kept
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Recipe document
+          content:
+            application/json:
+              schema:
+                type: object
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /workflows/{id}/map:
+    get:
+      operationId: get_workflow_map
+      summary: Contacts at each step, and step outcomes
+      description: The live view behind an automations map - how many contacts sit at each step now, how many have passed
+        through, and per-step send/open/click counts.
+      tags:
+      - automation-execution
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Map
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowMap'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /workflows/{id}/pause:
+    post:
+      operationId: pause_workflow
+      summary: Pause the workflow (enrolments hold at their step)
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Paused
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/rules:
+    get:
+      operationId: list_workflow_rules
+      summary: List rules for a workflow
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: List of rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RulePage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflow rules
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_workflow_rule
+      summary: Add a rule to a workflow
+      tags:
+      - rules
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRuleRequest'
+            examples:
+              default:
+                name: Assign to region A
+                condition:
+                  field: region
+                  operator: equals
+                  value: A
+                action:
+                  type: assign
+                  value: team-001
+        description: Add a rule to a workflow
+      responses:
+        '201':
+          description: Rule created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Rule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000008
+                  name: Assign to region A
+                  condition:
+                    field: region
+                    operator: equals
+                    value: A
+                  action:
+                    type: assign
+                    value: team-001
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Get workflow rules
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/run:
+    post:
+      operationId: run_workflow
+      summary: Manually trigger a workflow for testing
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Workflow execution result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecutionResult'
+              examples:
+                default:
+                  workflow_id: 00000000-0000-0000-0000-000000000007
+                  status: completed
+                  started_at: '2024-01-15T10:30:00Z'
+                  completed_at: '2024-01-15T10:30:05Z'
+                  rules_triggered: 3
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Run a workflow manually
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/run-history:
+    get:
+      operationId: list_workflow_run_history
+      summary: View execution history for a workflow
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Workflow run history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowRunPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get workflow execution history
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /workflows/{id}/setup:
+    get:
+      operationId: get_workflow_setup
+      summary: The setup wizard - the unbound recipe parameters, in order
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Parameters still to bind
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - parameters
+                properties:
+                  parameters:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RecipeParameter'
+                  total:
+                    type: integer
+                    format: int32
+                    description: Parameters the recipe has in all, for "Step 1/3"
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /workflows/{id}/steps:
+    get:
+      operationId: get_workflow_steps
+      summary: The workflow's step graph
+      tags:
+      - workflow-steps
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Ordered steps with branches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSteps'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: replace_workflow_steps
+      summary: Replace the step graph
+      description: 'The whole graph is replaced atomically and validated (every branch reaches an END or a GOAL, no
+
+        orphan steps, every SEND_MESSAGE names an AUTOMATION template). Contacts mid-way keep their
+
+        current step by id; a removed step moves them to its successor.
+
+        '
+      tags:
+      - workflow-steps
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowSteps'
+      responses:
+        '200':
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowSteps'
+        '400':
+          description: Graph invalid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepGraphValidation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /workflows/{id}/steps/{step_id}/notes:
+    post:
+      operationId: add_step_note
+      summary: Add a note to a step (or to the workflow with step_id "workflow")
+      tags:
+      - workflows
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - name: step_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - text
+              properties:
+                text:
+                  type: string
+                  maxLength: 2000
+      responses:
+        '201':
+          description: Note added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StepNote'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
 components:
-  parameters:
-    Page:
-      name: page
-      in: query
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        default: 1
-      description: Page number for pagination (1-indexed)
-    Limit:
-      name: limit
-      in: query
-      schema:
-        type: integer
-        format: int32
-        minimum: 1
-        maximum: 100
-        default: 20
-      description: 'Maximum number of items per page (default: 20, max: 100)'
-    Search:
-      name: search
-      in: query
-      schema:
-        type: string
-      description: Search query string for filtering resources
-    Id:
-      name: id
-      in: path
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: Unique identifier for the resource
   schemas:
+    ActionType:
+      type: string
+      enum:
+      - SEND_EMAIL
+      - SEND_MESSAGE
+      - CREATE_TASK
+      - UPDATE_FIELD
+      - ASSIGN_LEAD
+      - CALL_WEBHOOK
+      - CREATE_RECORD
+      - SET_VALUE
+      - ESCALATE
+      - ADD_TAG
+      - REMOVE_TAG
+      - SUBSCRIBE_LIST
+      - UNSUBSCRIBE_LIST
+      - ADJUST_SCORE
+      - NOTIFY
+      - CREATE_DEAL
+      - UPDATE_DEAL_STAGE
+      - ADD_NOTE
+      - START_WORKFLOW
+      - STOP_WORKFLOW
+      - SEND_1TO1_EMAIL
+      - SEND_TRANSACTIONAL
+      - INTERNAL_NOTIFICATION
+      - CONVERT
+      - ARCHIVE_CONTACT
+      - COMPLETE_TASK
+      - UPDATE_DEAL_OWNER
+      - UPDATE_DEAL_VALUE
+      - UPDATE_DEAL_STATUS
+      - UPDATE_DEAL_TITLE
+      - UPDATE_DEAL_FIELD
+      - ADD_TO_AD_AUDIENCE
+      - REMOVE_FROM_AD_AUDIENCE
+      - ADD_DEAL_NOTE
+      - ADJUST_DEAL_SCORE
+      - UPDATE_ACCOUNT_FIELD
+      - UPDATE_ACCOUNT_OWNER
+      - ADD_ACCOUNT_NOTE
+      - ADD_TO_ACCOUNT
+      - FORMAT_DATA
+      - END
+      description: Enum of action types. NOTIFY is the older name of INTERNAL_NOTIFICATION; SEND_EMAIL of SEND_MESSAGE. See
+        WorkflowStep.action_config for each type's configuration.
+    AutomationCatalog:
+      type: object
+      properties:
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogEntry'
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/CatalogEntry'
+      required:
+      - triggers
+      - actions
+      description: Every trigger and step type the engine supports, grouped; the builder palette is built from it.
+    CatalogEntry:
+      type: object
+      properties:
+        type:
+          type: string
+        label:
+          type: string
+        group:
+          type: string
+        kind:
+          type: string
+          enum:
+          - TRIGGER
+          - ACTION
+          - CONDITION
+          - WAIT
+          - GOAL
+          - FLOW
+        description:
+          type: string
+        config_schema:
+          type: object
+          properties: {}
+          description: JSON Schema of the step or trigger config
+          additionalProperties: true
+      required:
+      - type
+      - label
+      - group
+    ConditionOperator:
+      type: string
+      enum:
+      - EQUALS
+      - NOT_EQUALS
+      - GREATER_THAN
+      - LESS_THAN
+      - CONTAINS
+      - NOT_CONTAINS
+      - IS_EMPTY
+      - IS_NOT_EMPTY
+      - IN
+      - NOT_IN
+      description: Enum of condition operators (equals, contains, greater_than, etc.)
+    ConditionValueType:
+      type: string
+      enum:
+      - TEXT
+      - INTEGER
+      - FLOAT
+      - BOOLEAN
+      - DATE
+      - ENTITY
+      description: Enum of condition value types (string, number, date, boolean)
+    CreateRuleRequest:
+      type: object
+      required:
+      - workflow_id
+      - condition_field
+      - condition_operator
+      - condition_value
+      - action_type
+      - action_config
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        condition_field:
+          type: string
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+          format: int32
+      description: Request body for creating a new workflow rule
+    CreateTriggerRequest:
+      type: object
+      required:
+      - workflow_id
+      - type
+      - entity
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+        field:
+          type: string
+        schedule:
+          type: string
+        enabled:
+          type: boolean
+          default: true
+      description: Request body for creating a new workflow trigger
+    CreateWorkflowRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        exit_rules:
+          $ref: '#/components/schemas/ExitRules'
+        unsubscribe_scope:
+          type: string
+          enum:
+          - TRIGGER_LISTS
+          - ALL_LISTS
+          - NONE
+        access_group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reentry:
+          $ref: '#/components/schemas/ReentryRule'
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+          deprecated: true
+        trigger_config:
+          type: object
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        conditions:
+          type: object
+        sequence:
+          type: integer
+          format: int32
+        is_active:
+          type: boolean
+          default: true
+      description: Request body for creating a new workflow automation
+    EnrolRequest:
+      type: object
+      required:
+      - contact_ids
+      properties:
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          maxItems: 1000
+        start_step_id:
+          type: string
+          format: uuid
+          description: Defaults to the entry step
+    EnrolResult:
+      type: object
+      required:
+      - enrolled
+      - already_active
+      - excluded
+      properties:
+        enrolled:
+          type: integer
+          format: int32
+        already_active:
+          type: integer
+          format: int32
+          description: Skipped by the reentry rule (ONCE or MULTIPLE with an active enrolment)
+        excluded:
+          type: integer
+          format: int32
+          description: Unsubscribed or suppressed contacts when the workflow sends messages
+        skipped:
+          type: array
+          items:
+            type: object
+            properties:
+              contact_id:
+                type: string
+                format: uuid
+              reason:
+                type: string
+                enum:
+                - ALREADY_ENROLLED
+                - ALREADY_ACTIVE
+                - EXCLUDED
+                - ARCHIVED
+        enrolment_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+    Enrolment:
+      type: object
+      required:
+      - id
+      - workflow_id
+      - contact_id
+      - status
+      - entered_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+          readOnly: true
+        contact_id:
+          type: string
+          format: uuid
+        contact_email:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/EnrolmentStatus'
+        current_step_id:
+          type: string
+          format: uuid
+        next_run_at:
+          type: string
+          format: date-time
+          description: When the runtime will next act on this enrolment (WAITING)
+        entered_by:
+          type: string
+          description: TRIGGER, MANUAL, SEGMENT, STARTED_BY_WORKFLOW, or a staff user id
+        trigger_id:
+          type: string
+          format: uuid
+          description: The WorkflowTrigger that fired (entered_by TRIGGER)
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+        trigger_subject:
+          type: string
+          description: What fired it, for the log - the list, tag, form or deal involved
+        exit_reason:
+          $ref: '#/components/schemas/ExitReason'
+        split_paths:
+          type: object
+          readOnly: true
+          description: SPLIT step id -> branch key, fixed on first assignment so a contact keeps its path
+        goal_step_id:
+          type: string
+          format: uuid
+          readOnly: true
+        history:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/EnrolmentStepRecord'
+        entered_at:
+          type: string
+          format: date-time
+          readOnly: true
+        ended_at:
+          type: string
+          format: date-time
+          readOnly: true
+    EnrolmentPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Enrolment'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    EnrolmentStatus:
+      type: string
+      enum:
+      - ACTIVE
+      - WAITING
+      - COMPLETED
+      - GOAL_REACHED
+      - EXITED
+      - RESTARTED
+      - STOPPED
+      - FAILED
+      description: 'ACTIVE is between steps, WAITING sits in a WAIT or a GOAL with if_not_met WAIT. COMPLETED reached END.
+
+        EXITED left early (see Enrolment.exit_reason). RESTARTED was ended by a RESTART reentry. STOPPED was ended
+
+        by a user or STOP_WORKFLOW. FAILED hit an unrecoverable error.
+
+        '
+    EnrolmentStepRecord:
+      type: object
+      required:
+      - step_id
+      - kind
+      - at
+      - outcome
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/StepKind'
+        label:
+          type: string
+        at:
+          type: string
+          format: date-time
+        outcome:
+          type: string
+          enum:
+          - DONE
+          - BRANCH_YES
+          - BRANCH_NO
+          - SPLIT
+          - WAITED
+          - TIMED_OUT
+          - SKIPPED
+          - ACHIEVED
+          - JUMPED
+          - SUPPRESSED
+          - STEP_REMOVED
+          - FAILED
+          description: 'ACHIEVED/SKIPPED for a GOAL reached in sequence; JUMPED for a contact pulled to a GOAL from elsewhere;
+
+            SUPPRESSED for a send withheld for consent; STEP_REMOVED when the step was deleted under the contact.
+
+            '
+        skip_reason:
+          type: string
+          description: SKIPPED/SUPPRESSED detail - NO_OPEN_DEAL, ALREADY_CONVERTED, NOT_SUBSCRIBED, TEMPLATE_NOT_READY ...
+        left_at:
+          type: string
+          format: date-time
+        send_id:
+          type: string
+          format: uuid
+          description: crm/outreach send produced by a SEND_MESSAGE step
+        error:
+          type: string
+    ExecutionStatus:
+      type: string
+      enum:
+      - PENDING
+      - RUNNING
+      - SUCCESS
+      - FAILED
+      - CANCELLED
+      description: Enum of workflow execution statuses (running, completed, failed)
+    ExitReason:
+      type: string
+      enum:
+      - UNSUBSCRIBED
+      - CONVERTED
+      - GOAL_REACHED
+      - DATE_PASSED
+      - ARCHIVED
+      - STOPPED_BY_WORKFLOW
+      - STOPPED_BY_USER
+      - WORKFLOW_ARCHIVED
+      - RESTARTED
+    ExitRules:
+      type: object
+      description: When an enrolment ends early. Reaching END (or the last step) always ends it.
+      properties:
+        on_unsubscribe:
+          type: boolean
+          description: The contact unsubscribes from any message this workflow sent
+        on_conversion:
+          type: boolean
+          description: Any conversion the workflow tracks (`tracking`) is recorded for the contact
+        on_goal_reached:
+          type: boolean
+          description: A GOAL (jump-to) step's conditions are met
+    GoalConfig:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        scope:
+          type: string
+          enum:
+          - BELOW
+          - ANYWHERE
+          default: BELOW
+          description: Contacts that may jump here when the conditions are met - only those below this step, or anywhere in
+            the workflow
+        if_not_met:
+          type: string
+          enum:
+          - CONTINUE
+          - WAIT
+          default: CONTINUE
+          description: A contact that reaches this step in sequence without meeting the conditions continues past it, or waits
+            here until it does
+        track:
+          type: boolean
+          description: Record a goal event (crm/marketing conversions report) when a contact meets it
+    PaginatedEnrolment:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Enrolment'
+      description: Paginated list of Enrolment records
+    RecipeParameter:
+      type: object
+      required:
+      - key
+      - kind
+      - label
+      properties:
+        key:
+          type: string
+        kind:
+          type: string
+          enum:
+          - LIST
+          - TAG
+          - TEMPLATE
+          - FORM
+          - URL
+          - FIELD
+          - PIPELINE
+          - STAGE
+          - USER
+          - CONVERSION
+          - SCORE
+          - CONDITION
+          - TEXT
+        label:
+          type: string
+        hint:
+          type: string
+        required:
+          type: boolean
+          default: true
+        used_by_step_ids:
+          type: array
+          items:
+            type: string
+          readOnly: true
+    RecurringActionRequest:
+      type: object
+      required:
+      - workflow_id
+      - schedule
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        schedule:
+          type: string
+          description: Cron expression
+        action_config:
+          type: object
+      description: Request body for scheduling a recurring action
+    ReentryRule:
+      type: string
+      enum:
+      - ONCE
+      - MULTIPLE
+      - CONCURRENT
+      - RESTART
+      description: 'ONCE enrols a contact at most once ever; MULTIPLE allows a new enrolment only after the previous one has
+
+        exited; CONCURRENT starts a new enrolment every time a trigger fires, even while one is active; RESTART
+
+        stops the active enrolment and begins again.
+
+        '
+    Rule:
+      type: object
+      required:
+      - id
+      - workflow_id
+      - condition_field
+      - condition_operator
+      - sequence
+      - is_active
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        condition_field:
+          type: string
+          maxLength: 128
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+          description: Action-specific configuration (JSON)
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A conditional rule that triggers actions when certain criteria are met
+    RulePage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Rule'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    RuleTestResult:
+      type: object
+      properties:
+        rule_id:
+          type: string
+          format: uuid
+        condition_met:
+          type: boolean
+        matching_conditions:
+          type: array
+          items:
+            type: string
+        actions_to_fire:
+          type: array
+          items:
+            type: string
+      required:
+      - rule_id
+      - condition_met
+      - matching_conditions
+      - actions_to_fire
+      description: Result of testing a rule configuration
+    ScheduleActionRequest:
+      type: object
+      required:
+      - workflow_id
+      - scheduled_at
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        scheduled_at:
+          type: string
+          format: date-time
+        action_config:
+          type: object
+      description: Request body for scheduling a one-time action
+    ScheduledAction:
+      type: object
+      required:
+      - id
+      - scheduled_at
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        scheduled_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/ExecutionStatus'
+        action_config:
+          type: object
+        executed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A scheduled action with its execution parameters
+    ScheduledActionPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScheduledAction'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    SplitConfig:
+      type: object
+      required:
+      - mode
+      properties:
+        mode:
+          type: string
+          enum:
+          - EVEN
+          - PERCENT
+          - TEST
+          - UNTIL
+          description: 'EVEN spreads contacts over `branches` equally. PERCENT uses `branches[].percent`. TEST spreads evenly
+
+            until `test.until_date` or `test.until_count` contacts have been split, then sends everyone down the
+
+            winning path (the one whose contacts best met `test.winner_conditions`). UNTIL sends everyone to
+
+            path A until `until_date` or `until_count`, then to path B.
+
+            '
+        test:
+          type: object
+          properties:
+            until_date:
+              type: string
+              format: date
+            until_count:
+              type: integer
+              format: int32
+            winner_conditions:
+              type: object
+              description: The condition tree that defines success (opened, clicked, converted, tag added ...)
+            winner_key:
+              type: string
+              readOnly: true
+              description: Set once the test has decided
+        until_date:
+          type: string
+          format: date
+        until_count:
+          type: integer
+          format: int32
+    StepGraphValidation:
+      type: object
+      required:
+      - ok
+      - problems
+      properties:
+        ok:
+          type: boolean
+        problems:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                enum:
+                - ORPHAN_STEP
+                - DANGLING_NEXT
+                - BRANCH_PERCENT
+                - TEMPLATE_KIND
+                - MISSING_ENTRY
+                - CYCLE_WITHOUT_WAIT
+                - TEMPLATE_NOT_READY
+                - NO_POSTAL_ADDRESS
+                - UNBOUND_PARAMETER
+                - TOO_MANY_RECIPIENTS
+                - GOTO_HAS_NEXT
+              step_id:
+                type: string
+                format: uuid
+              message:
+                type: string
+    StepKind:
+      type: string
+      enum:
+      - ACTION
+      - WAIT
+      - IF_ELSE
+      - SPLIT
+      - GOAL
+      - GOTO
+      - END
+      description: 'ACTION runs one ActionType and continues. WAIT holds for a duration, until a date/time, until a contact
+
+        date field, or until a condition is met (with an optional timeout). IF_ELSE evaluates conditions and
+
+        takes the yes or no branch. SPLIT sends contacts down branches evenly, by percentage, as a test with a
+
+        winning path, or to path A until a date/count. GOAL ("jump to") names a condition that, when met, moves the
+
+        contact to this step from below it or from anywhere, and records the goal; a contact that reaches it
+
+        without meeting the condition continues or waits (`goal.if_not_met`). GOTO moves the contact to any other
+
+        step unconditionally and is terminal for its own branch (nothing follows it). END finishes the enrolment.
+
+        '
+    StepNote:
+      type: object
+      required:
+      - text
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+          maxLength: 2000
+        author:
+          type: string
+          description: A staff user id, or RECIPE
+        created_at:
+          type: string
+          format: date-time
+    Trigger:
+      type: object
+      required:
+      - id
+      - workflow_id
+      - type
+      - entity
+      - enabled
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+          maxLength: 64
+          description: Entity to watch (crm.lead, crm.contact, etc.)
+        field:
+          type: string
+          maxLength: 128
+          description: Field to watch (for field-based triggers)
+        schedule:
+          type: string
+          description: Cron expression (for time-based triggers)
+        enabled:
+          type: boolean
+        last_fired:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: An event-based trigger that initiates workflow execution
+    TriggerPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trigger'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    TriggerType:
+      type: string
+      enum:
+      - STAGE_CHANGE
+      - FIELD_CHANGE
+      - TIME_BASED
+      - WEBHOOK
+      - MANUAL
+      - ON_CREATE
+      - ON_UPDATE
+      - ON_DELETE
+      - SUBSCRIBED_TO_LIST
+      - UNSUBSCRIBED_FROM_LIST
+      - TAG_ADDED
+      - TAG_REMOVED
+      - FORM_SUBMITTED
+      - MESSAGE_OPENED
+      - MESSAGE_CLICKED
+      - MESSAGE_REPLIED
+      - MESSAGE_BOUNCED
+      - SITE_VISIT
+      - CUSTOM_EVENT
+      - SCORE_CHANGED
+      - DATE_FIELD
+      - DEAL_CREATED
+      - DEAL_STAGE_CHANGE
+      - DEAL_WON
+      - DEAL_LOST
+      - DEAL_VALUE_CHANGED
+      - DEAL_STATUS_CHANGED
+      - DEAL_FIELD_CHANGED
+      - ENTERED_PIPELINE
+      - ACCOUNT_FIELD_CHANGED
+      - TASK_COMPLETED
+      - MESSAGE_FORWARDED
+      - MESSAGE_SHARED
+      - FILE_DOWNLOADED
+      - RSS_ITEM
+      - JUMPED_TO
+      - GOAL_REACHED
+      - AD_CLICKED
+      description: Enum of trigger types (event-based, schedule-based, webhook-based). JUMPED_TO fires when a contact is moved
+        into this workflow by another workflow's GOTO/START_WORKFLOW.
+    UpdateRuleRequest:
+      type: object
+      properties:
+        condition_field:
+          type: string
+        condition_operator:
+          $ref: '#/components/schemas/ConditionOperator'
+        condition_value:
+          type: string
+        condition_value_type:
+          $ref: '#/components/schemas/ConditionValueType'
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        is_active:
+          type: boolean
+        sequence:
+          type: integer
+          format: int32
+      required:
+      - condition_field
+      - condition_value
+      - is_active
+      - sequence
+      description: Request body for updating an existing rule
+    UpdateTriggerRequest:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        schedule:
+          type: string
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        entity:
+          type: string
+        field:
+          type: string
+      required:
+      - enabled
+      - schedule
+      - entity
+      - field
+      description: Request body for updating an existing trigger
+    UpdateWorkflowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+        exit_rules:
+          $ref: '#/components/schemas/ExitRules'
+        unsubscribe_scope:
+          type: string
+          enum:
+          - TRIGGER_LISTS
+          - ALL_LISTS
+          - NONE
+        access_group_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reentry:
+          $ref: '#/components/schemas/ReentryRule'
+        tracking:
+          type: object
+          properties:
+            goal_id:
+              type: string
+              format: uuid
+            conversion_id:
+              type: string
+              format: uuid
+        trigger_type:
+          $ref: '#/components/schemas/TriggerType'
+          deprecated: true
+        trigger_config:
+          type: object
+          deprecated: true
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+        conditions:
+          type: object
+        sequence:
+          type: integer
+          format: int32
+        is_active:
+          type: boolean
+      description: Request body for updating an existing workflow (partial; absent fields are unchanged)
+    WaitConfig:
+      type: object
+      properties:
+        mode:
+          type: string
+          enum:
+          - DURATION
+          - UNTIL_DATETIME
+          - UNTIL_CONDITION
+          - UNTIL_DATE_FIELD
+        seconds:
+          type: integer
+          format: int64
+          description: DURATION
+        until:
+          type: string
+          format: date-time
+          description: UNTIL_DATETIME, an absolute instant
+        until_pattern:
+          type: object
+          description: 'UNTIL_DATETIME as a recurring pattern instead of an instant: the next matching day at `time`, where
+            any
+
+            of month/day/year may be left open ("any month, the 24th, at 08:00"). Evaluated in `timezone`.
+
+            '
+          properties:
+            month:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 12
+            day:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 31
+            year:
+              type: integer
+              format: int32
+            time:
+              type: string
+              description: HH:MM
+            timezone:
+              type: string
+              enum:
+              - CONTACT
+              - WORKSPACE
+              description: The contact's own timezone (falling back to the workspace's) or the workspace's
+        conditions:
+          type: object
+          description: UNTIL_CONDITION; the condition tree (see WorkflowStep.conditions)
+        date_field:
+          type: string
+          description: UNTIL_DATE_FIELD; a contact date or datetime field (renewal_date, trial_ends_at, birthday)
+        relation:
+          type: string
+          enum:
+          - true
+          - BEFORE
+          - AFTER
+          description: UNTIL_DATE_FIELD; with `offset_seconds` as the distance for BEFORE/AFTER
+        offset_seconds:
+          type: integer
+          format: int64
+          description: UNTIL_DATE_FIELD; the distance before/after the field's date (BEFORE and AFTER); negative also means
+            before
+        if_date_passed:
+          type: string
+          enum:
+          - CONTINUE
+          - EXIT
+          default: CONTINUE
+          description: UNTIL_DATE_FIELD; when the target date has already passed as the contact arrives
+        timeout_seconds:
+          type: integer
+          format: int64
+          description: UNTIL_CONDITION; continue anyway after this long
+        send_window:
+          type: object
+          description: Optional days/hours in the contact's timezone within which the wait may complete
+          properties:
+            days:
+              type: array
+              items:
+                type: string
+                enum:
+                - MON
+                - TUE
+                - WED
+                - THU
+                - FRI
+                - SAT
+                - SUN
+            from_hour:
+              type: integer
+              format: int32
+            to_hour:
+              type: integer
+              format: int32
     Workflow:
       type: object
       required:
@@ -1749,10 +3474,13 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/WorkflowTrigger'
-          description: |
-            Several start triggers per workflow; a contact enters when any one fires (subject to its own `runs`
+          description: 'Several start triggers per workflow; a contact enters when any one fires (subject to its own `runs`
+
             and `segment`). A workflow with no triggers is entered only by enrolment (manual, segment, or
+
             START_WORKFLOW from another workflow).
+
+            '
         trigger_type:
           $ref: '#/components/schemas/TriggerType'
           deprecated: true
@@ -1778,9 +3506,12 @@ components:
           - TRIGGER_LISTS
           - ALL_LISTS
           - NONE
-          description: |
-            Which lists an unsubscribe link in one of this workflow's messages applies to: the lists named by its
+          description: 'Which lists an unsubscribe link in one of this workflow''s messages applies to: the lists named by
+            its
+
             triggers and subscribe actions (default), every list, or none (the link is omitted; transactional-like).
+
+            '
         access_group_ids:
           type: array
           items:
@@ -1857,300 +3588,6 @@ components:
           format: date-time
           readOnly: true
       description: An automation workflow that defines business logic for lead processing
-    CreateWorkflowRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          maxLength: 128
-        description:
-          type: string
-        triggers:
-          type: array
-          items:
-            $ref: '#/components/schemas/WorkflowTrigger'
-        exit_rules:
-          $ref: '#/components/schemas/ExitRules'
-        unsubscribe_scope:
-          type: string
-          enum: [TRIGGER_LISTS, ALL_LISTS, NONE]
-        access_group_ids:
-          type: array
-          items: {type: string, format: uuid}
-        reentry:
-          $ref: '#/components/schemas/ReentryRule'
-        trigger_type:
-          $ref: '#/components/schemas/TriggerType'
-          deprecated: true
-        trigger_config:
-          type: object
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-        conditions:
-          type: object
-        sequence:
-          type: integer
-          format: int32
-        is_active:
-          type: boolean
-          default: true
-      description: Request body for creating a new workflow automation
-    UpdateWorkflowRequest:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-        triggers:
-          type: array
-          items:
-            $ref: '#/components/schemas/WorkflowTrigger'
-        exit_rules:
-          $ref: '#/components/schemas/ExitRules'
-        unsubscribe_scope:
-          type: string
-          enum: [TRIGGER_LISTS, ALL_LISTS, NONE]
-        access_group_ids:
-          type: array
-          items: {type: string, format: uuid}
-        reentry:
-          $ref: '#/components/schemas/ReentryRule'
-        tracking:
-          type: object
-          properties:
-            goal_id: {type: string, format: uuid}
-            conversion_id: {type: string, format: uuid}
-        trigger_type:
-          $ref: '#/components/schemas/TriggerType'
-          deprecated: true
-        trigger_config:
-          type: object
-          deprecated: true
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-        conditions:
-          type: object
-        sequence:
-          type: integer
-          format: int32
-        is_active:
-          type: boolean
-      description: Request body for updating an existing workflow (partial; absent fields are unchanged)
-    Rule:
-      type: object
-      required:
-      - id
-      - workflow_id
-      - condition_field
-      - condition_operator
-      - sequence
-      - is_active
-      properties:
-        id:
-          type: string
-          format: uuid
-        workflow_id:
-          type: string
-          format: uuid
-        condition_field:
-          type: string
-          maxLength: 128
-        condition_operator:
-          $ref: '#/components/schemas/ConditionOperator'
-        condition_value:
-          type: string
-        condition_value_type:
-          $ref: '#/components/schemas/ConditionValueType'
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-          description: Action-specific configuration (JSON)
-        is_active:
-          type: boolean
-        sequence:
-          type: integer
-          format: int32
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      description: A conditional rule that triggers actions when certain criteria
-        are met
-    CreateRuleRequest:
-      type: object
-      required:
-      - workflow_id
-      - condition_field
-      - condition_operator
-      - condition_value
-      - action_type
-      - action_config
-      properties:
-        workflow_id:
-          type: string
-          format: uuid
-        condition_field:
-          type: string
-        condition_operator:
-          $ref: '#/components/schemas/ConditionOperator'
-        condition_value:
-          type: string
-        condition_value_type:
-          $ref: '#/components/schemas/ConditionValueType'
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-        is_active:
-          type: boolean
-        sequence:
-          type: integer
-          format: int32
-      description: Request body for creating a new workflow rule
-    UpdateRuleRequest:
-      type: object
-      properties:
-        condition_field:
-          type: string
-        condition_operator:
-          $ref: '#/components/schemas/ConditionOperator'
-        condition_value:
-          type: string
-        condition_value_type:
-          $ref: '#/components/schemas/ConditionValueType'
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-        is_active:
-          type: boolean
-        sequence:
-          type: integer
-          format: int32
-      required:
-      - condition_field
-      - condition_value
-      - is_active
-      - sequence
-      description: Request body for updating an existing rule
-    Trigger:
-      type: object
-      required:
-      - id
-      - workflow_id
-      - type
-      - entity
-      - enabled
-      properties:
-        id:
-          type: string
-          format: uuid
-        workflow_id:
-          type: string
-          format: uuid
-        type:
-          $ref: '#/components/schemas/TriggerType'
-        entity:
-          type: string
-          maxLength: 64
-          description: Entity to watch (crm.lead, crm.contact, etc.)
-        field:
-          type: string
-          maxLength: 128
-          description: Field to watch (for field-based triggers)
-        schedule:
-          type: string
-          description: Cron expression (for time-based triggers)
-        enabled:
-          type: boolean
-        last_fired:
-          type: string
-          format: date-time
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      description: An event-based trigger that initiates workflow execution
-    CreateTriggerRequest:
-      type: object
-      required:
-      - workflow_id
-      - type
-      - entity
-      properties:
-        workflow_id:
-          type: string
-          format: uuid
-        type:
-          $ref: '#/components/schemas/TriggerType'
-        entity:
-          type: string
-        field:
-          type: string
-        schedule:
-          type: string
-        enabled:
-          type: boolean
-          default: true
-      description: Request body for creating a new workflow trigger
-    UpdateTriggerRequest:
-      type: object
-      properties:
-        enabled:
-          type: boolean
-        schedule:
-          type: string
-        type:
-          $ref: '#/components/schemas/TriggerType'
-        entity:
-          type: string
-        field:
-          type: string
-      required:
-      - enabled
-      - schedule
-      - entity
-      - field
-      description: Request body for updating an existing trigger
-    WorkflowExecution:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        workflow_id:
-          type: string
-          format: uuid
-        triggered_by:
-          type: string
-          format: uuid
-          description: User or cron job ID
-        started_at:
-          type: string
-          format: date-time
-        completed_at:
-          type: string
-          format: date-time
-        status:
-          $ref: '#/components/schemas/ExecutionStatus'
-        result_summary:
-          type: object
-          description: Summary of actions executed
-      required:
-      - workflow_id
-      - triggered_by
-      - started_at
-      - completed_at
-      description: Record of a workflow execution event with timing and status
     WorkflowExecutionResult:
       type: object
       properties:
@@ -2172,892 +3609,6 @@ components:
       - actions_ran
       - errors
       description: Result of executing a workflow including triggered rules
-    RuleTestResult:
-      type: object
-      properties:
-        rule_id:
-          type: string
-          format: uuid
-        condition_met:
-          type: boolean
-        matching_conditions:
-          type: array
-          items:
-            type: string
-        actions_to_fire:
-          type: array
-          items:
-            type: string
-      required:
-      - rule_id
-      - condition_met
-      - matching_conditions
-      - actions_to_fire
-      description: Result of testing a rule configuration
-    ScheduledAction:
-      type: object
-      required:
-      - id
-      - scheduled_at
-      - status
-      properties:
-        id:
-          type: string
-          format: uuid
-        workflow_id:
-          type: string
-          format: uuid
-        scheduled_at:
-          type: string
-          format: date-time
-        status:
-          $ref: '#/components/schemas/ExecutionStatus'
-        action_config:
-          type: object
-        executed_at:
-          type: string
-          format: date-time
-          readOnly: true
-        created_at:
-          type: string
-          format: date-time
-          readOnly: true
-      description: A scheduled action with its execution parameters
-    ScheduleActionRequest:
-      type: object
-      required:
-      - workflow_id
-      - scheduled_at
-      properties:
-        workflow_id:
-          type: string
-          format: uuid
-        scheduled_at:
-          type: string
-          format: date-time
-        action_config:
-          type: object
-      description: Request body for scheduling a one-time action
-    RecurringActionRequest:
-      type: object
-      required:
-      - workflow_id
-      - schedule
-      properties:
-        workflow_id:
-          type: string
-          format: uuid
-        schedule:
-          type: string
-          description: Cron expression
-        action_config:
-          type: object
-      description: Request body for scheduling a recurring action
-    TriggerType:
-      type: string
-      enum:
-      - STAGE_CHANGE
-      - FIELD_CHANGE
-      - TIME_BASED
-      - WEBHOOK
-      - MANUAL
-      - ON_CREATE
-      - ON_UPDATE
-      - ON_DELETE
-      - SUBSCRIBED_TO_LIST
-      - UNSUBSCRIBED_FROM_LIST
-      - TAG_ADDED
-      - TAG_REMOVED
-      - FORM_SUBMITTED
-      - MESSAGE_OPENED
-      - MESSAGE_CLICKED
-      - MESSAGE_REPLIED
-      - MESSAGE_BOUNCED
-      - SITE_VISIT
-      - CUSTOM_EVENT
-      - SCORE_CHANGED
-      - DATE_FIELD
-      - DEAL_CREATED
-      - DEAL_STAGE_CHANGE
-      - DEAL_WON
-      - DEAL_LOST
-      - DEAL_VALUE_CHANGED
-      - DEAL_STATUS_CHANGED
-      - DEAL_FIELD_CHANGED
-      - ENTERED_PIPELINE
-      - ACCOUNT_FIELD_CHANGED
-      - TASK_COMPLETED
-      - MESSAGE_FORWARDED
-      - MESSAGE_SHARED
-      - FILE_DOWNLOADED
-      - RSS_ITEM
-      - JUMPED_TO
-      - GOAL_REACHED
-      - AD_CLICKED
-      description: Enum of trigger types (event-based, schedule-based, webhook-based). JUMPED_TO fires when a contact is moved into this workflow by another workflow's GOTO/START_WORKFLOW.
-    ActionType:
-      type: string
-      enum:
-      - SEND_EMAIL
-      - SEND_MESSAGE
-      - CREATE_TASK
-      - UPDATE_FIELD
-      - ASSIGN_LEAD
-      - CALL_WEBHOOK
-      - CREATE_RECORD
-      - SET_VALUE
-      - ESCALATE
-      - ADD_TAG
-      - REMOVE_TAG
-      - SUBSCRIBE_LIST
-      - UNSUBSCRIBE_LIST
-      - ADJUST_SCORE
-      - NOTIFY
-      - CREATE_DEAL
-      - UPDATE_DEAL_STAGE
-      - ADD_NOTE
-      - START_WORKFLOW
-      - STOP_WORKFLOW
-      - SEND_1TO1_EMAIL
-      - SEND_TRANSACTIONAL
-      - INTERNAL_NOTIFICATION
-      - CONVERT
-      - ARCHIVE_CONTACT
-      - COMPLETE_TASK
-      - UPDATE_DEAL_OWNER
-      - UPDATE_DEAL_VALUE
-      - UPDATE_DEAL_STATUS
-      - UPDATE_DEAL_TITLE
-      - UPDATE_DEAL_FIELD
-      - ADD_TO_AD_AUDIENCE
-      - REMOVE_FROM_AD_AUDIENCE
-      - ADD_DEAL_NOTE
-      - ADJUST_DEAL_SCORE
-      - UPDATE_ACCOUNT_FIELD
-      - UPDATE_ACCOUNT_OWNER
-      - ADD_ACCOUNT_NOTE
-      - ADD_TO_ACCOUNT
-      - FORMAT_DATA
-      - END
-      description: Enum of action types. NOTIFY is the older name of INTERNAL_NOTIFICATION; SEND_EMAIL of SEND_MESSAGE. See WorkflowStep.action_config for each type's configuration.
-    ConditionOperator:
-      type: string
-      enum:
-      - EQUALS
-      - NOT_EQUALS
-      - GREATER_THAN
-      - LESS_THAN
-      - CONTAINS
-      - NOT_CONTAINS
-      - IS_EMPTY
-      - IS_NOT_EMPTY
-      - IN
-      - NOT_IN
-      description: Enum of condition operators (equals, contains, greater_than, etc.)
-    ConditionValueType:
-      type: string
-      enum:
-      - TEXT
-      - INTEGER
-      - FLOAT
-      - BOOLEAN
-      - DATE
-      - ENTITY
-      description: Enum of condition value types (string, number, date, boolean)
-    ExecutionStatus:
-      type: string
-      enum:
-      - PENDING
-      - RUNNING
-      - SUCCESS
-      - FAILED
-      - CANCELLED
-      description: Enum of workflow execution statuses (running, completed, failed)
-    Workflowexecutions:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/WorkflowExecution'
-      description: Collection of workflow execution records
-    Scheduledactions:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/ScheduledAction'
-      description: Collection of scheduled action records
-    ErrorResponse:
-      type: object
-      required:
-      - code
-      - message
-      properties:
-        code:
-          type: integer
-          format: int32
-          description: HTTP error code
-        message:
-          type: string
-          description: Human-readable error message
-        details:
-          type: string
-          description: Additional error details
-      description: An error response with code, message, and optional details
-    PaginatedResponse:
-      type: object
-      required:
-      - total
-      - page
-      - limit
-      properties:
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
-      description: A generic paginated response wrapper with items and pagination
-        metadata
-    PaginatedWorkflow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Workflow'
-      description: Paginated list of Workflow records
-    PaginatedRule:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Rule'
-      description: Paginated list of Rule records
-    PaginatedTrigger:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Trigger'
-      description: Paginated list of Trigger records
-    StepKind:
-      type: string
-      enum:
-      - ACTION
-      - WAIT
-      - IF_ELSE
-      - SPLIT
-      - GOAL
-      - GOTO
-      - END
-      description: |
-        ACTION runs one ActionType and continues. WAIT holds for a duration, until a date/time, until a contact
-        date field, or until a condition is met (with an optional timeout). IF_ELSE evaluates conditions and
-        takes the yes or no branch. SPLIT sends contacts down branches evenly, by percentage, as a test with a
-        winning path, or to path A until a date/count. GOAL ("jump to") names a condition that, when met, moves the
-        contact to this step from below it or from anywhere, and records the goal; a contact that reaches it
-        without meeting the condition continues or waits (`goal.if_not_met`). GOTO moves the contact to any other
-        step unconditionally and is terminal for its own branch (nothing follows it). END finishes the enrolment.
-    WorkflowStep:
-      type: object
-      required:
-      - id
-      - kind
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Stable across edits; enrolments point at it
-        kind:
-          $ref: '#/components/schemas/StepKind'
-        label:
-          type: string
-          maxLength: 128
-        next_step_id:
-          type: string
-          format: uuid
-          description: ACTION, WAIT and GOAL continue here; absent means END
-        action_type:
-          $ref: '#/components/schemas/ActionType'
-        action_config:
-          type: object
-          description: |
-            ACTION: per type.
-            SEND_MESSAGE {template_id, sender_id?} (a marketing message; needs list consent). SEND_1TO1_EMAIL
-            {from_user_id, subject, text} (plain text, from a user's mailbox or sender identity with their reply-to).
-            SEND_TRANSACTIONAL {transactional_template_id, variables}. INTERNAL_NOTIFICATION {subject, to[] (up to
-            5 addresses or user ids), from_sender_id?, body, include_contact_link: bool} (staff only, no consent).
-            SUBSCRIBE_LIST / UNSUBSCRIBE_LIST {list_ids[]}. ADD_TAG / REMOVE_TAG {tag}. UPDATE_FIELD {field, value}.
-            ADD_NOTE {text}. ADJUST_SCORE {score_id, points}. CONVERT {conversion_id}. ARCHIVE_CONTACT {}.
-            CREATE_TASK {title, description?, task_type_id, assignee: "OWNER"|user_id, due_after_seconds, deal: bool}
-            (deal: true attaches it to the contact's open deal in `pipeline_id`). COMPLETE_TASK {task_type_id?,
-            outcome?}. CREATE_DEAL {pipeline_id, stage_id, title, value?, owner: "OWNER"|user_id}. UPDATE_DEAL_STAGE
-            {pipeline_id, stage_id}. UPDATE_DEAL_OWNER {user_id}. UPDATE_DEAL_VALUE {value|delta}. UPDATE_DEAL_STATUS
-            {status}. UPDATE_DEAL_TITLE {title}. UPDATE_DEAL_FIELD {field, value}. ADD_DEAL_NOTE {text}.
-            ADJUST_DEAL_SCORE {score_id, points}. UPDATE_ACCOUNT_FIELD {field, value}. UPDATE_ACCOUNT_OWNER
-            {user_id}. ADD_ACCOUNT_NOTE {text}. ADD_TO_ACCOUNT {account_id|"FROM_EMAIL_DOMAIN"}.
-            CALL_WEBHOOK {url, secret_id?}. START_WORKFLOW / STOP_WORKFLOW {workflow_id}.
-            ADD_TO_AD_AUDIENCE / REMOVE_FROM_AD_AUDIENCE {audience_id} (crm/marketing `/ads/audiences`; the
-            warm-up sequence is add → wait N days → send → remove on click).
-            FORMAT_DATA {op: COPY|DATE_ADJUST|EXTRACT|MATH|CAPITALIZE, source_field, target_field, amount?, unit?,
-            extract?: PHONE|URL, operator?: ADD|SUBTRACT|MULTIPLY|DIVIDE, operand?, case?: SENTENCE|TITLE|UPPER|LOWER}.
-        wait:
-          $ref: '#/components/schemas/WaitConfig'
-        conditions:
-          type: object
-          description: |
-            IF_ELSE and GOAL; the crm/contacts condition tree (AND/OR groups of field / tag / list status / form
-            submitted / engagement / site / deal / score predicates; `{"segment_id": ...}` reuses a saved segment).
-        yes_step_id:
-          type: string
-          format: uuid
-        no_step_id:
-          type: string
-          format: uuid
-        split:
-          $ref: '#/components/schemas/SplitConfig'
-        branches:
-          type: array
-          items:
-            type: object
-            required:
-            - key
-            properties:
-              key:
-                type: string
-                description: A, B, C ...
-              percent:
-                type: integer
-                format: int32
-                description: PERCENT mode; percents sum to 100. Ignored (even) in the other modes.
-              step_id:
-                type: string
-                format: uuid
-          description: SPLIT paths, in order; `step_id` absent means the path ends at once
-        goal:
-          $ref: '#/components/schemas/GoalConfig'
-        goto_step_id:
-          type: string
-          format: uuid
-          description: GOTO target; any step of this workflow
-        position:
-          type: object
-          description: Editor layout hint (x, y); opaque to the runtime
-        notes:
-          type: array
-          items:
-            $ref: '#/components/schemas/StepNote'
-          description: Guidance and comments on the step; recipes ship with them
-        unbound_parameters:
-          type: array
-          readOnly: true
-          items:
-            type: string
-          description: Recipe parameters this step references that are not bound yet (the step cannot run)
-    StepNote:
-      type: object
-      required:
-      - text
-      properties:
-        id:
-          type: string
-          format: uuid
-        text:
-          type: string
-          maxLength: 2000
-        author:
-          type: string
-          description: A staff user id, or RECIPE
-        created_at:
-          type: string
-          format: date-time
-    WaitConfig:
-      type: object
-      properties:
-        mode:
-          type: string
-          enum:
-          - DURATION
-          - UNTIL_DATETIME
-          - UNTIL_CONDITION
-          - UNTIL_DATE_FIELD
-        seconds:
-          type: integer
-          format: int64
-          description: DURATION
-        until:
-          type: string
-          format: date-time
-          description: UNTIL_DATETIME, an absolute instant
-        until_pattern:
-          type: object
-          description: |
-            UNTIL_DATETIME as a recurring pattern instead of an instant: the next matching day at `time`, where any
-            of month/day/year may be left open ("any month, the 24th, at 08:00"). Evaluated in `timezone`.
-          properties:
-            month:
-              type: integer
-              format: int32
-              minimum: 1
-              maximum: 12
-            day:
-              type: integer
-              format: int32
-              minimum: 1
-              maximum: 31
-            year:
-              type: integer
-              format: int32
-            time:
-              type: string
-              description: HH:MM
-            timezone:
-              type: string
-              enum:
-              - CONTACT
-              - WORKSPACE
-              description: The contact's own timezone (falling back to the workspace's) or the workspace's
-        conditions:
-          type: object
-          description: UNTIL_CONDITION; the condition tree (see WorkflowStep.conditions)
-        date_field:
-          type: string
-          description: UNTIL_DATE_FIELD; a contact date or datetime field (renewal_date, trial_ends_at, birthday)
-        relation:
-          type: string
-          enum:
-          - ON
-          - BEFORE
-          - AFTER
-          description: UNTIL_DATE_FIELD; with `offset_seconds` as the distance for BEFORE/AFTER
-        offset_seconds:
-          type: integer
-          format: int64
-          description: UNTIL_DATE_FIELD; the distance before/after the field's date (BEFORE and AFTER); negative also means before
-        if_date_passed:
-          type: string
-          enum:
-          - CONTINUE
-          - EXIT
-          default: CONTINUE
-          description: UNTIL_DATE_FIELD; when the target date has already passed as the contact arrives
-        timeout_seconds:
-          type: integer
-          format: int64
-          description: UNTIL_CONDITION; continue anyway after this long
-        send_window:
-          type: object
-          description: Optional days/hours in the contact's timezone within which the wait may complete
-          properties:
-            days:
-              type: array
-              items:
-                type: string
-                enum:
-                - MON
-                - TUE
-                - WED
-                - THU
-                - FRI
-                - SAT
-                - SUN
-            from_hour:
-              type: integer
-              format: int32
-            to_hour:
-              type: integer
-              format: int32
-    SplitConfig:
-      type: object
-      required:
-      - mode
-      properties:
-        mode:
-          type: string
-          enum:
-          - EVEN
-          - PERCENT
-          - TEST
-          - UNTIL
-          description: |
-            EVEN spreads contacts over `branches` equally. PERCENT uses `branches[].percent`. TEST spreads evenly
-            until `test.until_date` or `test.until_count` contacts have been split, then sends everyone down the
-            winning path (the one whose contacts best met `test.winner_conditions`). UNTIL sends everyone to
-            path A until `until_date` or `until_count`, then to path B.
-        test:
-          type: object
-          properties:
-            until_date:
-              type: string
-              format: date
-            until_count:
-              type: integer
-              format: int32
-            winner_conditions:
-              type: object
-              description: The condition tree that defines success (opened, clicked, converted, tag added ...)
-            winner_key:
-              type: string
-              readOnly: true
-              description: Set once the test has decided
-        until_date:
-          type: string
-          format: date
-        until_count:
-          type: integer
-          format: int32
-    GoalConfig:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 128
-        scope:
-          type: string
-          enum:
-          - BELOW
-          - ANYWHERE
-          default: BELOW
-          description: Contacts that may jump here when the conditions are met - only those below this step, or anywhere in the workflow
-        if_not_met:
-          type: string
-          enum:
-          - CONTINUE
-          - WAIT
-          default: CONTINUE
-          description: A contact that reaches this step in sequence without meeting the conditions continues past it, or waits here until it does
-        track:
-          type: boolean
-          description: Record a goal event (crm/marketing conversions report) when a contact meets it
-    WorkflowSteps:
-      type: object
-      required:
-      - workflow_id
-      - entry_step_id
-      - steps
-      properties:
-        workflow_id:
-          type: string
-          format: uuid
-        entry_step_id:
-          type: string
-          format: uuid
-        steps:
-          type: array
-          items:
-            $ref: '#/components/schemas/WorkflowStep'
-        version:
-          type: integer
-          format: int32
-          readOnly: true
-    StepGraphValidation:
-      type: object
-      required:
-      - ok
-      - problems
-      properties:
-        ok:
-          type: boolean
-        problems:
-          type: array
-          items:
-            type: object
-            required:
-            - code
-            - message
-            properties:
-              code:
-                type: string
-                enum:
-                - ORPHAN_STEP
-                - DANGLING_NEXT
-                - BRANCH_PERCENT
-                - TEMPLATE_KIND
-                - MISSING_ENTRY
-                - CYCLE_WITHOUT_WAIT
-                - TEMPLATE_NOT_READY
-                - NO_POSTAL_ADDRESS
-                - UNBOUND_PARAMETER
-                - TOO_MANY_RECIPIENTS
-                - GOTO_HAS_NEXT
-              step_id:
-                type: string
-                format: uuid
-              message:
-                type: string
-    ReentryRule:
-      type: string
-      enum:
-      - ONCE
-      - MULTIPLE
-      - CONCURRENT
-      - RESTART
-      description: |
-        ONCE enrols a contact at most once ever; MULTIPLE allows a new enrolment only after the previous one has
-        exited; CONCURRENT starts a new enrolment every time a trigger fires, even while one is active; RESTART
-        stops the active enrolment and begins again.
-    ExitRules:
-      type: object
-      description: When an enrolment ends early. Reaching END (or the last step) always ends it.
-      properties:
-        on_unsubscribe:
-          type: boolean
-          description: The contact unsubscribes from any message this workflow sent
-        on_conversion:
-          type: boolean
-          description: Any conversion the workflow tracks (`tracking`) is recorded for the contact
-        on_goal_reached:
-          type: boolean
-          description: A GOAL (jump-to) step's conditions are met
-    WorkflowTrigger:
-      type: object
-      required:
-      - type
-      properties:
-        id:
-          type: string
-          format: uuid
-        type:
-          $ref: '#/components/schemas/TriggerType'
-        config:
-          type: object
-          description: |
-            Per type (absent keys mean "any"):
-            SUBSCRIBED_TO_LIST / UNSUBSCRIBED_FROM_LIST {list_id?}. TAG_ADDED / TAG_REMOVED {tag}. FORM_SUBMITTED
-            {form_id?}. MESSAGE_OPENED / MESSAGE_CLICKED / MESSAGE_REPLIED / MESSAGE_FORWARDED / MESSAGE_SHARED /
-            MESSAGE_BOUNCED {template_id?|campaign_id?, link_url?, list_id?, one_to_one?: ANY|AUTOMATED|DIRECT,
-            network?: FACEBOOK|TWITTER|...}. SITE_VISIT {url_pattern} (`*` wildcard). CUSTOM_EVENT {event_type,
-            value?}. ON_CREATE {}. FIELD_CHANGE {field, to?} ("changes ever" when `to` is absent). ACCOUNT_FIELD_CHANGED
-            {field, to?}. SCORE_CHANGED {score_id, threshold, direction: ABOVE|BELOW}. DATE_FIELD {field (a contact or
-            deal date field, or subscribed_at / created_at), relation: ON|BEFORE|AFTER, offset: {amount, unit:
-            DAYS|WEEKS|MONTHS|YEARS}, days: DAILY|WEEKDAYS|WEEKENDS, hour: 0-23, timezone: CONTACT|WORKSPACE}.
-            TIME_BASED {cron, timezone}. RSS_ITEM {feed_url, cadence: HOURLY|DAILY|WEEKDAYS|WEEKENDS, time, timezone}.
-            DEAL_CREATED / ENTERED_PIPELINE {pipeline_id?}. DEAL_STAGE_CHANGE {pipeline_id, from_stage_id?,
-            to_stage_id?}. DEAL_STATUS_CHANGED {to: OPEN|WON|LOST, pipeline_id?}. DEAL_WON / DEAL_LOST {pipeline_id?}.
-            DEAL_VALUE_CHANGED / DEAL_FIELD_CHANGED {pipeline_id?, field?}. Any DEAL_* also takes {owner: {op:
-            EQ|NEQ, user_id}}. TASK_COMPLETED {task_type_id?, outcome?}. GOAL_REACHED {workflow_id, goal_step_id,
-            outcome: ACHIEVED|SKIPPED}. JUMPED_TO {from_workflow_id?}. FILE_DOWNLOADED {asset_id?}. WEBHOOK
-            {secret_id}. MANUAL {}.
-        runs:
-          type: string
-          enum:
-          - ONCE
-          - MULTIPLE
-          default: ONCE
-          description: Fire once per contact for this trigger, or every time the event happens (subject to the workflow's reentry rule)
-        segment:
-          type: object
-          description: Optional condition tree; only contacts matching it enter through this trigger
-    EnrolmentStatus:
-      type: string
-      enum:
-      - ACTIVE
-      - WAITING
-      - COMPLETED
-      - GOAL_REACHED
-      - EXITED
-      - RESTARTED
-      - STOPPED
-      - FAILED
-      description: |
-        ACTIVE is between steps, WAITING sits in a WAIT or a GOAL with if_not_met WAIT. COMPLETED reached END.
-        EXITED left early (see Enrolment.exit_reason). RESTARTED was ended by a RESTART reentry. STOPPED was ended
-        by a user or STOP_WORKFLOW. FAILED hit an unrecoverable error.
-    ExitReason:
-      type: string
-      enum:
-      - UNSUBSCRIBED
-      - CONVERTED
-      - GOAL_REACHED
-      - DATE_PASSED
-      - ARCHIVED
-      - STOPPED_BY_WORKFLOW
-      - STOPPED_BY_USER
-      - WORKFLOW_ARCHIVED
-      - RESTARTED
-    Enrolment:
-      type: object
-      required:
-      - id
-      - workflow_id
-      - contact_id
-      - status
-      - entered_at
-      properties:
-        id:
-          type: string
-          format: uuid
-        workflow_id:
-          type: string
-          format: uuid
-        workflow_name:
-          type: string
-          readOnly: true
-        contact_id:
-          type: string
-          format: uuid
-        contact_email:
-          type: string
-          readOnly: true
-        status:
-          $ref: '#/components/schemas/EnrolmentStatus'
-        current_step_id:
-          type: string
-          format: uuid
-        next_run_at:
-          type: string
-          format: date-time
-          description: When the runtime will next act on this enrolment (WAITING)
-        entered_by:
-          type: string
-          description: TRIGGER, MANUAL, SEGMENT, STARTED_BY_WORKFLOW, or a staff user id
-        trigger_id:
-          type: string
-          format: uuid
-          description: The WorkflowTrigger that fired (entered_by TRIGGER)
-        trigger_type:
-          $ref: '#/components/schemas/TriggerType'
-        trigger_subject:
-          type: string
-          description: What fired it, for the log - the list, tag, form or deal involved
-        exit_reason:
-          $ref: '#/components/schemas/ExitReason'
-        split_paths:
-          type: object
-          readOnly: true
-          description: SPLIT step id -> branch key, fixed on first assignment so a contact keeps its path
-        goal_step_id:
-          type: string
-          format: uuid
-          readOnly: true
-        history:
-          type: array
-          readOnly: true
-          items:
-            $ref: '#/components/schemas/EnrolmentStepRecord'
-        entered_at:
-          type: string
-          format: date-time
-          readOnly: true
-        ended_at:
-          type: string
-          format: date-time
-          readOnly: true
-    EnrolmentStepRecord:
-      type: object
-      required:
-      - step_id
-      - kind
-      - at
-      - outcome
-      properties:
-        step_id:
-          type: string
-          format: uuid
-        kind:
-          $ref: '#/components/schemas/StepKind'
-        label:
-          type: string
-        at:
-          type: string
-          format: date-time
-        outcome:
-          type: string
-          enum:
-          - DONE
-          - BRANCH_YES
-          - BRANCH_NO
-          - SPLIT
-          - WAITED
-          - TIMED_OUT
-          - SKIPPED
-          - ACHIEVED
-          - JUMPED
-          - SUPPRESSED
-          - STEP_REMOVED
-          - FAILED
-          description: |
-            ACHIEVED/SKIPPED for a GOAL reached in sequence; JUMPED for a contact pulled to a GOAL from elsewhere;
-            SUPPRESSED for a send withheld for consent; STEP_REMOVED when the step was deleted under the contact.
-        skip_reason:
-          type: string
-          description: SKIPPED/SUPPRESSED detail - NO_OPEN_DEAL, ALREADY_CONVERTED, NOT_SUBSCRIBED, TEMPLATE_NOT_READY ...
-        left_at:
-          type: string
-          format: date-time
-        send_id:
-          type: string
-          format: uuid
-          description: crm/outreach send produced by a SEND_MESSAGE step
-        error:
-          type: string
-    EnrolRequest:
-      type: object
-      required:
-      - contact_ids
-      properties:
-        contact_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
-          maxItems: 1000
-        start_step_id:
-          type: string
-          format: uuid
-          description: Defaults to the entry step
-    EnrolResult:
-      type: object
-      required:
-      - enrolled
-      - already_active
-      - excluded
-      properties:
-        enrolled:
-          type: integer
-          format: int32
-        already_active:
-          type: integer
-          format: int32
-          description: Skipped by the reentry rule (ONCE or MULTIPLE with an active enrolment)
-        excluded:
-          type: integer
-          format: int32
-          description: Unsubscribed or suppressed contacts when the workflow sends messages
-        skipped:
-          type: array
-          items:
-            type: object
-            properties:
-              contact_id:
-                type: string
-                format: uuid
-              reason:
-                type: string
-                enum: [ALREADY_ENROLLED, ALREADY_ACTIVE, EXCLUDED, ARCHIVED]
-        enrolment_ids:
-          type: array
-          items:
-            type: string
-            format: uuid
     WorkflowMap:
       type: object
       required:
@@ -3122,43 +3673,27 @@ components:
               failed:
                 type: integer
                 format: int64
-    RecipeParameter:
+    WorkflowPage:
       type: object
       required:
-      - key
-      - kind
-      - label
+      - items
+      - total
+      - page
+      - limit
       properties:
-        key:
-          type: string
-        kind:
-          type: string
-          enum:
-          - LIST
-          - TAG
-          - TEMPLATE
-          - FORM
-          - URL
-          - FIELD
-          - PIPELINE
-          - STAGE
-          - USER
-          - CONVERSION
-          - SCORE
-          - CONDITION
-          - TEXT
-        label:
-          type: string
-        hint:
-          type: string
-        required:
-          type: boolean
-          default: true
-        used_by_step_ids:
+        items:
           type: array
           items:
-            type: string
-          readOnly: true
+            $ref: '#/components/schemas/Workflow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
     WorkflowRecipe:
       type: object
       required:
@@ -3203,10 +3738,13 @@ components:
           description: Library grouping (Software, E-Commerce, Any ...)
         definition:
           type: object
-          description: |
-            The graph as the recipe files hold it (openapi/crm/automation/recipes/*.yaml): triggers, steps, templates,
+          description: 'The graph as the recipe files hold it (openapi/crm/automation/recipes/*.yaml): triggers, steps, templates,
+
             with `$list`, `$tag:<key>`, `$template:<key>`, `$url`, `$condition` placeholders where workspace
+
             references go. Returned by GET /recipes/{id}.
+
+            '
         step_count:
           type: integer
           format: int32
@@ -3214,21 +3752,422 @@ components:
           type: integer
           format: int32
           description: AUTOMATION templates the user must supply or accept defaults for
-    PaginatedEnrolment:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+    WorkflowRun:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        workflow_id:
+          type: string
+          format: uuid
+        started_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/ExecutionStatus'
+        contacts_processed:
+          type: integer
+          format: int32
+        errors:
+          type: integer
+          format: int32
+      required:
+      - id
+      - workflow_id
+      - started_at
+    WorkflowRunPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Enrolment'
-      description: Paginated list of Enrolment records
+            $ref: '#/components/schemas/WorkflowRun'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    WorkflowStep:
+      type: object
+      required:
+      - id
+      - kind
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Stable across edits; enrolments point at it
+        kind:
+          $ref: '#/components/schemas/StepKind'
+        label:
+          type: string
+          maxLength: 128
+        next_step_id:
+          type: string
+          format: uuid
+          description: ACTION, WAIT and GOAL continue here; absent means END
+        action_type:
+          $ref: '#/components/schemas/ActionType'
+        action_config:
+          type: object
+          description: 'ACTION: per type.
+
+            SEND_MESSAGE {template_id, sender_id?} (a marketing message; needs list consent). SEND_1TO1_EMAIL
+
+            {from_user_id, subject, text} (plain text, from a user''s mailbox or sender identity with their reply-to).
+
+            SEND_TRANSACTIONAL {transactional_template_id, variables}. INTERNAL_NOTIFICATION {subject, to[] (up to
+
+            5 addresses or user ids), from_sender_id?, body, include_contact_link: bool} (staff only, no consent).
+
+            SUBSCRIBE_LIST / UNSUBSCRIBE_LIST {list_ids[]}. ADD_TAG / REMOVE_TAG {tag}. UPDATE_FIELD {field, value}.
+
+            ADD_NOTE {text}. ADJUST_SCORE {score_id, points}. CONVERT {conversion_id}. ARCHIVE_CONTACT {}.
+
+            CREATE_TASK {title, description?, task_type_id, assignee: "OWNER"|user_id, due_after_seconds, deal: bool}
+
+            (deal: true attaches it to the contact''s open deal in `pipeline_id`). COMPLETE_TASK {task_type_id?,
+
+            outcome?}. CREATE_DEAL {pipeline_id, stage_id, title, value?, owner: "OWNER"|user_id}. UPDATE_DEAL_STAGE
+
+            {pipeline_id, stage_id}. UPDATE_DEAL_OWNER {user_id}. UPDATE_DEAL_VALUE {value|delta}. UPDATE_DEAL_STATUS
+
+            {status}. UPDATE_DEAL_TITLE {title}. UPDATE_DEAL_FIELD {field, value}. ADD_DEAL_NOTE {text}.
+
+            ADJUST_DEAL_SCORE {score_id, points}. UPDATE_ACCOUNT_FIELD {field, value}. UPDATE_ACCOUNT_OWNER
+
+            {user_id}. ADD_ACCOUNT_NOTE {text}. ADD_TO_ACCOUNT {account_id|"FROM_EMAIL_DOMAIN"}.
+
+            CALL_WEBHOOK {url, secret_id?}. START_WORKFLOW / STOP_WORKFLOW {workflow_id}.
+
+            ADD_TO_AD_AUDIENCE / REMOVE_FROM_AD_AUDIENCE {audience_id} (crm/marketing `/ads/audiences`; the
+
+            warm-up sequence is add → wait N days → send → remove on click).
+
+            FORMAT_DATA {op: COPY|DATE_ADJUST|EXTRACT|MATH|CAPITALIZE, source_field, target_field, amount?, unit?,
+
+            extract?: PHONE|URL, operator?: ADD|SUBTRACT|MULTIPLY|DIVIDE, operand?, case?: SENTENCE|TITLE|UPPER|LOWER}.
+
+            '
+        wait:
+          $ref: '#/components/schemas/WaitConfig'
+        conditions:
+          type: object
+          description: 'IF_ELSE and GOAL; the crm/contacts condition tree (AND/OR groups of field / tag / list status / form
+
+            submitted / engagement / site / deal / score predicates; `{"segment_id": ...}` reuses a saved segment).
+
+            '
+        yes_step_id:
+          type: string
+          format: uuid
+        no_step_id:
+          type: string
+          format: uuid
+        split:
+          $ref: '#/components/schemas/SplitConfig'
+        branches:
+          type: array
+          items:
+            type: object
+            required:
+            - key
+            properties:
+              key:
+                type: string
+                description: A, B, C ...
+              percent:
+                type: integer
+                format: int32
+                description: PERCENT mode; percents sum to 100. Ignored (even) in the other modes.
+              step_id:
+                type: string
+                format: uuid
+          description: SPLIT paths, in order; `step_id` absent means the path ends at once
+        goal:
+          $ref: '#/components/schemas/GoalConfig'
+        goto_step_id:
+          type: string
+          format: uuid
+          description: GOTO target; any step of this workflow
+        position:
+          type: object
+          description: Editor layout hint (x, y); opaque to the runtime
+        notes:
+          type: array
+          items:
+            $ref: '#/components/schemas/StepNote'
+          description: Guidance and comments on the step; recipes ship with them
+        unbound_parameters:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Recipe parameters this step references that are not bound yet (the step cannot run)
+    WorkflowSteps:
+      type: object
+      required:
+      - workflow_id
+      - entry_step_id
+      - steps
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        entry_step_id:
+          type: string
+          format: uuid
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+        version:
+          type: integer
+          format: int32
+          readOnly: true
+    WorkflowTrigger:
+      type: object
+      required:
+      - type
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/TriggerType'
+        config:
+          type: object
+          description: 'Per type (absent keys mean "any"):
+
+            SUBSCRIBED_TO_LIST / UNSUBSCRIBED_FROM_LIST {list_id?}. TAG_ADDED / TAG_REMOVED {tag}. FORM_SUBMITTED
+
+            {form_id?}. MESSAGE_OPENED / MESSAGE_CLICKED / MESSAGE_REPLIED / MESSAGE_FORWARDED / MESSAGE_SHARED /
+
+            MESSAGE_BOUNCED {template_id?|campaign_id?, link_url?, list_id?, one_to_one?: ANY|AUTOMATED|DIRECT,
+
+            network?: FACEBOOK|TWITTER|...}. SITE_VISIT {url_pattern} (`*` wildcard). CUSTOM_EVENT {event_type,
+
+            value?}. ON_CREATE {}. FIELD_CHANGE {field, to?} ("changes ever" when `to` is absent). ACCOUNT_FIELD_CHANGED
+
+            {field, to?}. SCORE_CHANGED {score_id, threshold, direction: ABOVE|BELOW}. DATE_FIELD {field (a contact or
+
+            deal date field, or subscribed_at / created_at), relation: ON|BEFORE|AFTER, offset: {amount, unit:
+
+            DAYS|WEEKS|MONTHS|YEARS}, days: DAILY|WEEKDAYS|WEEKENDS, hour: 0-23, timezone: CONTACT|WORKSPACE}.
+
+            TIME_BASED {cron, timezone}. RSS_ITEM {feed_url, cadence: HOURLY|DAILY|WEEKDAYS|WEEKENDS, time, timezone}.
+
+            DEAL_CREATED / ENTERED_PIPELINE {pipeline_id?}. DEAL_STAGE_CHANGE {pipeline_id, from_stage_id?,
+
+            to_stage_id?}. DEAL_STATUS_CHANGED {to: OPEN|WON|LOST, pipeline_id?}. DEAL_WON / DEAL_LOST {pipeline_id?}.
+
+            DEAL_VALUE_CHANGED / DEAL_FIELD_CHANGED {pipeline_id?, field?}. Any DEAL_* also takes {owner: {op:
+
+            EQ|NEQ, user_id}}. TASK_COMPLETED {task_type_id?, outcome?}. GOAL_REACHED {workflow_id, goal_step_id,
+
+            outcome: ACHIEVED|SKIPPED}. JUMPED_TO {from_workflow_id?}. FILE_DOWNLOADED {asset_id?}. WEBHOOK
+
+            {secret_id}. MANUAL {}.
+
+            '
+        runs:
+          type: string
+          enum:
+          - ONCE
+          - MULTIPLE
+          default: ONCE
+          description: Fire once per contact for this trigger, or every time the event happens (subject to the workflow's
+            reentry rule)
+        segment:
+          type: object
+          description: Optional condition tree; only contacts matching it enter through this trigger
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    PaginatedResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: A page of items whose shape the operation describes.
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      description: Free-text search
+      schema:
+        type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      description: 'The workspace (brand) the call acts in. Checked against the caller''s memberships: a foreign workspace
+        is 403, a record in another workspace is 404 (ADR 004).'
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Malformed request
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 'Not allowed: the role, or a workspace the caller is not a member of'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-externalDocs:
-  description: Automation API Reference
-  url: https://docs.rerp.com/crm/automation/api-reference

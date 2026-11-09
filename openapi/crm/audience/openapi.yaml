@@ -1,0 +1,3910 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Audience
+  version: v1.0.0
+  description: 'Who we can reach: contacts with custom field values, organisations (prospect companies), tags, segments and
+    the shared condition tree, lists, subscriptions with their consent history, suppressions, notes, the contact timeline
+    and bulk jobs. Owns every "can we contact this person?" fact. Admits confirmed sign-ups from crm/intake (ADR 004).'
+  x-api-docs:
+    service: audience
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+- url: http://localhost:10352/api/v1/crm/audience
+  description: Local development (port from port-registry)
+- url: /api/v1/crm/audience
+  description: CRM Audience API
+tags:
+- name: bulk-jobs
+  description: Bulk jobs
+- name: contacts
+  description: Contact CRUD
+- name: lists
+  description: Mailing lists and their subscription state
+- name: organisations
+  description: Organisations
+- name: segments
+  description: Saved condition trees that select contacts
+- name: subscriptions
+  description: Contact x list subscription state and consent history
+- name: suppressions
+  description: Addresses that must never be sent to
+- name: tags
+  description: Tags on contacts
+paths:
+  /bulk-jobs:
+    get:
+      operationId: list_bulk_jobs
+      summary: Bulk jobs, newest first
+      tags:
+      - bulk-jobs
+      responses:
+        '200':
+          description: Page of bulk jobs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkJobPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Id'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_bulk_job
+      summary: Change many contacts at once
+      tags:
+      - bulk-jobs
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Runs in the background on a segment or an explicit list of contacts.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBulkJobRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /bulk-jobs/{id}/undo:
+    post:
+      operationId: undo_bulk_job
+      summary: Undo a bulk job
+      tags:
+      - bulk-jobs
+      responses:
+        '202':
+          description: Undo accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BulkJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Restores the before-values. 409 when the job is not undoable or older than 7 days.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts:
+    get:
+      operationId: list_contacts
+      summary: List contacts
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: filter_company_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_parent_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_email
+        in: query
+        schema:
+          type: string
+          format: email
+      - name: filter_active
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: List all contacts
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_contact
+      summary: Create a new contact
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+            examples:
+              default:
+                first_name: Jane
+                last_name: Smith
+                email: jane@example.com
+                phone: +1-555-0124
+                title: Marketing Director
+                account_id: 00000000-0000-0000-0000-000000000003
+        description: Create a new contact person
+      responses:
+        '201':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000002
+                  first_name: Jane
+                  last_name: Smith
+                  email: jane@example.com
+                  phone: +1-555-0124
+                  title: Marketing Director
+                  account_id: 00000000-0000-0000-0000-000000000003
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Create a new contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/counts:
+    get:
+      operationId: get_contact_counts
+      summary: Contact counts for the aside
+      tags:
+      - contacts
+      responses:
+        '200':
+          description: Counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactCountsSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/export:
+    post:
+      operationId: export_contacts
+      summary: Export contacts matching a segment as CSV
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                segment_id:
+                  type: string
+                  format: uuid
+                conditions:
+                  type: object
+                fields:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '202':
+          description: Export job started; the job carries the download URL when done
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/import:
+    post:
+      operationId: import_contacts
+      summary: Bulk import from CSV
+      description: Multipart CSV with a column mapping. Rows are validated and deduplicated by email; the response is a job
+        the client polls. Consent for list subscription is recorded as IMPORT with the stated source.
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              - mapping
+              properties:
+                file:
+                  type: string
+                  format: binary
+                mapping:
+                  type: string
+                  description: JSON object column -> contact field or custom field key
+                tag_names:
+                  type: string
+                  description: JSON array of tags to add to every imported contact
+                list_id:
+                  type: string
+                  format: uuid
+                consent_note:
+                  type: string
+                update_existing:
+                  type: boolean
+      responses:
+        '202':
+          description: Import job started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/import/{id}:
+    get:
+      operationId: get_import_job
+      summary: Import job progress
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/merge:
+    post:
+      operationId: merge_contacts
+      summary: Merge two contacts (keep one, delete other, update references)
+      tags:
+      - contacts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MergeContactsRequest'
+            examples:
+              default:
+                first_name: Jane
+                last_name: Smith
+                email: jane@example.com
+                phone: +1-555-0124
+                title: Marketing Director
+                account_id: 00000000-0000-0000-0000-000000000003
+        description: Merge two duplicate contacts, keeping the better data
+      responses:
+        '200':
+          description: Merge completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MergeResult'
+              examples:
+                default:
+                  primary_id: 00000000-0000-0000-0000-000000000002
+                  merged_from:
+                  - 00000000-0000-0000-0000-000000000032
+                  - 00000000-0000-0000-0000-000000000033
+                  fields_merged:
+                  - email
+                  - phone
+                  - company
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+              examples:
+                default:
+                  success: true
+                  kept_id: 00000000-0000-0000-0000-000000000001
+                  merged_id: 00000000-0000-0000-0000-000000000002
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Create a new contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/search-by-email:
+    get:
+      operationId: search_contacts_by_email
+      summary: Find contacts matching an email address
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: email
+        in: query
+        required: true
+        schema:
+          type: string
+          format: email
+      responses:
+        '200':
+          description: Matching contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Search contacts by email address
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/{id}:
+    get:
+      operationId: get_contact
+      summary: Get contact by id
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000002
+                  first_name: Jane
+                  last_name: Smith
+                  email: jane@example.com
+                  phone: +1-555-0124
+                  title: Marketing Director
+                  account_id: 00000000-0000-0000-0000-000000000003
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get contacts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_contact
+      summary: Update contact fields
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+            examples:
+              default:
+                first_name: Jane
+                last_name: Smith
+                email: jane@example.com
+                phone: +1-555-0124
+                title: Marketing Director
+                account_id: 00000000-0000-0000-0000-000000000003
+        description: Update an existing contact
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000002
+                  first_name: Jane
+                  last_name: Smith
+                  email: jane@example.com
+                  phone: +1-555-0124
+                  title: Marketing Director
+                  account_id: 00000000-0000-0000-0000-000000000003
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch or duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Update contacts by ID
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_contact
+      summary: Soft-delete contact
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Contact deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Delete contacts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    patch:
+      operationId: patch_contact
+      summary: Update some of a contact's fields
+      tags:
+      - contacts
+      responses:
+        '200':
+          description: Updated contact
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Only the fields sent change; the change is audited with before and after values.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/{id}/accounts:
+    get:
+      operationId: get_contact_accounts
+      summary: Get accounts associated with a contact
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Related accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganisationPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get contacts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/{id}/activity:
+    get:
+      operationId: get_contact_activity
+      summary: The contact's timeline
+      description: Merged, newest first, from every CRM service - sends and opens (outreach), enrolment steps (automation),
+        form submissions and page views (marketing), stage changes (pipeline), notes and tag changes.
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: kinds
+        in: query
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityKind'
+        style: form
+        explode: false
+      responses:
+        '200':
+          description: Activity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/{id}/notes:
+    post:
+      operationId: add_contact_note
+      summary: Add a note to the timeline
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+      responses:
+        '201':
+          description: Note added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Activity'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/{id}/subscriptions:
+    get:
+      operationId: list_contact_subscriptions
+      summary: A contact's subscriptions across all lists
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/{id}/tags:
+    post:
+      operationId: add_contact_tags
+      summary: Add tags to a contact
+      description: Emits TAG_ADDED for each tag newly present, which crm/automation listens for.
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagNames'
+      responses:
+        '200':
+          description: Contact with its tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: remove_contact_tags
+      summary: Remove tags from a contact
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TagNames'
+      responses:
+        '200':
+          description: Contact with its tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /contacts/{id}/tree:
+    get:
+      operationId: get_contact_hierarchy
+      summary: Get contact's org tree (parent + children)
+      tags:
+      - contacts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Org tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get hierarchical tree structure
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /lists:
+    get:
+      operationId: list_lists
+      summary: List mailing lists
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Mailing lists with subscriber counts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailingList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_list
+      summary: Create a mailing list
+      tags:
+      - lists
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMailingListRequest'
+            examples:
+              default:
+                name: Product launch waitlist
+                description: Everyone who asked to be told when the product opens
+                sender_id: 00000000-0000-0000-0000-000000000301
+                double_opt_in: true
+      responses:
+        '201':
+          description: List created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /lists/{id}:
+    get:
+      operationId: get_list
+      summary: Get a mailing list
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: The list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_list
+      summary: Update a mailing list
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailingListRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailingList'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_list
+      summary: Archive a mailing list
+      description: Lists are archived, never hard-deleted; subscription history under them is retained for consent audit.
+      tags:
+      - lists
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Archived
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /lists/{id}/subscriptions:
+    get:
+      operationId: list_list_subscriptions
+      summary: Subscriptions on a list
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SubscriptionStatus'
+      responses:
+        '200':
+          description: Subscriptions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSubscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /organisations:
+    get:
+      operationId: list_accounts
+      summary: List accounts/companies
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          default: 20
+      - name: search
+        in: query
+        schema:
+          type: string
+      - name: filter_parent_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_industry_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: filter_active
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: List of accounts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOrganisation'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  per_page: 20
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: List all accounts
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_account
+      summary: Create a new account/company
+      tags:
+      - organisations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateOrganisationRequest'
+            examples:
+              default:
+                name: Acme Corp
+                website: https://acme.com
+                industry: Technology
+                size: medium
+                owner_id: 00000000-0000-0000-0000-000000000010
+        description: Create a new account/organization in the CRM
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000003
+                  name: Acme Corp
+                  website: https://acme.com
+                  industry: Technology
+                  size: medium
+                  owner_id: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Create a new accounts
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /organisations/{id}:
+    get:
+      operationId: get_account
+      summary: Get account by id
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Account details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000003
+                  name: Acme Corp
+                  website: https://acme.com
+                  industry: Technology
+                  size: medium
+                  owner_id: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get accounts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_account
+      summary: Update account fields
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateOrganisationRequest'
+            examples:
+              default:
+                name: Acme Corp
+                website: https://acme.com
+                industry: Technology
+                size: medium
+                owner_id: 00000000-0000-0000-0000-000000000010
+        description: Update an existing account by ID
+      responses:
+        '200':
+          description: Account updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Organisation'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000003
+                  name: Acme Corp
+                  website: https://acme.com
+                  industry: Technology
+                  size: medium
+                  owner_id: 00000000-0000-0000-0000-000000000010
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch or duplicate
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '204':
+          description: Resource updated successfully
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Update accounts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_account
+      summary: Soft-delete account
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Account deleted
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Delete accounts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /organisations/{id}/contacts:
+    get:
+      operationId: get_account_contacts
+      summary: Get contacts associated with an account
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 100
+          default: 20
+      responses:
+        '200':
+          description: Related contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get accounts by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /organisations/{id}/tree:
+    get:
+      operationId: get_account_hierarchy
+      summary: Get account's org tree (parent + children)
+      tags:
+      - organisations
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Org tree
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrganisationPage'
+              examples:
+                default:
+                  items: []
+                  total: 0
+                  page: 1
+                  limit: 20
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get hierarchical tree structure
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /segments:
+    get:
+      operationId: list_segments
+      summary: Saved segments
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Segments
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSegment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_segment
+      summary: Save a segment
+      tags:
+      - segments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /segments/evaluate:
+    post:
+      operationId: evaluate_segment
+      summary: Count and sample the contacts a condition tree matches
+      tags:
+      - segments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - conditions
+              properties:
+                conditions:
+                  $ref: '#/components/schemas/ConditionGroup'
+      responses:
+        '200':
+          description: Match count and sample
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                - count
+                properties:
+                  count:
+                    type: integer
+                    format: int64
+                  sample:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Contact'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /segments/{id}:
+    get:
+      operationId: get_segment
+      summary: Get a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Segment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_segment
+      summary: Update a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Segment'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_segment
+      summary: Delete a segment
+      tags:
+      - segments
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /subscriptions:
+    post:
+      operationId: subscribe
+      summary: Subscribe a contact to a list
+      description: 'Records a subscription with its consent source. With double opt-in on the list the status is PENDING until
+
+        the confirmation link is followed. Re-subscribing an UNSUBSCRIBED contact requires a fresh consent source
+
+        (a form submission or an explicit staff action with a note); an automation may not do it.
+
+        '
+      tags:
+      - subscriptions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscribeRequest'
+      responses:
+        '201':
+          description: Subscription recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          description: Address is suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /subscriptions/{id}:
+    get:
+      operationId: get_subscription
+      summary: Get a subscription with its consent history
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /subscriptions/{id}/unsubscribe:
+    post:
+      operationId: unsubscribe
+      summary: Unsubscribe a contact from a list
+      tags:
+      - subscriptions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnsubscribeRequest'
+      responses:
+        '200':
+          description: Unsubscribed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /suppressions:
+    get:
+      operationId: list_suppressions
+      summary: Suppressed addresses
+      tags:
+      - suppressions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: reason
+        in: query
+        schema:
+          $ref: '#/components/schemas/SuppressionReason'
+      responses:
+        '200':
+          description: Suppressions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSuppression'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_suppression
+      summary: Suppress an address manually
+      tags:
+      - suppressions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSuppressionRequest'
+      responses:
+        '201':
+          description: Suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Suppression'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /suppressions/{id}:
+    delete:
+      operationId: delete_suppression
+      summary: Lift a manual suppression
+      description: Only MANUAL suppressions can be lifted. COMPLAINT and HARD_BOUNCE are permanent.
+      tags:
+      - suppressions
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Lifted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /tags:
+    get:
+      operationId: list_tags
+      summary: Tags with contact counts
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      responses:
+        '200':
+          description: Tags
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_tag
+      summary: Create a tag
+      tags:
+      - tags
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /tags/{id}:
+    put:
+      operationId: update_tag
+      summary: Rename or recolour a tag
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTagRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_tag
+      summary: Delete a tag (removed from every contact)
+      tags:
+      - tags
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    patch:
+      operationId: audience_update_tag
+      summary: Rename, recolour or merge a tag
+      tags:
+      - tags
+      responses:
+        '200':
+          description: Updated tag
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tag'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTagRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+components:
+  schemas:
+    Activity:
+      type: object
+      required:
+      - id
+      - contact_id
+      - kind
+      - at
+      - summary
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        kind:
+          $ref: '#/components/schemas/ActivityKind'
+        at:
+          type: string
+          format: date-time
+        summary:
+          type: string
+          description: One line for the timeline
+        actor:
+          type: string
+          description: Staff user id, workflow id, 'contact' or 'system'
+        ref_service:
+          type: string
+          description: Which CRM service owns the underlying record
+        ref_id:
+          type: string
+          format: uuid
+        data:
+          type: object
+          description: Kind-specific detail (template name, link url, form fields, from/to stage)
+    ActivityKind:
+      type: string
+      enum:
+      - MESSAGE_SENT
+      - MESSAGE_OPENED
+      - MESSAGE_CLICKED
+      - MESSAGE_BOUNCED
+      - UNSUBSCRIBED
+      - SUBSCRIBED
+      - FORM_SUBMITTED
+      - PAGE_VIEW
+      - SITE_EVENT
+      - WORKFLOW_ENTERED
+      - WORKFLOW_STEP
+      - WORKFLOW_ENDED
+      - TAG_ADDED
+      - TAG_REMOVED
+      - FIELD_CHANGED
+      - SCORE_CHANGED
+      - DEAL_CREATED
+      - DEAL_STAGE_CHANGED
+      - NOTE
+      - CHAT
+    BulkJob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        action:
+          $ref: '#/components/schemas/BulkJobAction'
+        value:
+          type: string
+        field_key:
+          type: string
+        list_id:
+          type: string
+          format: uuid
+        segment_id:
+          type: string
+          format: uuid
+        contacts:
+          type: integer
+          format: int64
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+          - FAILED
+          - UNDONE
+        by:
+          type: string
+          description: Who started it
+        undoable:
+          type: boolean
+        undo_until:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        finished_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - action
+      - status
+      - created_at
+      description: A change applied to many contacts at once; the before-values are kept so it can be undone for 7 days.
+    BulkJobAction:
+      type: string
+      enum:
+      - ADD_TAG
+      - REMOVE_TAG
+      - SUBSCRIBE
+      - UNSUBSCRIBE
+      - SET_FIELD
+      - ARCHIVE
+    BulkJobPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkJob'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    Channel:
+      type: string
+      enum:
+      - EMAIL
+      - SMS
+      - WHATSAPP
+      description: Delivery channel. EMAIL is delivered; SMS and WHATSAPP need a provider adapter.
+    Condition:
+      type: object
+      required:
+      - subject
+      - operator
+      properties:
+        subject:
+          type: string
+          description: 'What is tested: field:<name>, custom:<key>, tag, list:<id>, score, engagement:opened:<days>,
+
+            engagement:clicked:<days>, engagement:any:<days>, deal:stage, deal:value, site:visited:<path>,
+
+            event:<name>, form:<id>, created_at, last_activity_at, timezone, country
+
+            '
+        operator:
+          type: string
+          enum:
+          - EQ
+          - NEQ
+          - CONTAINS
+          - NOT_CONTAINS
+          - STARTS_WITH
+          - GT
+          - GTE
+          - LT
+          - LTE
+          - IN
+          - NOT_IN
+          - IS_SET
+          - IS_NOT_SET
+          - HAS
+          - HAS_NOT
+          - BEFORE
+          - AFTER
+          - WITHIN_DAYS
+          - NOT_WITHIN_DAYS
+        value:
+          description: String, number, boolean, ISO date or array as the operator requires
+    ConditionGroup:
+      type: object
+      required:
+      - op
+      - items
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/ConditionGroup'
+            - $ref: '#/components/schemas/Condition'
+      description: Recursive AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences
+    ConsentEvent:
+      type: object
+      required:
+      - at
+      - status
+      - source
+      properties:
+        at:
+          type: string
+          format: date-time
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+        actor:
+          type: string
+          description: Staff user id, automation id, or 'contact'
+        note:
+          type: string
+    ConsentSource:
+      type: string
+      enum:
+      - WEB_FORM
+      - DOUBLE_OPT_IN
+      - IMPORT
+      - STAFF
+      - API
+      - PREFERENCE_PAGE
+      - CHECKOUT
+      description: Where the consent came from; stored on every subscription change
+    Contact:
+      type: object
+      required:
+      - id
+      - name
+      - create_date
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names (see /tags)
+        custom_fields:
+          type: object
+          additionalProperties: true
+          description: Values for crm/platform custom fields, keyed by field key
+        score:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Current crm/intelligence score
+        timezone:
+          type: string
+          description: IANA zone, for send-in-contact-timezone and send windows
+        last_activity_at:
+          type: string
+          format: date-time
+          readOnly: true
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 64
+        mobile:
+          type: string
+          maxLength: 64
+        title:
+          type: string
+          enum:
+          - MR
+          - MRS
+          - MME
+          description: Salutation
+        function:
+          type: string
+          maxLength: 128
+        department:
+          type: string
+          maxLength: 128
+        company_id:
+          type: string
+          format: uuid
+          description: Parent company/account
+        is_company:
+          type: boolean
+          default: false
+        parent_id:
+          type: string
+          format: uuid
+          description: Parent contact for org structure
+        street:
+          type: string
+          maxLength: 255
+        street2:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 128
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+          maxLength: 32
+        country_id:
+          type: string
+          format: uuid
+        user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        active:
+          type: boolean
+          default: true
+        color:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 16
+        create_date:
+          type: string
+          format: date-time
+          readOnly: true
+        write_date:
+          type: string
+          format: date-time
+          readOnly: true
+        child_contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        lead_count:
+          type: integer
+          format: int32
+          readOnly: true
+        opportunity_count:
+          type: integer
+          format: int32
+          readOnly: true
+      description: An individual person associated with an account or lead
+    ContactCountsSummary:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int64
+        subscribed:
+          type: integer
+          format: int64
+        unsubscribed:
+          type: integer
+          format: int64
+        bounced:
+          type: integer
+          format: int64
+        pending:
+          type: integer
+          format: int64
+        segments:
+          type: array
+          items:
+            type: object
+            properties:
+              segment_id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              count:
+                type: integer
+                format: int64
+            required:
+            - segment_id
+            - count
+      required:
+      - total
+      description: 'Counts for the contacts aside: all contacts by status and each saved segment.'
+    ContactPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    CreateBulkJobRequest:
+      type: object
+      properties:
+        label:
+          type: string
+        action:
+          $ref: '#/components/schemas/BulkJobAction'
+        value:
+          type: string
+          description: Tag name, field value, ...
+        field_key:
+          type: string
+        list_id:
+          type: string
+          format: uuid
+        segment_id:
+          type: string
+          format: uuid
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Explicit contacts, when no segment is given
+        consent_source:
+          type: string
+          description: 'Required for SUBSCRIBE: how these contacts consented'
+      required:
+      - action
+    CreateContactRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        mobile:
+          type: string
+        title:
+          type: string
+          enum:
+          - MR
+          - MRS
+          - MME
+        function:
+          type: string
+        department:
+          type: string
+        company_id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+        street:
+          type: string
+        street2:
+          type: string
+        city:
+          type: string
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+        country_id:
+          type: string
+          format: uuid
+      description: Request body for creating a new contact person
+    CreateMailingListRequest:
+      type: object
+      required:
+      - name
+      - sender_id
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+        double_opt_in:
+          type: boolean
+          default: false
+        confirmation_template_id:
+          type: string
+          format: uuid
+    CreateOrganisationRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        website:
+          type: string
+          format: uri
+        industry_id:
+          type: string
+          format: uuid
+        company_size:
+          type: string
+          enum:
+          - STARTUP
+          - SMB
+          - MID_MARKET
+          - ENTERPRISE
+        employees:
+          type: integer
+          format: int32
+        annual_revenue:
+          type: number
+          format: double
+        description:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+        street:
+          type: string
+        street2:
+          type: string
+        city:
+          type: string
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+        country_id:
+          type: string
+          format: uuid
+      description: Request body for creating a new account/organization
+    CreateSegmentRequest:
+      type: object
+      required:
+      - name
+      - conditions
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        conditions:
+          $ref: '#/components/schemas/ConditionGroup'
+    CreateSuppressionRequest:
+      type: object
+      required:
+      - address
+      properties:
+        address:
+          type: string
+        channel:
+          $ref: '#/components/schemas/Channel'
+        note:
+          type: string
+    CreateTagRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        color:
+          type: string
+        description:
+          type: string
+    ImportJob:
+      type: object
+      required:
+      - id
+      - kind
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - IMPORT
+          - EXPORT
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+          - FAILED
+        total_rows:
+          type: integer
+          format: int64
+        processed_rows:
+          type: integer
+          format: int64
+        created:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+        skipped:
+          type: integer
+          format: int64
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              row:
+                type: integer
+                format: int64
+              message:
+                type: string
+        download_url:
+          type: string
+          format: uri
+          description: EXPORT when DONE; expires
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        finished_at:
+          type: string
+          format: date-time
+    MailingList:
+      type: object
+      required:
+      - id
+      - name
+      - sender_id
+      - double_opt_in
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+          description: Default sender for campaigns to this list
+        double_opt_in:
+          type: boolean
+        confirmation_template_id:
+          type: string
+          format: uuid
+          description: Template used for the double opt-in email; required when double_opt_in is true
+        is_archived:
+          type: boolean
+          default: false
+        subscriber_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: SUBSCRIBED only
+        unsubscribed_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A mailing list. Consent is per list; a contact may be on several.
+    MergeContactsRequest:
+      type: object
+      required:
+      - keep_id
+      - remove_id
+      properties:
+        keep_id:
+          type: string
+          format: uuid
+        remove_id:
+          type: string
+          format: uuid
+      description: Request body for merging two duplicate contacts
+    MergeResult:
+      type: object
+      properties:
+        kept_id:
+          type: string
+          format: uuid
+        removed_id:
+          type: string
+          format: uuid
+        merged_lead_count:
+          type: integer
+          format: int32
+        merged_account_count:
+          type: integer
+          format: int32
+      required:
+      - kept_id
+      - removed_id
+      - merged_lead_count
+      - merged_account_count
+      description: Result of merging multiple records together
+    Organisation:
+      type: object
+      required:
+      - id
+      - name
+      - create_date
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 255
+        phone:
+          type: string
+          maxLength: 64
+        website:
+          type: string
+          format: uri
+          maxLength: 255
+        industry_id:
+          type: string
+          format: uuid
+        industry_name:
+          type: string
+          readOnly: true
+        company_size:
+          type: string
+          enum:
+          - STARTUP
+          - SMB
+          - MID_MARKET
+          - ENTERPRISE
+        employees:
+          type: integer
+          format: int32
+        annual_revenue:
+          type: number
+          format: double
+        description:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+          description: Parent company
+        child_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+        street:
+          type: string
+          maxLength: 255
+        street2:
+          type: string
+          maxLength: 255
+        city:
+          type: string
+          maxLength: 128
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+          maxLength: 32
+        country_id:
+          type: string
+          format: uuid
+        country_name:
+          type: string
+          readOnly: true
+        active:
+          type: boolean
+          default: true
+        color:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 16
+        create_date:
+          type: string
+          format: date-time
+          readOnly: true
+        write_date:
+          type: string
+          format: date-time
+          readOnly: true
+        contact_count:
+          type: integer
+          format: int32
+          readOnly: true
+        active_lead_count:
+          type: integer
+          format: int32
+          readOnly: true
+        total_revenue:
+          type: number
+          format: double
+          readOnly: true
+        contact_name:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: The person to address at the customer
+        region:
+          type: string
+          minLength: 1
+          maxLength: 100
+        country_code:
+          type: string
+          pattern: ^[A-Z]{2}$
+          description: ISO 3166-1 alpha-2 (RERP has no country table yet; country_id stays unset)
+        tax_id:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: VAT or tax id
+        origin:
+          $ref: '#/components/schemas/OrganisationOrigin'
+      description: A company or organization that is a customer or prospect
+    OrganisationOrigin:
+      type: object
+      readOnly: true
+      required:
+      - conversion_id
+      - reason
+      - reference
+      - converted_at
+      properties:
+        conversion_id:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          enum:
+          - stripe_checkout
+          - order
+          - contract
+        reference:
+          type: string
+        funnel_lead_id:
+          type: string
+          format: uuid
+        stripe_customer_id:
+          type: string
+        converted_by:
+          type: string
+        converted_at:
+          type: string
+          format: date-time
+      description: How the customer crossed into RERP (ADR 003)
+    OrganisationPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Organisation'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PaginatedActivity:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Activity'
+    PaginatedMailingList:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/MailingList'
+    PaginatedOrganisation:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Organisation'
+      description: Paginated list of Account records
+    PaginatedSegment:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Segment'
+    PaginatedSubscription:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Subscription'
+    PaginatedSuppression:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Suppression'
+    PaginatedTag:
+      allOf:
+      - $ref: '#/components/schemas/PaginatedResponse'
+      - type: object
+        properties:
+          items:
+            type: array
+            items:
+              $ref: '#/components/schemas/Tag'
+    Segment:
+      type: object
+      required:
+      - id
+      - name
+      - conditions
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        conditions:
+          $ref: '#/components/schemas/ConditionGroup'
+        contact_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Evaluated at last save or refresh
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+    SubscribeRequest:
+      type: object
+      required:
+      - contact_id
+      - list_id
+      - consent_source
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
+        consent_source:
+          $ref: '#/components/schemas/ConsentSource'
+        consent_ip:
+          type: string
+        consent_text:
+          type: string
+        form_id:
+          type: string
+          format: uuid
+        note:
+          type: string
+          description: Required when consent_source is STAFF
+    Subscription:
+      type: object
+      required:
+      - id
+      - contact_id
+      - list_id
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        list_id:
+          type: string
+          format: uuid
+        list_name:
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/SubscriptionStatus'
+        consent_source:
+          $ref: '#/components/schemas/ConsentSource'
+        consent_at:
+          type: string
+          format: date-time
+        consent_ip:
+          type: string
+          description: Recorded for WEB_FORM and DOUBLE_OPT_IN consent
+        consent_text:
+          type: string
+          description: The exact consent wording shown at the time
+        form_id:
+          type: string
+          format: uuid
+          description: The crm/marketing form that produced the consent, when WEB_FORM
+        unsubscribed_at:
+          type: string
+          format: date-time
+        unsubscribe_reason:
+          type: string
+        history:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ConsentEvent'
+          description: Every status change, oldest first; never trimmed
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A contact's standing on one list, with the audit trail that justifies sending to them
+    SubscriptionStatus:
+      type: string
+      enum:
+      - PENDING
+      - SUBSCRIBED
+      - UNSUBSCRIBED
+      - BOUNCED
+      - COMPLAINED
+      description: PENDING awaits double opt-in; BOUNCED and COMPLAINED are set by delivery events and cannot be re-subscribed
+        by automation
+    Suppression:
+      type: object
+      required:
+      - id
+      - address
+      - reason
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        address:
+          type: string
+        channel:
+          $ref: '#/components/schemas/Channel'
+        reason:
+          $ref: '#/components/schemas/SuppressionReason'
+        note:
+          type: string
+        source_send_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    SuppressionReason:
+      type: string
+      enum:
+      - HARD_BOUNCE
+      - COMPLAINT
+      - MANUAL
+      - GLOBAL_UNSUBSCRIBE
+    Tag:
+      type: object
+      required:
+      - id
+      - name
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 64
+        color:
+          type: string
+          description: Hex colour for the chip
+        description:
+          type: string
+        contact_count:
+          type: integer
+          format: int64
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    TagNames:
+      type: object
+      required:
+      - tags
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Tag names; unknown names are created
+    UnsubscribeRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+        source:
+          $ref: '#/components/schemas/ConsentSource'
+    UpdateContactRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        mobile:
+          type: string
+        title:
+          type: string
+          enum:
+          - MR
+          - MRS
+          - MME
+        function:
+          type: string
+        department:
+          type: string
+        company_id:
+          type: string
+          format: uuid
+        parent_id:
+          type: string
+          format: uuid
+        street:
+          type: string
+        street2:
+          type: string
+        city:
+          type: string
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+        country_id:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+      required:
+      - name
+      - email
+      - phone
+      - mobile
+      - title
+      - function
+      - department
+      - company_id
+      - parent_id
+      - street
+      - street2
+      - city
+      - state_id
+      - zip
+      - country_id
+      - active
+      description: Request body for updating an existing contact person
+    UpdateMailingListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        sender_id:
+          type: string
+          format: uuid
+        double_opt_in:
+          type: boolean
+        confirmation_template_id:
+          type: string
+          format: uuid
+    UpdateOrganisationRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+        website:
+          type: string
+        industry_id:
+          type: string
+          format: uuid
+        company_size:
+          type: string
+          enum:
+          - STARTUP
+          - SMB
+          - MID_MARKET
+          - ENTERPRISE
+        employees:
+          type: integer
+          format: int32
+        annual_revenue:
+          type: number
+        description:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+        street:
+          type: string
+        street2:
+          type: string
+        city:
+          type: string
+        state_id:
+          type: string
+          format: uuid
+        zip:
+          type: string
+        country_id:
+          type: string
+          format: uuid
+        active:
+          type: boolean
+      required:
+      - name
+      - email
+      - phone
+      - website
+      - industry_id
+      - company_size
+      - employees
+      - annual_revenue
+      - description
+      - parent_id
+      - street
+      - street2
+      - city
+      - state_id
+      - zip
+      - country_id
+      - active
+      description: Request body for updating an existing account/organization
+    UpdateTagRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        color:
+          type: string
+          pattern: ^#[0-9A-Fa-f]{6}$
+        merge_into_id:
+          type: string
+          format: uuid
+          description: Move every contact of this tag to that tag, then delete this tag
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    PaginatedResponse:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: A page of items whose shape the operation describes.
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      description: Free-text search
+      schema:
+        type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      description: 'The workspace (brand) the call acts in. Checked against the caller''s memberships: a foreign workspace
+        is 403, a record in another workspace is 404 (ADR 004).'
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Malformed request
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 'Not allowed: the role, or a workspace the caller is not a member of'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicts with the current state
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

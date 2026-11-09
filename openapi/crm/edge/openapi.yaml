@@ -1,0 +1,1577 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Edge
+  version: v1.0.0
+  description: 'The public surface (ADR 004). Every unauthenticated request lands here: form submissions and double opt-in
+    confirmations, tracking, open pixels and click redirects, unsubscribe and preferences, provider and ad-platform webhooks,
+    OAuth callbacks and calendar feeds. The edge holds no database credentials: it validates shape, origin and rate, resolves
+    the workspace from what is targeted, and publishes to Pub/Sub; the owning service pulls and re-validates.'
+  x-api-docs:
+    service: edge
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+- url: http://localhost:10352/api/v1/crm/edge
+  description: Local development (port from port-registry)
+- url: /api/v1/crm/edge
+  description: CRM Edge API
+tags:
+- name: ad-tracking
+  description: 'Ad tracking: first-party click capture, link decoration, server-side conversion relay (Meta CAPI, Google offline
+    / enhanced, LinkedIn, TikTok), call touchpoints'
+- name: calendars
+  description: iCal feeds of tasks
+- name: events
+  description: Event registration tracking
+- name: forms
+  description: Public web form capture
+- name: oauth
+  description: Oauth
+- name: provider-webhooks
+  description: Inbound delivery events from the email/SMS provider
+- name: public
+  description: Unauthenticated endpoints a recipient's mail client or browser touches
+- name: surveys
+  description: Survey response tracking
+- name: visitors
+  description: Anonymous visitor tracking
+- name: webhooks
+  description: Webhooks
+paths:
+  /ads/calls:
+    post:
+      operationId: record_ad_call
+      summary: Record an inbound call (telephony webhook) as a touchpoint; matched to a contact by caller number or by the
+        dynamically inserted number's session
+      tags:
+      - ad-tracking
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdCallRequest'
+      security: []
+      responses:
+        '201':
+          description: Call touchpoint
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdTouchpoint'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-brrtrouter-impl: true
+  /ads/clicks:
+    post:
+      operationId: record_ad_click
+      summary: 'Public: the site script posts the ad click ids and UTM it found on landing'
+      tags:
+      - ad-tracking
+      description: Called by the tracking snippet (`/tracking/sites`) on every landing that carries a click id (`gclid`, `wbraid`,
+        `gbraid`, `fbclid`, `ttclid`, `li_fat_id`, `msclkid`, `twclid`, `epik`, or the workspace's own `pw_cid`) or UTM parameters.
+        The origin must be an allowed tracked site. When `cookie.server_set` is on, the response carries a `Set-Cookie` for
+        the tracking domain so the id survives ITP's 7-day cap on script-set cookies.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdClickRequest'
+      security: []
+      responses:
+        '201':
+          description: Recorded; returns the visitor id and the first-party cookie to set
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdClickResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-brrtrouter-impl: true
+  /ads/conversions:
+    post:
+      operationId: record_ad_conversion
+      summary: Record a conversion from another service (pipeline on deal won, outreach on form, the ERP on payment) and relay
+        it per the rules
+      tags:
+      - ad-tracking
+      description: Internal (service-to-service). The contact's stored click ids, hashed identifiers and the first-party cookie
+        id are attached so the platform can match without a browser pixel; `value` defaults from the rule's `value_from`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordAdConversionRequest'
+      security: []
+      responses:
+        '201':
+          description: Conversion rows, one per matching rule
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/AdConversion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-brrtrouter-impl: true
+  /c/{token}:
+    get:
+      operationId: public_click
+      summary: Click redirect
+      description: Records a CLICKED event (with the link index) and 302s to the destination held server-side. Destinations
+        are never taken from the query string.
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '302':
+          description: Redirect to the original link
+          headers:
+            Location:
+              schema:
+                type: string
+                format: uri
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+  /calendars/{token}.ics:
+    get:
+      operationId: get_calendar_ics
+      summary: The feed as iCalendar (no auth; the token is the secret). One VEVENT per task with due date/time, the type's
+        default duration, assignee as attendee, related contact/deal in the description, VALARMs from reminders when include_alerts
+      tags:
+      - calendars
+      parameters:
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            text/calendar:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+  /confirm/{token}:
+    get:
+      operationId: public_confirm_subscription
+      summary: Double opt-in confirmation
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: HTML confirmation page
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+  /events/register:
+    post:
+      operationId: register_event
+      summary: Register attendee for an event (creates lead)
+      tags:
+      - events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRegistrationRequest'
+            examples:
+              default:
+                event_id: 00000000-0000-0000-0000-000000000029
+                contact_id: 00000000-0000-0000-0000-000000000002
+        description: Register for an event
+      responses:
+        '201':
+          description: Event registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRegistration'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000028
+                  event_id: 00000000-0000-0000-0000-000000000029
+                  contact_id: 00000000-0000-0000-0000-000000000002
+                  registered_at: '2024-01-15T10:30:00Z'
+                  status: confirmed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+      description: Register for an event
+  /forms/{id}/config:
+    get:
+      operationId: get_form_config
+      summary: Get form configuration for embedding
+      tags:
+      - forms
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Form configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebForm'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000030
+                  name: Contact Us Form
+                  fields:
+                  - name
+                  - email
+                  - message
+                  enabled: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      description: Get web form configuration
+      x-brrtrouter-impl: true
+  /forms/{id}/submit:
+    post:
+      operationId: submit_form
+      summary: Submit a form
+      tags:
+      - forms
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubmissionAccepted'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: 'Checks origin (the form''s allowed origins), honeypot, size and rate, then publishes form.submission.received.
+        crm/intake quarantines it: a subscription waits for the confirmation click; an enquiry is admitted after screening
+        (ADR 004).'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PublicFormSubmission'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security: []
+  /o/{token}:
+    get:
+      operationId: public_open
+      summary: Open pixel
+      description: Records an OPENED event for the send the token names and returns a 1x1 GIF. Unauthenticated; the token
+        is an HMAC of the send id.
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: 1x1 transparent GIF
+          content:
+            image/gif:
+              schema:
+                type: string
+                format: binary
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security: []
+      x-brrtrouter-impl: true
+  /oauth/{flow}/callback:
+    get:
+      operationId: oauth_callback
+      summary: OAuth redirect from a provider
+      tags:
+      - oauth
+      responses:
+        '302':
+          description: Back to the portal screen that started the flow
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: Verifies the signed state and publishes oauth.completed for the service named in it; tokens go to the secrets
+        service, never to the browser.
+      parameters:
+      - name: flow
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - mailbox
+          - ad-account
+          - social-account
+      - name: code
+        in: query
+        schema:
+          type: string
+      - name: state
+        in: query
+        schema:
+          type: string
+          description: Signed by the service that started the flow
+        required: true
+      - name: error
+        in: query
+        schema:
+          type: string
+      x-brrtrouter-impl: true
+      security: []
+  /p/{token}:
+    get:
+      operationId: public_preferences_get
+      summary: Preference page state
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: The contact's lists and their current status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencePage'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+    post:
+      operationId: public_preferences_update
+      summary: Update list subscriptions from the preference page
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreferenceUpdate'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PreferencePage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+  /surveys/submit:
+    post:
+      operationId: submit_survey
+      summary: Submit a survey response (may create lead)
+      tags:
+      - surveys
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SurveyResponseRequest'
+        description: Submit a survey response
+      responses:
+        '201':
+          description: Survey submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SurveyResponse'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000032
+                  survey_id: 00000000-0000-0000-0000-000000000033
+                  contact_id: 00000000-0000-0000-0000-000000000002
+                  score: 4
+                  feedback: Great experience!
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+      description: Submit a survey response
+      parameters:
+      - $ref: '#/components/parameters/IdempotencyKey'
+  /track:
+    post:
+      operationId: track_page_view
+      summary: Track a page view for an anonymous visitor
+      tags:
+      - visitors
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TrackPageViewRequest'
+        description: Track a visitor page view
+      responses:
+        '201':
+          description: Page view tracked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisitorTracking'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000035
+                  visitor_id: 00000000-0000-0000-0000-000000000014
+                  page: /pricing
+                  duration: 45
+                  timestamp: '2024-01-15T10:30:00Z'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+      description: Track visitor activity on a page
+  /u/{token}:
+    get:
+      operationId: public_unsubscribe_page
+      summary: Unsubscribe landing page
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: HTML page confirming the unsubscribe with a link to preferences
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+    post:
+      operationId: public_unsubscribe_one_click
+      summary: One-click unsubscribe (RFC 8058 List-Unsubscribe-Post)
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                List-Unsubscribe:
+                  type: string
+                  const: One-Click
+      responses:
+        '200':
+          description: Unsubscribed
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+  /view/{token}:
+    get:
+      operationId: public_web_view
+      summary: View the message in a browser
+      tags:
+      - public
+      parameters:
+      - $ref: '#/components/parameters/Token'
+      responses:
+        '200':
+          description: Rendered message HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security: []
+      x-brrtrouter-impl: true
+  /webhooks/ads/{platform}:
+    post:
+      operationId: ad_platform_webhook
+      summary: Push from an ad platform (lead forms and other events)
+      tags:
+      - webhooks
+      responses:
+        '202':
+          description: Accepted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Verifies the platform's signature and publishes ad.webhook.received. Lead-form leads go through crm/intake
+        like any other form.
+      parameters:
+      - name: platform
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - meta
+          - linkedin
+          - google-ads
+          - tiktok
+          - reddit
+      - name: X-Signature
+        in: header
+        required: false
+        schema:
+          type: string
+          description: Platform signature (e.g. X-Hub-Signature-256)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties: {}
+              additionalProperties: true
+      x-brrtrouter-impl: true
+      security: []
+  /webhooks/provider/{provider}:
+    post:
+      operationId: ingest_provider_events
+      summary: Inbound delivery events from the provider
+      description: 'Verified by the provider''s signature scheme (header named per provider). Every event is normalized into
+        a
+
+        MessageEvent keyed by the provider message id. Idempotent on provider event id. Unknown events are acked and
+
+        dropped. Deployments should expose this only through a keyless relay (the same shape as the
+
+        crm-conversions intake in ADR 003), never directly from the provider to the service.
+
+        '
+      tags:
+      - provider-webhooks
+      parameters:
+      - name: provider
+        in: path
+        required: true
+        schema:
+          $ref: '#/components/schemas/Provider'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Provider-native payload
+      responses:
+        '200':
+          description: Accepted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security: []
+      x-brrtrouter-impl: true
+components:
+  schemas:
+    AdClickResult:
+      type: object
+      properties:
+        click_id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+          description: When the visitor is already identified
+        set_cookie:
+          type: boolean
+        consent_applied:
+          type: string
+          enum:
+          - FULL
+          - ANALYTICS_ONLY
+          - COOKIELESS
+    AdConversion:
+      type: object
+      required:
+      - id
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        rule_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          type: string
+        event:
+          type: string
+        external_event_name:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        contact_name:
+          type: string
+        deal_id:
+          type: string
+          format: uuid
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        click_id_param:
+          type: string
+        identifiers_sent:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - SENT
+          - FAILED
+          - SKIPPED_NO_MATCH
+          - SKIPPED_NO_CONSENT
+          - SKIPPED_DUPLICATE
+        platform_response:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        sent_at:
+          type: string
+          format: date-time
+        error:
+          type: string
+    AdTouchpoint:
+      type: object
+      required:
+      - kind
+      - at
+      properties:
+        id:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - AD_CLICK
+          - AD_VIEW
+          - SITE_VISIT
+          - FORM_SUBMITTED
+          - EMAIL_SENT
+          - EMAIL_OPENED
+          - EMAIL_CLICKED
+          - SMS_CLICKED
+          - SOCIAL_CLICK
+          - CALL
+          - DEAL_CREATED
+          - DEAL_WON
+          - PAYMENT
+          - EVENT
+        at:
+          type: string
+          format: date-time
+        channel:
+          type: string
+          description: paid-social, paid-search, email, organic, direct, referral, social, call
+        platform:
+          type: string
+        campaign:
+          type: string
+        ad_set:
+          type: string
+        ad:
+          type: string
+        detail:
+          type: string
+        url:
+          type: string
+        value:
+          type: number
+          format: double
+        joined_by:
+          type: string
+          enum:
+          - COOKIE
+          - CLICK_ID
+          - CONTACT_TOKEN
+          - EMAIL
+          - PHONE
+          - FINGERPRINT
+          - LOGIN
+          description: The identifier that attached this event to the contact
+        credit:
+          type: number
+          format: float
+          description: Share of the conversion under the requested model, 0–1
+    EventRegistration:
+      type: object
+      required:
+      - id
+      - event_name
+      - attendee_email
+      properties:
+        id:
+          type: string
+          format: uuid
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+        attendee_company:
+          type: string
+        attendee_phone:
+          type: string
+        attendee_function:
+          type: string
+        lead_id:
+          type: string
+          format: uuid
+        source:
+          type: string
+        attended:
+          type: boolean
+        registration_date:
+          type: string
+          format: date-time
+      description: An event registration record
+    EventRegistrationRequest:
+      type: object
+      required:
+      - event_name
+      - attendee_name
+      - attendee_email
+      properties:
+        event_name:
+          type: string
+        event_date:
+          type: string
+          format: date-time
+        attendee_name:
+          type: string
+        attendee_email:
+          type: string
+          format: email
+        attendee_phone:
+          type: string
+        attendee_company:
+          type: string
+        attendee_function:
+          type: string
+        source:
+          type: string
+          default: web
+      description: Request body for registering for an event
+    FormAction:
+      type: object
+      required:
+      - kind
+      properties:
+        kind:
+          type: string
+          enum:
+          - SUBSCRIBE_LIST
+          - SUBSCRIBE_SMS_LIST
+          - ADD_TAG
+          - START_WORKFLOW
+          - CREATE_LEAD
+          - EMAIL_RESULTS
+          - NOTIFY
+          - WEBHOOK
+        list_id:
+          type: string
+          format: uuid
+          description: SUBSCRIBE_LIST / SUBSCRIBE_SMS_LIST (an SMS-channel list; consent is recorded on the contact)
+        pipeline_id:
+          type: string
+          format: uuid
+          description: CREATE_LEAD, with stage_id and user_id (owner)
+        emails:
+          type: array
+          items:
+            type: string
+            format: email
+          description: EMAIL_RESULTS recipients
+        tag:
+          type: string
+        workflow_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        url:
+          type: string
+          format: uri
+    FormFieldDef:
+      type: object
+      required:
+      - key
+      - label
+      - kind
+      properties:
+        key:
+          type: string
+          description: Contact field (email, first_name, phone...) or custom:<key>
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+          - TEXT
+          - EMAIL
+          - PHONE
+          - TEXTAREA
+          - SELECT
+          - MULTISELECT
+          - CHECKBOX
+          - RADIO
+          - DATE
+          - NUMBER
+          - HIDDEN
+          - CONSENT
+          - HEADER
+          - HTML
+          - IMAGE
+          - FULL_NAME
+          - CAPTCHA
+          - SUBSCRIPTION_TOGGLE
+          - LIST_SELECTOR
+          - ACCOUNT_FIELD
+          description: 'Input kinds, plus layout blocks (HEADER, HTML, IMAGE) that capture nothing, FULL_NAME (split into
+
+            first/last on submit), CAPTCHA, SUBSCRIPTION_TOGGLE (subscribe/unsubscribe to `list_ids`),
+
+            LIST_SELECTOR (the visitor picks from `list_ids`) and ACCOUNT_FIELD (a crm/accounts company field).
+
+            '
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: SUBSCRIPTION_TOGGLE and LIST_SELECTOR
+        content:
+          type: string
+          description: HEADER text, HTML markup, IMAGE url
+        required:
+          type: boolean
+          default: false
+        placeholder:
+          type: string
+        options:
+          type: array
+          items:
+            type: string
+        default_value:
+          type: string
+        consent_text:
+          type: string
+          description: CONSENT kind; the exact wording stored on the subscription
+    FormStyle:
+      type: object
+      properties:
+        layout:
+          type: string
+          enum:
+          - INLINE
+          - FLOATING_BOX
+          - FLOATING_BAR
+          - MODAL
+          - HOSTED_PAGE
+        theme:
+          type: object
+          description: Colours, fonts, radius; opaque to the service
+        submit_label:
+          type: string
+        success_message:
+          type: string
+        trigger:
+          type: object
+          description: MODAL/FLOATING only - on load, after N seconds, on scroll %, on exit intent
+    PreferencePage:
+      type: object
+      required:
+      - email_masked
+      - lists
+      properties:
+        email_masked:
+          type: string
+          example: a***e@example.com
+        lists:
+          type: array
+          items:
+            type: object
+            required:
+            - list_id
+            - name
+            - subscribed
+            properties:
+              list_id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              description:
+                type: string
+              subscribed:
+                type: boolean
+    PreferenceUpdate:
+      type: object
+      required:
+      - lists
+      properties:
+        lists:
+          type: array
+          items:
+            type: object
+            required:
+            - list_id
+            - subscribed
+            properties:
+              list_id:
+                type: string
+                format: uuid
+              subscribed:
+                type: boolean
+        unsubscribe_all:
+          type: boolean
+    Provider:
+      type: string
+      enum:
+      - SES
+      - POSTMARK
+      - RESEND
+      - TWILIO
+      - META
+      description: Provider adapters the service knows how to drive and whose webhooks it can verify
+    PublicFormSubmission:
+      type: object
+      properties:
+        fields:
+          type: object
+          properties: {}
+          description: Field key to value, as the form defines them
+          additionalProperties:
+            type: string
+            maxLength: 2000
+        consent:
+          type: object
+          properties:
+            given:
+              type: boolean
+            text:
+              type: string
+              description: The consent text that was shown
+        visitor_id:
+          type: string
+          description: The _pw_vid cookie, when present
+        page_url:
+          type: string
+          format: uri
+        referrer:
+          type: string
+        utm:
+          type: object
+          properties: {}
+          additionalProperties:
+            type: string
+        website:
+          type: string
+          maxLength: 0
+          description: 'Honeypot: must be empty'
+      required:
+      - fields
+    RecordAdCallRequest:
+      type: object
+      required:
+      - caller_number
+      - at
+      properties:
+        caller_number:
+          type: string
+        called_number:
+          type: string
+          description: The dynamically inserted number, which maps back to the session that saw it
+        duration_seconds:
+          type: integer
+          format: int32
+        outcome:
+          type: string
+        recording_url:
+          type: string
+        at:
+          type: string
+          format: date-time
+        provider:
+          type: string
+        external_id:
+          type: string
+    RecordAdClickRequest:
+      type: object
+      required:
+      - site_key
+      - landing_url
+      properties:
+        site_key:
+          type: string
+        visitor_id:
+          type: string
+          description: Existing cookie id, if any
+        landing_url:
+          type: string
+          format: uri
+        referrer:
+          type: string
+        click_ids:
+          type: object
+          additionalProperties:
+            type: string
+          description: '`{gclid: ..., fbclid: ...}`'
+        utm:
+          type: object
+          additionalProperties:
+            type: string
+        contact_token:
+          type: string
+          description: From a decorated email / SMS link
+        consent:
+          type: object
+          properties:
+            analytics:
+              type: boolean
+            ads:
+              type: boolean
+        fingerprint:
+          type: object
+          additionalProperties:
+            type: string
+        at:
+          type: string
+          format: date-time
+    RecordAdConversionRequest:
+      type: object
+      required:
+      - event
+      - contact_id
+      properties:
+        event:
+          type: string
+        contact_id:
+          type: string
+          format: uuid
+        deal_id:
+          type: string
+          format: uuid
+        payment_id:
+          type: string
+        value:
+          type: number
+          format: double
+        currency:
+          type: string
+        occurred_at:
+          type: string
+          format: date-time
+        properties:
+          type: object
+          additionalProperties: true
+    SubmissionAccepted:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - CONFIRMATION_SENT
+          - RECEIVED
+        message:
+          type: string
+          description: The form's success message
+      required:
+      - status
+    SurveyResponse:
+      type: object
+      required:
+      - id
+      - survey_name
+      - respondent_email
+      properties:
+        id:
+          type: string
+          format: uuid
+        survey_name:
+          type: string
+        respondent_email:
+          type: string
+        respondent_name:
+          type: string
+        responses:
+          type: object
+        lead_id:
+          type: string
+          format: uuid
+        response_date:
+          type: string
+          format: date-time
+      description: A survey response with answers and feedback
+    SurveyResponseRequest:
+      type: object
+      required:
+      - survey_name
+      - responses
+      properties:
+        survey_name:
+          type: string
+        respondent_name:
+          type: string
+        respondent_email:
+          type: string
+          format: email
+        responses:
+          type: object
+          description: All survey answers as key-value pairs
+      description: Request body for submitting a survey response
+    TrackPageViewRequest:
+      type: object
+      required:
+      - visitor_id
+      - url_visited
+      properties:
+        visitor_id:
+          type: string
+        url_visited:
+          type: string
+        referrer:
+          type: string
+        user_agent:
+          type: string
+        ip_address:
+          type: string
+      description: Request body for tracking a visitor page view
+    VisitorTracking:
+      type: object
+      required:
+      - id
+      - visitor_id
+      - first_seen
+      properties:
+        id:
+          type: string
+          format: uuid
+        visitor_id:
+          type: string
+        url_visited:
+          type: string
+        referrer:
+          type: string
+        user_agent:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        first_seen:
+          type: string
+          format: date-time
+        last_seen:
+          type: string
+          format: date-time
+        pages_viewed:
+          type: integer
+          format: int32
+        converted_to_lead:
+          type: boolean
+        lead_id:
+          type: string
+          format: uuid
+      description: A visitor tracking record with page and session data
+    WebForm:
+      type: object
+      required:
+      - id
+      - name
+      - capture_fields
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        description:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormFieldDef'
+          description: Ordered field definitions; supersedes capture_fields
+        actions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FormAction'
+        style:
+          $ref: '#/components/schemas/FormStyle'
+        double_opt_in:
+          type: boolean
+        allowed_origins:
+          type: array
+          items:
+            type: string
+            format: uri
+        submission_count:
+          type: integer
+          format: int64
+          readOnly: true
+        conversion_rate:
+          type: number
+          format: double
+          readOnly: true
+          description: Submissions / views where views are tracked
+        public_url:
+          type: string
+          format: uri
+          readOnly: true
+        redirect_url:
+          type: string
+          description: Set with on_submit REDIRECT
+        on_submit:
+          type: string
+          enum:
+          - THANK_YOU
+          - REDIRECT
+          default: THANK_YOU
+          description: Show `style.success_message`, or send the visitor to `redirect_url`
+        is_active:
+          type: boolean
+          default: true
+          description: false pauses submissions (the public endpoint answers 410)
+        allow_blank_overwrite:
+          type: boolean
+          default: false
+          description: A submitted blank overwrites an existing field value (otherwise blanks are ignored)
+        block_free_mail:
+          type: boolean
+          default: false
+          description: Refuse personal email providers (gmail, yahoo, outlook ...)
+        blocked_domains:
+          type: array
+          items:
+            type: string
+          description: Refuse these email domains; `*.example.com` blocks subdomains only
+        custom_html:
+          type: string
+          description: When set, the embed renders this markup instead of `fields`
+        workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          readOnly: true
+          description: Workflows with a FORM_SUBMITTED trigger on this form
+        capture_fields:
+          type: object
+          description: Schema of fields to capture (key-value definitions)
+        team_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        utm_source_id:
+          type: string
+          format: uuid
+        utm_medium_id:
+          type: string
+          format: uuid
+        utm_campaign_id:
+          type: string
+          format: uuid
+        consent_required:
+          type: boolean
+          default: false
+        consent_text:
+          type: string
+        api_endpoint:
+          type: string
+          readOnly: true
+        embed_code:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: A marketing form definition with its fields
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+  parameters:
+    Token:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 128
+      description: Opaque signed token minted at send time; names a send (and link index) without exposing ids
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Malformed request
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer

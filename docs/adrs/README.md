@@ -4,7 +4,7 @@ This register is the authoritative inventory of RERP ADRs. See
 [`DOCUMENTATION_GOVERNANCE.md`](../DOCUMENTATION_GOVERNANCE.md) for lifecycle,
 authority, and supersession rules.
 
-**Next ADR number:** `004`
+**Next ADR number:** `005`
 
 ## Status vocabulary
 
@@ -20,6 +20,7 @@ authority, and supersession rules.
 | [001](./001-accounting-runtime-boundary.md) | Accepted | `accounting.runtime-boundary` | First invoice-to-GL slice remains atomic within the invoice implementation runtime |
 | [002](./002-document-generation-ownership.md) | Accepted | `documents.generated-rendition-ownership` | Documents owns generic generated renditions; source suites own business facts |
 | [003](./003-crm-funnel-conversion-boundary.md) | Accepted | `crm.funnel-conversion-boundary` | The marketing funnel stays outside RERP; only converted customers cross, by Pub/Sub pull with re-verification |
+| [004](./004-crm-capture-intake-and-workspaces.md) | Accepted | `crm.capture-intake-and-workspaces` | Anonymous capture is quarantined in crm/intake until confirmed; the CRM store is Postgres on GCP with workspaces (RLS) and runs on GKE Autopilot |
 
 ## Creating an ADR
 
