@@ -31,7 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "timezone": "Europe/Berlin"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "create_date": "2026-11-05T16:00:00Z",
   "custom_fields": {
     "industry": "Logistics",
@@ -52,7 +52,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "enterprise"
   ],
   "timezone": "Europe/Berlin"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

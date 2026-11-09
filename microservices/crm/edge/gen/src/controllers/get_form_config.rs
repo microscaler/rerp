@@ -70,7 +70,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "actions": [
     {
       "kind": "SUBSCRIBE_LIST"
@@ -123,7 +123,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "workflow_ids": [
     "93fc52f4-00e0-548c-98fc-b9faa5056849"
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

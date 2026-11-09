@@ -35,7 +35,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "user_id": "alex"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "address": "alex@acme.example",
   "created_at": "2026-10-01T16:00:00Z",
   "display_name": "Alex Morgan",
@@ -53,7 +53,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "track_clicks": true,
   "track_opens": true,
   "user_id": "alex"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

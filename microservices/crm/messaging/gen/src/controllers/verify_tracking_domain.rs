@@ -19,7 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "tls": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "domain": "northwindtraders.example",
   "id": "3eb009b7-a99d-5a4c-956a-99e11d8dbb76",
   "last_checked_at": "2026-11-05T16:00:00Z",
@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "status": "PENDING",
   "tls": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

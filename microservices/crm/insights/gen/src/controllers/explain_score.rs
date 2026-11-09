@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "score_id": "cef670be-5b12-52e7-8232-19a36fb64702"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "entity_id": "d7976b34-ac30-5901-8042-56e3d81193ab",
   "factors": [
     {
@@ -46,7 +46,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "score": 86,
   "score_id": "cef670be-5b12-52e7-8232-19a36fb64702"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

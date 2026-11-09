@@ -16,13 +16,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "unsubscribed": 1104
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "bounced": 464,
   "pending": 476,
   "subscribed": 10912,
   "total": 12480,
   "unsubscribed": 1104
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

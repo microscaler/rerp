@@ -19,7 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "visibility": "ALL"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "auto_assign": "ROUND_ROBIN",
   "created_at": "2026-03-30T16:00:00Z",
   "currency": "EUR",
@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "open_deals": 38,
   "open_value": "412300.00",
   "visibility": "ALL"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

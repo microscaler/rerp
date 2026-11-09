@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "name": "Engaged · 30 days"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "conditions": {
     "items": [
       {
@@ -43,7 +43,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "description": "Opened or clicked in the last 30 days",
   "id": "20df9eb1-f769-5766-b664-2f6b6529022c",
   "name": "Engaged · 30 days"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

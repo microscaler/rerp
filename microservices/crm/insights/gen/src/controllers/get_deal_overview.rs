@@ -144,7 +144,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_owner": [
     {
       "avg_days_to_close": 29,
@@ -267,7 +267,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "value": "171600.00"
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

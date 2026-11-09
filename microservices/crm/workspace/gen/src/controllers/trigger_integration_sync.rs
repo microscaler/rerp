@@ -12,10 +12,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "sync_id": "827087d0-d598-5430-b72d-ea37c0dfc1b1"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "status": "Status",
   "sync_id": "827087d0-d598-5430-b72d-ea37c0dfc1b1"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

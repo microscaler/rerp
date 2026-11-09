@@ -53,7 +53,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by": "CHANNEL",
   "cohorts": [
     {
@@ -96,7 +96,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "payback_month": 1
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

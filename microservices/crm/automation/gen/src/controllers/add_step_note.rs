@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "text": "Thanks for getting in touch."
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "author": "Author",
   "created_at": "2026-11-05T16:00:00Z",
   "id": "c9e18116-9fea-5e6e-ac32-52580d2450b8",
   "text": "Thanks for getting in touch."
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

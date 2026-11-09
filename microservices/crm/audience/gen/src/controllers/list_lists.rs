@@ -55,7 +55,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total": 5
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "items": [
     {
       "confirmation_template_id": "be01905c-70da-59d9-b7ad-e59f4d2f4109",
@@ -97,7 +97,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "limit": 25,
   "page": 1,
   "total": 5
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

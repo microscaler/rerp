@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "write_date": "2026-11-02T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": true,
   "contact_name": "Priya Natarajan",
   "create_date": "2026-10-13T16:00:00Z",
@@ -56,7 +56,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "type": "LEAD",
   "won_status": "PENDING",
   "write_date": "2026-11-02T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

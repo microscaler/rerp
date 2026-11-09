@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "items": [
     {
       "at": "2026-11-05T15:59:48Z",
@@ -56,7 +56,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "source": "google · cpc"
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "items": [
     {
       "created_at": "2026-11-05T16:00:00Z",
@@ -35,7 +35,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "status": "PENDING"
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -51,7 +51,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "actions": [
     {
       "group": "Sending",
@@ -89,7 +89,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "type": "UNSUBSCRIBED_FROM_LIST"
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

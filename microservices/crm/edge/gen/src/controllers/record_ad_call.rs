@@ -13,10 +13,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "kind": "AD_CLICK"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "at": "2026-11-05T16:00:00Z",
   "kind": "AD_CLICK"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

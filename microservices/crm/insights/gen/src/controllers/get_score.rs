@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated_at": "2026-11-05T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "counts": {
     "cold": 3,
     "hot": 3,
@@ -67,7 +67,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "warm": 3
   },
   "updated_at": "2026-11-05T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

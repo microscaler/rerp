@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "width": 1200
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "body": "",
   "brand_kit_applied": true,
   "call_to_action": "LEARN_MORE",
@@ -46,7 +46,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {}
   ],
   "width": 1200
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

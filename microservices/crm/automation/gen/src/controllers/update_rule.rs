@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "action_config": {},
   "action_type": "SEND_EMAIL",
   "condition_field": "Condition field",
@@ -41,7 +41,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "is_active": true,
   "sequence": 1,
   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

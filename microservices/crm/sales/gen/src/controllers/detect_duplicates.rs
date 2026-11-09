@@ -13,11 +13,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "duplicates": [
     "6df32aad-3786-5d11-b8d3-f378c2fcef20"
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

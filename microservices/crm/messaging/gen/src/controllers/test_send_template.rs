@@ -25,13 +25,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "QUEUED"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "channel": "EMAIL",
   "contact_id": "c891a339-996d-56b9-a022-244c570f48c9",
   "created_at": "2026-11-05T16:00:00Z",
   "id": "3eb009b7-a99d-5a4c-956a-99e11d8dbb76",
   "status": "QUEUED"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -47,7 +47,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "zip": "Zip"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": true,
   "child_contact_ids": [
     "8da3ada2-4577-5570-8894-0631a83d0667"
@@ -84,7 +84,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "write_date": "2026-11-05T16:00:00Z",
   "zip": "Zip"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "value_mode": "NONE"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "count_30d": 2140,
   "created_at": "2026-06-08T16:00:00Z",
   "currency": "EUR",
@@ -45,7 +45,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   },
   "value": "0.00",
   "value_mode": "NONE"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

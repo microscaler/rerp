@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total": 2
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_outcome": {
     "key": 3
   },
@@ -56,7 +56,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {}
   ],
   "total": 2
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

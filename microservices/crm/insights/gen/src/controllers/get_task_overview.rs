@@ -117,7 +117,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_outcome": [
     {
       "count": 44,
@@ -213,7 +213,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "open": 42,
     "overdue": 6
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

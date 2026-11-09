@@ -18,12 +18,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total": 0
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "items": [],
   "limit": 25,
   "page": 1,
   "total": 0
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "visible": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "entity": "contact",
   "field_type": "STRING",
   "group": "Profile",
@@ -39,7 +39,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sequence": 1,
   "show_on_card": false,
   "visible": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

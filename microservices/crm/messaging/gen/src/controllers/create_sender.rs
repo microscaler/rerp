@@ -51,7 +51,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "VERIFIED"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-04-19T16:00:00Z",
   "dns_records": [
     {
@@ -85,7 +85,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "provider": "SES",
   "reply_to": "support@acme.example",
   "status": "VERIFIED"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

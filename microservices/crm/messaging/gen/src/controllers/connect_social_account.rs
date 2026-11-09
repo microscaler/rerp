@@ -22,7 +22,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "CONNECTED"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-07-08T16:00:00Z",
   "display_name": "Acme Co",
   "followers": 12400,
@@ -31,7 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "paused_reason": "Paused reason",
   "platform": "X",
   "status": "CONNECTED"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

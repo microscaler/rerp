@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "source": "Source"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "attended": false,
   "attendee_company": "Attendee company",
   "attendee_email": "Attendee email",
@@ -36,7 +36,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "lead_id": "b68dbf73-2479-5234-b517-798dd1265706",
   "registration_date": "2026-11-05T16:00:00Z",
   "source": "Source"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

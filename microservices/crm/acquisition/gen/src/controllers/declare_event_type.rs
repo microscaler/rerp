@@ -16,13 +16,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "name": "activated"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "count_30d": 2140,
   "declared": true,
   "description": "First successful import in the product",
   "last_seen_at": "2026-11-05T15:58:00Z",
   "name": "activated"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

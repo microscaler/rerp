@@ -9,7 +9,7 @@ use brrtrouter_macros::handler;
 pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     // Example response:
     // {}
-    match serde_json::from_str::<Response>(r###"{}"###) {
+    match serde_json::from_str::<Response>(r#"{}"#) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {
             eprintln!("Failed to parse mock example JSON into Response: {}", e);

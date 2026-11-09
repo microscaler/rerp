@@ -21,7 +21,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "unsubscribed_count": 812
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "confirmation_template_id": "be01905c-70da-59d9-b7ad-e59f4d2f4109",
   "created_at": "2026-03-10T16:00:00Z",
   "description": "Monthly product news",
@@ -32,7 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sender_id": "37371e40-5aeb-5ad2-a9e6-389a2d6f0ca2",
   "subscriber_count": 9870,
   "unsubscribed_count": 812
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

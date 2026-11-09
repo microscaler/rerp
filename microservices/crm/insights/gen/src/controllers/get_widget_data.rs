@@ -38,7 +38,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "widget_id": "1590c639-a479-5154-9846-191756192e74"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "refreshed_at": "2026-11-05T16:00:00Z",
   "rows": [
     {}
@@ -61,7 +61,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "widget_id": "1590c639-a479-5154-9846-191756192e74"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

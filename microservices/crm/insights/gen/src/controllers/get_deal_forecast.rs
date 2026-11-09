@@ -78,7 +78,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "pipeline_id": "d9a2022e-96ff-53a3-a94d-2b169424fd31"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "accuracy": [
     {
       "actual": "84100.00",
@@ -139,7 +139,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "pipeline_id": "d9a2022e-96ff-53a3-a94d-2b169424fd31"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

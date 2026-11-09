@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-11-05T16:00:00Z",
   "enabled": true,
   "entity": "Entity",
@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "schedule": "Schedule",
   "type": "STAGE_CHANGE",
   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

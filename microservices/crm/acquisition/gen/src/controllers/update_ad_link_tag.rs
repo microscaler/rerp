@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "utm_source": "email"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "add_click_id": true,
   "add_contact_token": true,
   "applies_to": "CAMPAIGN_EMAIL",
@@ -36,7 +36,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "utm_content": "Utm content",
   "utm_medium": "Utm medium",
   "utm_source": "email"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total_won_deals": 3
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "average_deal_size": "1250.00",
   "total_opportunities": 3,
   "total_revenue": "1250.00",
   "total_won_deals": 3
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

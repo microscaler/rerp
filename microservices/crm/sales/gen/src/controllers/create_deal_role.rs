@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "used_on": 38
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "description": "Default role for the deal's first contact",
   "id": "c0fd9836-bb8e-5080-b832-50c4843b3e9f",
   "title": "Primary contact",
   "used_on": 38
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

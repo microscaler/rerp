@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "use_opportunities": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active_lead_count": 3,
   "alias_name": "Alias name",
   "assignment_auto_enabled": false,
@@ -46,7 +46,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "total_revenue": "1250.00",
   "use_leads": false,
   "use_opportunities": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

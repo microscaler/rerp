@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "timezone": "Europe/Sofia"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_hour": [
     {
       "hour": 0,
@@ -70,7 +70,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "timezone": "Europe/Sofia"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

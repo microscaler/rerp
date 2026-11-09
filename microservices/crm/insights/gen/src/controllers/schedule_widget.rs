@@ -19,7 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "report_id": "00daadeb-6175-5df5-b365-7a76ec2eaa99"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "frequency": "Frequency",
   "id": "aa70dbe4-37c6-567e-b827-49d9e6bcd18c",
   "is_active": true,
@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "74ac0043-87c0-5717-854d-594f606bbda7"
   ],
   "report_id": "00daadeb-6175-5df5-b365-7a76ec2eaa99"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

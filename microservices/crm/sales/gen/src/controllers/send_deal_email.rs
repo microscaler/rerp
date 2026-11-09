@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "subject": "October product update"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "at": "2026-11-05T16:00:00Z",
   "direction": "OUT",
   "id": "63a6661f-5860-50ed-8697-f28d29a3917f",
   "subject": "October product update"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -30,7 +30,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "visitor_id": "ext_66efa929ba"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "account_id": "bafc0e6d-6308-524f-9487-8d8424615bb7",
   "ad": "Ad",
   "ad_set": "Ad set",
@@ -50,7 +50,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "key": "Value"
   },
   "visitor_id": "ext_66efa929ba"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

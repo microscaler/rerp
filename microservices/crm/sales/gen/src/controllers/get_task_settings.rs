@@ -15,9 +15,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "require_outcomes": true
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "require_outcomes": true
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

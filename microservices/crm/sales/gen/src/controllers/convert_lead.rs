@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "stage": "Stage"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "conversion_id": "2c4a2628-c1ef-51f9-bb85-7af366714c87",
   "lead_id": "36ad9027-d2b6-5440-962c-1bf60325b115",
   "reason": "order",
   "stage": "Stage"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

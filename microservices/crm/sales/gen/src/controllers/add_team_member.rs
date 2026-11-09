@@ -25,7 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "user_name": "User name"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "assignment_domain": "Assignment domain",
   "assignment_enabled": false,
   "assignment_max": 3,
@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "quota_yearly": "1250.00",
   "user_id": "alex",
   "user_name": "User name"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -22,14 +22,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "reason": "HARD_BOUNCE"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "address": "daniel.kim@wideworld.example",
   "channel": "EMAIL",
   "created_at": "2026-10-28T16:00:00Z",
   "id": "fc58b14d-e13f-5d43-bad7-0a86f5d330c6",
   "note": "October product update",
   "reason": "HARD_BOUNCE"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

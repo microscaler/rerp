@@ -62,7 +62,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated_at": "2026-11-02T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "capture_referrer": true,
   "capture_utm": true,
   "click_id_params": [
@@ -114,7 +114,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   },
   "own_click_id_param": "pw_cid",
   "updated_at": "2026-11-02T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

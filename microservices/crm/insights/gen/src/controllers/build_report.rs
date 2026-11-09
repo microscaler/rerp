@@ -13,11 +13,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "saved": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "data": {},
   "report_id": "00daadeb-6175-5df5-b365-7a76ec2eaa99",
   "saved": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

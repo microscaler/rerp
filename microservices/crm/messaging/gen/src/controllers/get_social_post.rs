@@ -37,7 +37,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated_at": "2026-10-28T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "body": "October release notes are out. Highlights in the thread.",
   "created_at": "2026-10-28T16:00:00Z",
   "created_by": "alex",
@@ -57,7 +57,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "updated_at": "2026-10-28T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

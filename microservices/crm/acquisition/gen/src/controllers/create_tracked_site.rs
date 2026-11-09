@@ -17,14 +17,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "tracking_key": "pk_site_07c1e"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-05-09T16:00:00Z",
   "id": "f3a558f4-397d-5377-8279-803f527fe211",
   "last_event_at": "2026-11-05T15:59:48Z",
   "name": "Marketing site",
   "origin": "https://acme.example",
   "tracking_key": "pk_site_07c1e"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

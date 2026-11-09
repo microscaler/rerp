@@ -47,7 +47,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_id": "f56c2ab8-e37f-57c9-80ee-b3c2d7d0cbe7"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "campaign_id": "94cb11b7-4223-5b33-bb8d-320012c437a0",
   "channel": "EMAIL",
   "clicked_at": "2026-11-05T16:00:00Z",
@@ -75,7 +75,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "to": "To",
   "variant_key": "Variant key",
   "workflow_id": "f56c2ab8-e37f-57c9-80ee-b3c2d7d0cbe7"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

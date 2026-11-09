@@ -68,7 +68,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "write_uid": "732f0e66-b2f7-5348-99d3-66be3574998d"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": true,
   "automated_probability": 12.5,
   "campaign_id": "ba26a7ff-002b-53a0-8e3b-a562bf024124",
@@ -126,7 +126,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "won_status": "PENDING",
   "write_date": "2026-11-05T16:00:00Z",
   "write_uid": "732f0e66-b2f7-5348-99d3-66be3574998d"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -13,10 +13,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "name": "Sales"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "id": "113ca5aa-e3f2-576a-b6b5-79dbb715308e",
   "name": "Sales"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

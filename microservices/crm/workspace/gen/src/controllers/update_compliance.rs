@@ -17,14 +17,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated_at": "2026-11-05T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "anonymous_retention_days": 90,
   "double_opt_in_default": true,
   "footer_postal_address": "Acme Co, 12 Example Street, 10115 Berlin, Germany",
   "one_click_unsubscribe": true,
   "require_unsubscribe_links": true,
   "updated_at": "2026-11-05T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

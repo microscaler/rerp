@@ -105,7 +105,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total_revenue": "68340.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "attribution_window_days": 7,
   "currency": "EUR",
   "from_automation_messages": 41200,
@@ -195,7 +195,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "total_revenue": "68340.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

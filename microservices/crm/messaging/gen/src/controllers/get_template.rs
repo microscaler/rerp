@@ -35,7 +35,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "version": 3
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "body": "Hi {{contact.first_name}},\n\nWelcome · day 0: what you can do today.\n\n[Open your workspace](https://app.acme.example)\n\n---\n{{sender.postal_address}} · [Unsubscribe]({{links.unsubscribe}}) · [Preferences]({{links.preferences}})",
   "body_format": "MARKDOWN",
   "channel": "EMAIL",
@@ -53,7 +53,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "subject": "Welcome to {{sender.name}}",
   "updated_at": "2026-10-16T16:00:00Z",
   "version": 3
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

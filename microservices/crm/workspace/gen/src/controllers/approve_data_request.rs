@@ -18,7 +18,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "DONE"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "contact_email": "marcus.reid@adventure.example",
   "created_at": "2026-11-02T16:00:00Z",
   "id": "c4faeb88-b400-5f86-84ae-47f52514f082",
@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "note": "2.1 MB JSON",
   "requested_by": "Contact · preference page",
   "status": "DONE"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

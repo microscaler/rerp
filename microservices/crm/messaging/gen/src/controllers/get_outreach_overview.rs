@@ -19,7 +19,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "unsubscribe_rate": 0.003
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "bounce_rate": 0.009,
   "campaigns_sent": 6,
   "click_rate": 0.046,
@@ -28,7 +28,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "subscribed_contacts": 10912,
   "total_contacts": 12480,
   "unsubscribe_rate": 0.003
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

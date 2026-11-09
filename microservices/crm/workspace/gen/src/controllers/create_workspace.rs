@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "timezone": "Europe/Berlin"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "brand_domain": "Brand domain",
   "created_at": "2026-11-05T16:00:00Z",
   "default_currency": "EUR",
@@ -30,7 +30,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "organisation_id": "20df1243-e229-5084-b57d-e48d795731f8",
   "slug": "northwind",
   "timezone": "Europe/Berlin"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

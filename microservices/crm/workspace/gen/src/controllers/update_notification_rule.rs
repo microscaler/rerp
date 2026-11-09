@@ -17,14 +17,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "when": "Form submitted · Contact sales"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "enabled": true,
   "event": "Event",
   "how": "Email + chat #sales-inbound",
   "id": "f3473159-784b-56cd-8dc1-c540b9842e88",
   "notify": "Sales team",
   "when": "Form submitted · Contact sales"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

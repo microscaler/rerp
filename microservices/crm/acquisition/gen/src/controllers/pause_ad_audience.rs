@@ -67,7 +67,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "account_id": "ded95315-6c77-51a0-b8ea-66b76fada21a",
   "consent_basis": "CONSENT",
   "created_at": "2026-10-24T16:00:00Z",
@@ -121,7 +121,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "remove_on": "EMAIL_CLICKED",
     "window_days": 14
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

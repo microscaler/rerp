@@ -35,7 +35,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "trigger_type": "SUBSCRIBED_TO_LIST"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-11-05T16:00:00Z",
   "description": "Five emails over seven days after a list subscription, ending early when the contact activates.",
   "id": "6b579986-98a1-52bc-b486-8c48e0820541",
@@ -43,7 +43,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "name": "Welcome series",
   "sequence": 1,
   "trigger_type": "SUBSCRIBED_TO_LIST"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -57,7 +57,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_id": "22e49987-c27c-538a-9688-56d9ca17a7ec"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": 1204,
   "completed": 8311,
   "goal_reached": 1911,
@@ -104,7 +104,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "stopped": 89,
   "workflow_id": "22e49987-c27c-538a-9688-56d9ca17a7ec"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -21,7 +21,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "title": "Call"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": true,
   "default_minutes": 15,
   "id": "4eec3526-5869-5e76-820f-ac2358c6b899",
@@ -32,7 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "Left voicemail"
   ],
   "title": "Call"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

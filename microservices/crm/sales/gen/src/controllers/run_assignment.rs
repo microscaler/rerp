@@ -15,13 +15,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "failed_count": 3
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "assigned_count": 3,
   "details": [
     {}
   ],
   "failed_count": 3
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

@@ -39,7 +39,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "unsubscribed_at": "2026-11-05T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "consent_at": "2026-10-31T16:00:00Z",
   "consent_ip": "84.22.0.x",
   "consent_source": "WEB_FORM",
@@ -61,7 +61,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "SUBSCRIBED",
   "unsubscribe_reason": "Unsubscribe reason",
   "unsubscribed_at": "2026-11-05T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

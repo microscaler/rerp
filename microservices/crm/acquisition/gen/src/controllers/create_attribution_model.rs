@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "window_days": 30
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "builtin": true,
   "count_kinds": [
     "AD_CLICK",
@@ -44,7 +44,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "last": 1
   },
   "window_days": 30
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

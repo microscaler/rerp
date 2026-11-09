@@ -13,11 +13,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "visitor_id": "ext_66efa929ba"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "identified": false,
   "lead_id": "a46e2e3a-01f7-5c22-abcb-22698f556fda",
   "visitor_id": "ext_66efa929ba"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

@@ -146,7 +146,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "warm_up_for_campaign_id": "cf353d4a-972b-5b2f-8d04-b74803de4c99"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "accounts": [
     {
       "account_id": "ded95315-6c77-51a0-b8ea-66b76fada21a",
@@ -279,7 +279,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   },
   "updated_at": "2026-11-05T15:00:00Z",
   "warm_up_for_campaign_id": "cf353d4a-972b-5b2f-8d04-b74803de4c99"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

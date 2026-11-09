@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "weighted_pipeline": "1250.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "activity_count": 3,
   "avg_deal_size": "1250.00",
   "avg_sales_cycle_days": 12.5,
@@ -42,7 +42,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "user_id": "alex",
   "user_name": "User name",
   "weighted_pipeline": "1250.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

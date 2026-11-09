@@ -12,9 +12,9 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "days": []
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "days": []
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

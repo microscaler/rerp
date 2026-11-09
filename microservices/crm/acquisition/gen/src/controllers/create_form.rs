@@ -74,7 +74,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "submission_count": 612
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "actions": [
     {
       "kind": "SUBSCRIBE_LIST",
@@ -131,7 +131,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "success_message": "Thanks, check your inbox to confirm."
   },
   "submission_count": 612
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

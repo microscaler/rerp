@@ -89,7 +89,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated_at": "2026-11-05T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "access_group_ids": [
     "dc6ee68c-2507-556c-b8b1-5a79f0575f8c"
   ],
@@ -151,7 +151,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "unsubscribe_scope": "TRIGGER_LISTS",
   "updated_at": "2026-11-05T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

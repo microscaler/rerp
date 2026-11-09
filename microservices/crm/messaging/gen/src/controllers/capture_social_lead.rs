@@ -13,10 +13,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "matched_existing": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "lead_id": "8c42f135-110c-57a8-bfa6-c01026615082",
   "matched_existing": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

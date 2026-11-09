@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "reason": "Competitor domain"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-09-04T16:00:00Z",
   "created_by": "Alex Morgan",
   "id": "50137312-86a6-50be-b4f3-784df3c7ee21",
@@ -30,7 +30,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   ],
   "pattern": "*@competitor.example",
   "reason": "Competitor domain"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

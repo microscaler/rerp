@@ -67,7 +67,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "utm_campaign_id": "d60cc555-1aa8-57d4-b917-88bbd0d5b437"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "audience_count": 9870,
   "channel": "EMAIL",
   "completed_at": "2026-10-28T18:00:00Z",
@@ -103,7 +103,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "track_replies": true,
   "updated_at": "2026-11-05T14:00:00Z",
   "utm_campaign_id": "d60cc555-1aa8-57d4-b917-88bbd0d5b437"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

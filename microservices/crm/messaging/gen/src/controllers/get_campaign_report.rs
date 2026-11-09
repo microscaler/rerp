@@ -67,7 +67,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "verified_opens": 4045
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "audience": {},
   "bounced": 135,
   "campaign_id": "7de39bcc-4bc6-551b-a967-7b1629b846be",
@@ -121,7 +121,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "total_opens": 5447,
   "unsubscribed": 12,
   "verified_opens": 4045
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "source_count": 5102
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "below_platform_minimum": false,
   "eligible": 2983,
   "estimated_match_rate": 0.61,
@@ -48,7 +48,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "POSTCODE": 0.22
   },
   "source_count": 5102
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

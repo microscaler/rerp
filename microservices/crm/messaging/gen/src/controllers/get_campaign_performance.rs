@@ -53,7 +53,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "campaigns": {
     "items": [
       {
@@ -91,7 +91,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "total_contacts": 3,
     "unsubscribe_rate": 12.5
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

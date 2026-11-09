@@ -17,11 +17,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "sentiment": "POSITIVE"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "id": "0a7437f6-0e3e-51ae-a9fd-4a44b900f91e",
   "label": "Reached",
   "sentiment": "POSITIVE"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

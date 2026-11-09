@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "url": "https://api.acme.example/hooks/crm"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-08-07T16:00:00Z",
   "events": [
     "contact.subscribed",
@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "is_active": true,
   "name": "Northwind Traders",
   "url": "https://api.acme.example/hooks/crm"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -45,7 +45,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_name": "Workflow name"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "contact_email": "Contact email",
   "contact_id": "7970f5e9-e936-5cd5-b2cf-883a6f1433fc",
   "current_step_id": "e73c31c1-5129-50f1-ad4a-d05281d2a22a",
@@ -71,7 +71,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "trigger_type": "STAGE_CHANGE",
   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548",
   "workflow_name": "Workflow name"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

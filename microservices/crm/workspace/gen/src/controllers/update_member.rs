@@ -20,14 +20,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "user_id": "alex"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "added_at": "2026-11-05T16:00:00Z",
   "email": "priya.natarajan@northwindtraders.example",
   "last_active_at": "2026-11-05T16:00:00Z",
   "name": "Northwind Traders",
   "role": "owner",
   "user_id": "alex"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

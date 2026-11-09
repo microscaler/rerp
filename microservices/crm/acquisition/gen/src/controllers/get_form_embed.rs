@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "script_tag": "Script tag"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "form_id": "c49b4999-d0ed-58c1-a824-1ffe42b213e8",
   "hosted_url": "https://northwindtraders.example/pricing",
   "inline_html": "Inline html",
   "script_tag": "Script tag"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

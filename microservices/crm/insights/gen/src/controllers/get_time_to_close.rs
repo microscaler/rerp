@@ -18,7 +18,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "overall_avg_days": 12.5
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_source": [
     {}
   ],
@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     {}
   ],
   "overall_avg_days": 12.5
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

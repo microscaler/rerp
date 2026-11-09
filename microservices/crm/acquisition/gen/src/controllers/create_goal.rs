@@ -25,7 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "unit": "COUNT"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "conversion_id": "7c5ad264-f0bb-54cd-a7f8-a78df094f9bb",
   "conversion_name": "Conversion name",
   "created_at": "2026-11-05T16:00:00Z",
@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "ON_TRACK",
   "target": "1250.00",
   "unit": "COUNT"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -32,7 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "QUEUED"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "entity": "CONTACTS",
   "file_name": "contacts.csv",
   "id": "9b732034-b874-5185-911e-fd4355d5e7f0",
@@ -45,7 +45,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "requested_by": "alex",
   "source": "UI",
   "status": "QUEUED"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

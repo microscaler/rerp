@@ -41,7 +41,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "channels": [
     {
       "key": "sms",
@@ -72,7 +72,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "webhook_last_event_at": "2026-11-05T15:59:56Z",
     "webhook_status": "Connected"
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

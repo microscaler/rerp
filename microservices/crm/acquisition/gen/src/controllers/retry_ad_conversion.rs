@@ -31,7 +31,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "value": "1250.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "account_id": "bafc0e6d-6308-524f-9487-8d8424615bb7",
   "click_id_param": "Click id param",
   "contact_id": "057e8ff5-e1f2-53b3-bd11-7b45165fabe7",
@@ -52,7 +52,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sent_at": "2026-11-05T16:00:00Z",
   "status": "QUEUED",
   "value": "1250.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -21,13 +21,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "touchpoints": []
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "conversions": [],
   "devices": 0,
   "identifiers": {},
   "revenue": "0.00",
   "touchpoints": []
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

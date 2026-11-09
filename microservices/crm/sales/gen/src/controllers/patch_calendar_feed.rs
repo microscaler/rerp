@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "url": "https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "assignee_ids": [
     "alex"
   ],
@@ -38,7 +38,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "scope": "DEALS",
   "token": "55e9e0da0f6b5bac785a4e086d4672cd",
   "url": "https://crm.acme.example/api/v1/crm/tasks/public/calendars/55e9e0da0f6b5bac785a4e086d4672cd.ics"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

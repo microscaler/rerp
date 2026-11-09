@@ -66,7 +66,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "counts": {
     "cold": 8920,
     "hot": 916,
@@ -119,7 +119,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "hot": 70,
     "warm": 40
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

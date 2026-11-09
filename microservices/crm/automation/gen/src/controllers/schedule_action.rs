@@ -21,7 +21,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "action_config": {},
   "created_at": "2026-11-05T16:00:00Z",
   "executed_at": "2026-11-05T16:00:00Z",
@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "scheduled_at": "2026-11-05T16:00:00Z",
   "status": "PENDING",
   "workflow_id": "7008f5a1-8ead-5a4f-8cd3-a3deab21a548"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

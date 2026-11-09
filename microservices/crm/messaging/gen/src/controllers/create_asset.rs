@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "upload_url": "https://northwindtraders.example/pricing"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "asset": {
     "content_type": "Content type",
     "created_at": "2026-11-05T16:00:00Z",
@@ -39,7 +39,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   },
   "expires_at": "2026-11-05T16:00:00Z",
   "upload_url": "https://northwindtraders.example/pricing"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

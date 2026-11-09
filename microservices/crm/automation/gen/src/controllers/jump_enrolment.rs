@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "workflow_name": "Welcome series (7 days)"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "contact_email": "priya.natarajan@northwindtraders.example",
   "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
   "current_step_id": "6987f07d-c099-529a-bb28-e900ce5e5d00",
@@ -61,7 +61,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "WAITING",
   "workflow_id": "22e49987-c27c-538a-9688-56d9ca17a7ec",
   "workflow_name": "Welcome series (7 days)"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

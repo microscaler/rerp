@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r##"{
   "card_fields": [
     "title",
     "next_task",
@@ -48,7 +48,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "team_ids": [
     "00000000-0000-0000-0000-000000000401"
   ]
-}"###,
+}"##,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

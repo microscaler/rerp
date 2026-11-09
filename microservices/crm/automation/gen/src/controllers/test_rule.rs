@@ -18,7 +18,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "rule_id": "9fd16524-6914-54dc-a830-024bec1c8df0"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "actions_to_fire": [
     "Actions to fire"
   ],
@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     "Matching conditions"
   ],
   "rule_id": "9fd16524-6914-54dc-a830-024bec1c8df0"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "value": "1250.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created_at": "2026-11-05T16:00:00Z",
   "currency": "EUR",
   "id": "1b23e5c3-0ff4-5d6d-a54b-e72da751ce26",
@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "OPEN",
   "title": "Northwind · 48 → 120 seats",
   "value": "1250.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

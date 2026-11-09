@@ -13,11 +13,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> ApiResponse {
     //   "valid": false
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "rate_limit_remaining": 3,
   "scope": {},
   "valid": false
-}"###,
+}"#,
     ) {
         Ok(parsed) => return ApiResponse::Ok(parsed),
         Err(e) => {

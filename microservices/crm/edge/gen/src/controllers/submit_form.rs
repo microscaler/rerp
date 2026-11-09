@@ -13,10 +13,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "CONFIRMATION_SENT"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "message": "Example",
   "status": "CONFIRMATION_SENT"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

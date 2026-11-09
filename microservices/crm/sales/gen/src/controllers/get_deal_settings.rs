@@ -17,14 +17,14 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   }
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "default_currency": "Default currency",
   "default_pipeline_id": "7a9c6742-b6a4-54c0-bae3-e0578533dc6e",
   "require_expected_close_from_stage_id": "6e025ea4-2f9b-5460-b23f-834aa8efce87",
   "win_probability": {
     "key": {}
   }
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

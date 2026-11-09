@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "window_days": 30
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "account_id": "ded95315-6c77-51a0-b8ea-66b76fada21a",
   "consent_required": true,
   "currency": "EUR",
@@ -44,7 +44,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sent_30d": 612,
   "value_from": "FIXED",
   "window_days": 30
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

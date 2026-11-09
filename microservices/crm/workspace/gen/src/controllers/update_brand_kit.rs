@@ -29,7 +29,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r##"{
   "body_font": "Inter",
   "button_style": "ROUNDED_FILLED",
   "colors": {
@@ -45,7 +45,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "x.com/acme",
     "linkedin.com/company/acme"
   ]
-}"###,
+}"##,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

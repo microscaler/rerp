@@ -24,7 +24,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "submitted_at": "2026-11-05T16:00:00Z"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "confirmation_count": 3,
   "confirmation_sent_at": "2026-11-05T16:00:00Z",
   "confirmed_at": "2026-11-05T16:00:00Z",
@@ -38,7 +38,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "reject_reason": "HONEYPOT",
   "status": "PENDING",
   "submitted_at": "2026-11-05T16:00:00Z"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

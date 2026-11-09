@@ -37,7 +37,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "suppressed_30d": 122
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_provider": [
     {
       "bounce_rate": 0.001,
@@ -64,7 +64,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "hard_bounce_rate": 0.002,
   "soft_bounce_rate": 0.007,
   "suppressed_30d": 122
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

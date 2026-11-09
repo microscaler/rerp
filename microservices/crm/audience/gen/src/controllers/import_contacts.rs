@@ -25,7 +25,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated": 3
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "created": 3,
   "created_at": "2026-11-05T16:00:00Z",
   "download_url": "https://northwindtraders.example/pricing",
@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "QUEUED",
   "total_rows": 3,
   "updated": 3
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

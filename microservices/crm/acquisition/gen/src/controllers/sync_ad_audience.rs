@@ -14,11 +14,11 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "status": "QUEUED"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "audience_id": "50b1012e-f304-5512-8265-bfc8e7df9a55",
   "id": "b6d841b8-e819-50bb-ba55-f9f0c0e679bf",
   "status": "QUEUED"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

@@ -22,7 +22,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "won_value_this_month": "1250.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "open": 3,
   "open_value": "1250.00",
   "pipeline_id": "32dd9c82-6ef8-54b5-816b-7f32b5de5050",
@@ -34,7 +34,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "weighted_value": "1250.00",
   "won_this_month": 3,
   "won_value_this_month": "1250.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

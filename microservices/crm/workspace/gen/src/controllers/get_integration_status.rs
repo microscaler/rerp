@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "type": "ERP"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "config": {},
   "created_at": "2026-11-05T16:00:00Z",
   "id": "94b293ed-258b-5091-8e79-75d2ac471f25",
@@ -37,7 +37,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "sync_direction": "CRM_TO_EXTERNAL",
   "sync_status": "IDLE",
   "type": "ERP"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

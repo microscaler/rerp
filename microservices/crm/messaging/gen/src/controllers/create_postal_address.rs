@@ -20,7 +20,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "address": "Acme Co, 12 Example Street, 10115 Berlin, Germany",
   "id": "9c7a38b3-2c83-5eb5-9d4c-7cf723835c99",
   "is_default": true,
@@ -30,7 +30,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     "Customers",
     "Webinars"
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

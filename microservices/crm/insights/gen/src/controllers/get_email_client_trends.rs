@@ -51,7 +51,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total_opens": 24466
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "by_family": [
     {
       "count": 58,
@@ -87,7 +87,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   ],
   "total_opens": 24466
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

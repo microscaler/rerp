@@ -54,7 +54,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "weighted_value": "1250.00"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "contacts": [
     {
       "contact_id": "cab01328-10bf-5c9a-9c3a-5c2c57018288"
@@ -93,7 +93,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "updated_at": "2026-11-05T16:00:00Z",
   "value": "1250.00",
   "weighted_value": "1250.00"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

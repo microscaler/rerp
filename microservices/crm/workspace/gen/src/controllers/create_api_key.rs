@@ -13,10 +13,10 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "name": "Website (public tracking key)"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "id": "b90438d1-e134-5543-919f-19864d0919d3",
   "name": "Website (public tracking key)"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

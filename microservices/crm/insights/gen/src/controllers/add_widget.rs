@@ -27,7 +27,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "width": 1
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "id": "3d0b28d9-5ddf-5113-8e16-97b0bc878ccf",
   "kind": "TABLE",
   "position": 5,
@@ -39,7 +39,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "refreshed_at": "2026-11-05T16:00:00Z",
   "title": "Contacts per list",
   "width": 1
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

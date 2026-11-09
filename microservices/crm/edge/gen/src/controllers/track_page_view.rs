@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "visitor_id": "ext_20eadbef80"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "city": "City",
   "converted_to_lead": false,
   "country": "DE",
@@ -36,7 +36,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "url_visited": "Url visited",
   "user_agent": "User agent",
   "visitor_id": "ext_20eadbef80"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

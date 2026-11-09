@@ -23,7 +23,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "value": "webinar-oct"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "action": "ADD_TAG",
   "by": "Riya Kapoor",
   "contacts": 418,
@@ -33,7 +33,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "status": "DONE",
   "undoable": true,
   "value": "webinar-oct"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

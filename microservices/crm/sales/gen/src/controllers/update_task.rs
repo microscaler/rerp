@@ -40,7 +40,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "type_id": "4eec3526-5869-5e76-820f-ac2358c6b899"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "completed_at": "2026-11-05T16:00:00Z",
   "contact_id": "af512c4f-0beb-50b6-bf61-7a9d8bd417b5",
   "contact_name": "Priya Natarajan",
@@ -59,7 +59,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "title": "Call about SSO requirements",
   "type": "Call",
   "type_id": "4eec3526-5869-5e76-820f-ac2358c6b899"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

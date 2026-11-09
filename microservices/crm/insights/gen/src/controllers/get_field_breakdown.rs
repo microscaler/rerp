@@ -32,7 +32,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   ]
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "blank": 4204,
   "entity": "CONTACT",
   "field_id": "0bbefc02-42a4-5469-bb31-d1fba48fc38a",
@@ -51,7 +51,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
       "name": "Business"
     }
   ]
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

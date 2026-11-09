@@ -15,12 +15,12 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "updated": 3
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "skipped": [
     {}
   ],
   "updated": 3
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

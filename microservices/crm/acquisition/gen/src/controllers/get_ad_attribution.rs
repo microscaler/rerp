@@ -84,7 +84,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "window_days": 30
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "from": "2026-10-06",
   "model": "last_touch",
   "rows": [
@@ -158,7 +158,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     }
   },
   "window_days": 30
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

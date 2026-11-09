@@ -18,7 +18,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "survey_name": "Survey name"
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "id": "9fa51332-6221-502c-a499-80ae6ddde550",
   "lead_id": "b68dbf73-2479-5234-b517-798dd1265706",
   "respondent_email": "Respondent email",
@@ -26,7 +26,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "response_date": "2026-11-05T16:00:00Z",
   "responses": {},
   "survey_name": "Survey name"
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

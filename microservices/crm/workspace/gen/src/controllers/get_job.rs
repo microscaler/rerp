@@ -45,7 +45,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "total_rows": 38
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "entity": "DEALS",
   "file_name": "deals-q4.xlsx",
   "finished_at": "2026-11-05T16:00:00Z",
@@ -71,7 +71,7 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
   "started_at": "2026-11-05T15:58:00Z",
   "status": "RUNNING",
   "total_rows": 38
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {

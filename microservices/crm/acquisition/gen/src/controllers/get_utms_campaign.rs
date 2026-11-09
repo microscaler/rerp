@@ -16,13 +16,13 @@ pub fn handle(_req: TypedHandlerRequest<Request>) -> HttpJson<Response> {
     //   "sequence": 1
     // }
     match serde_json::from_str::<Response>(
-        r###"{
+        r#"{
   "active": true,
   "id": "e67555dd-33f4-5fee-9da3-a019895219b1",
   "name": "Northwind Traders",
   "organisation_id": "265b0f8c-dac8-5c05-a3b9-2ac0ffc65dd1",
   "sequence": 1
-}"###,
+}"#,
     ) {
         Ok(parsed) => return HttpJson::ok(parsed),
         Err(e) => {
