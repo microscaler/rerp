@@ -102,7 +102,8 @@ cmd_up() {
     local database
     for database in crm crm_insights crm_intake; do
         if ! psql_admin_exists_query crm_database_exists "$database" >/dev/null; then
-            # CREATE DATABASE cannot run inside a transaction or take IF NOT EXISTS; the query gate is the race-free check.
+            # CREATE DATABASE cannot run inside a transaction or take IF NOT EXISTS; single-runner dev tool, so
+            # the query gate only guards the re-run case — concurrent `up` invocations are out of scope.
             admin_psql postgres <<<"CREATE DATABASE ${database} OWNER postgres;" >/dev/null
             echo "created database ${database}"
         fi
