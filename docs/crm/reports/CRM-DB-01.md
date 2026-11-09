@@ -34,9 +34,11 @@
   - **`audit.audit_log` is created by `up`**, not by a service migration: every service's write path needs
     it from its first story and no single service owns the audit store. CRM-RT-03/CRM-WSP-05 extend it
     through migrations; `up` only guarantees it exists with the conventions §3 columns.
-- **Needs approval:** none. No new dependencies (pure bash + psql). Dev-only password convention
-  (password = role name, overridable by `CRM_DEV_PASSWORD`) is documented in the script header; real
-  deployments come from SOPS profiles.
+- **Needs approval:** none. No new dependencies (pure bash + psql). Service roles carry no repository-visible
+  credential: without `CRM_DEV_PASSWORD` they are created LOGIN-without-PASSWORD for the trust-auth dev
+  containers (docker `POSTGRES_HOST_AUTH_METHOD=trust`, and the local Tilt Postgres), and with it they take
+  that single dev password supplied at run time. Real deployments come from SOPS profiles. This keeps
+  GitGuardian's hardcoded-secret scan green instead of arguing the finding away.
 - **Notes for the next story:**
   - The migrator's order file is suite-level: `microservices/crm/migrations/apply_order.txt` with
     `<service>/<file>.sql` lines; `crm-db.sh apply` consumes exactly that and falls back to sorted globs

@@ -23,11 +23,12 @@
 #
 # Connection:
 #   CRM_PG_URL   admin URL used for bootstrap and apply.
-#                Default: the local Tilt Postgres at postgres://postgres:postgres@localhost:5432/postgres
+#                Default: the local Tilt Postgres at postgres://postgres:***@localhost:5432/postgres
 #                (same endpoint both ms02 and a Mac reach against their Tilt/dev cluster).
-#   CRM_DEV_PASSWORD  optional; when set, every crm_* role gets this password on up.
-#                Default (per role): the role's own name — a DEV-ONLY convention matching the shared local
-#                postgres; real deployments provision credentials through SOPS profiles, never through this file.
+#   CRM_DEV_PASSWORD  optional. When set, every crm_* role authenticates with this password. When unset,
+#                roles are created WITHOUT a password (LOGIN only) and connect through the trust pg_hba
+#                of the local throwaway/Tilt Postgres — no credential ever appears in this repository.
+#                Real deployments provision roles through SOPS profiles, never through this file.
 #   CRM_MIGRATIONS_DIR  optional override of microservices/crm/migrations (tests use fixtures).
 #
 # The admin URL role must be the `postgres` superuser that owns the databases and schemas (the ALTER DEFAULT
@@ -53,9 +54,8 @@ service_database() {
 }
 
 role_password() {
-    local service="$1"
-    local password="${CRM_DEV_PASSWORD:-crm_${service}}"
-    # Single quotes would break the CREATE/ALTER ROLE statements; the dev convention never needs them.
+    # Empty output = roles are created LOGIN-without-PASSWORD and rely on the dev cluster's trust pg_hba.
+    local password="${CRM_DEV_PASSWORD:-}"
     if [[ "$password" == *"'"* ]]; then
         echo "crm-db.sh: CRM_DEV_PASSWORD must not contain a single quote" >&2
         exit 1
@@ -88,9 +88,10 @@ service_psql_url() {
     local without_scheme="${base#*://}"
     local authority="${without_scheme%%/*}"
     local hostport="${authority##*@}"
-    local password
-    password="$(role_password "$service")"
-    echo "postgres://crm_${service}:${password}@${hostport}/$(service_database "$service")"
+    local password creds
+    password="$(role_password)"
+    creds="crm_${service}${password:+:${password}}"
+    echo "postgres://${creds}@${hostport}/$(service_database "$service")"
 }
 
 usage() {
@@ -112,17 +113,18 @@ cmd_up() {
     local service
     for service in "${ALL_SERVICES[@]}"; do
         local role="crm_${service}"
-        local pw
-        pw="$(role_password "$service")"
+        local pw pw_clause
+        pw="$(role_password)"
+        pw_clause="${pw:+PASSWORD '${pw}'}"
         admin_psql postgres <<SQL >/dev/null
 DO \$\$
 BEGIN
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '${role}') THEN
-        CREATE ROLE ${role} LOGIN PASSWORD '${pw}'
+        CREATE ROLE ${role} LOGIN ${pw_clause}
             NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT
             VALID UNTIL 'infinity';
     ELSE
-        ALTER ROLE ${role} WITH LOGIN PASSWORD '${pw}'
+        ALTER ROLE ${role} WITH LOGIN ${pw_clause}
             NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOINHERIT;
     END IF;
 END

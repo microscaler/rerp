@@ -4,8 +4,8 @@ The suite proves crm-db.sh up/apply/reset, cross-service schema and database iso
 and the fail-closed RLS guard. CI has no Postgres service for the Tooling job, so this skips there; run it
 against a throwaway instance:
 
-    docker run -d --name crm-db-test -e POSTGRES_PASSWORD=*** -p 127.0.0.1:55432:5432 postgres:16
-    CRM_PG_URL=postgres://postgres:postgres@127.0.0.1:55432/postgres \
+    docker run -d --name crm-db-test -e POSTGRES_HOST_AUTH_METHOD=trust -p 127.0.0.1:55432:5432 postgres:16
+    CRM_PG_URL=postgres://postgres@127.0.0.1:55432/postgres \
         tooling/.venv/bin/pytest tooling/tests/test_crm_db.py -v
 """
 

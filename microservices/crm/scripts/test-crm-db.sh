@@ -2,8 +2,8 @@
 # CRM-DB-01 acceptance tests for crm-db.sh (docs/crm/stories/CRM-DB-01).
 #
 # Runs against a throwaway Postgres 16. Create one first, e.g.:
-#   docker run -d --name crm-db-test -e POSTGRES_PASSWORD=*** -p 127.0.0.1:55432:5432 postgres:16
-#   CRM_PG_URL=postgres://postgres:postgres@127.0.0.1:55432/postgres ./test-crm-db.sh
+#   docker run -d --name crm-db-test -e POSTGRES_HOST_AUTH_METHOD=trust -p 127.0.0.1:55432:5432 postgres:16
+#   CRM_PG_URL=postgres://postgres@127.0.0.1:55432/postgres ./test-crm-db.sh
 #
 # Covers:
 #   AC-1  up && apply on an empty server succeeds; applying again changes nothing.
@@ -96,7 +96,9 @@ as_service_db() {
     for sql in "$@"; do
         args+=(-c "$sql")
     done
-    PGPASSWORD="crm_${service}" psql -h 127.0.0.1 -p "${hostport##*:}" \
+    local pw_env=()
+    [ -n "${CRM_DEV_PASSWORD:-}" ] && pw_env=(PGPASSWORD="***")
+    env ${pw_env[@]+"${pw_env[@]}"} psql -h 127.0.0.1 -p "${hostport##*:}" \
         -U "crm_${service}" -d "$database" -v ON_ERROR_STOP=1 -tA "${args[@]}"
 }
 
