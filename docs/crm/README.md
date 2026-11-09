@@ -33,7 +33,7 @@ Order: build step, then the table order. A story may start when everything in **
 |---|---|---|---|---|---|---|
 | 0 | [CRM-DB-01](stories/CRM-DB-01-local-database-and-migrations.md) | Local CRM databases and the migration pipeline | — | 3 | — | ⬜ |
 | 0 | [CRM-PLT-01](stories/CRM-PLT-01-gcp-platform.md) | CRM platform resources on GCP (gcp-infrastructure) | — | 8 | — | ⬜ |
-| 0 | [CRM-RT-01](stories/CRM-RT-01-context-and-errors.md) | request context and errors | — | 5 | — | ⬜ |
+| 0 | [CRM-RT-01](stories/CRM-RT-01-context-and-errors.md) | request context and errors | — | 5 | — | ✅ |
 | 0 | [CRM-RT-02](stories/CRM-RT-02-events.md) | events: envelope, outbox, relay, consumer | CRM-RT-01, CRM-DB-01 | 8 | — | ⬜ |
 | 0 | [CRM-RT-03](stories/CRM-RT-03-audit-and-idempotency.md) | audit and idempotency | CRM-RT-01, CRM-WSP-00 | 5 | — | ⬜ |
 | 1 | [CRM-RT-05](stories/CRM-RT-05-conditions.md) | the condition tree | CRM-AUD-00 | 8 | — | ⬜ |
