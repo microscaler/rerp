@@ -1340,6 +1340,15 @@ pub struct DealContact {
 }
 
 #[derive(Debug, Serialize, Deserialize, Default)]
+pub struct DealContactUpdate {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub primary: Option<bool>,
+
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub role_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct DealEmail {
     pub at: String,
 
@@ -2772,19 +2781,8 @@ pub struct StageChangeRequest {
 
 #[derive(Debug, Serialize, Deserialize, Default)]
 pub struct UpdateDealContactRequest {
-    pub contact_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub name: Option<String>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     pub primary: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub role: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     pub role_id: Option<String>,

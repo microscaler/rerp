@@ -1652,7 +1652,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DealContact'
+              $ref: '#/components/schemas/DealContactUpdate'
       responses:
         '200':
           description: OK
@@ -3492,6 +3492,15 @@ components:
         primary:
           type: boolean
           default: false
+    DealContactUpdate:
+      type: object
+      description: Change a deal contact's role or make it primary; the contact is named by the path.
+      properties:
+        role_id:
+          type: string
+          format: uuid
+        primary:
+          type: boolean
     Deal:
       type: object
       required:

@@ -12,24 +12,9 @@ use std::convert::TryFrom;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Request {
-    #[serde(rename = "contact_id")]
-    pub contact_id: String,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "email")]
-    pub email: Option<String>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "name")]
-    pub name: Option<String>,
-
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "primary")]
     pub primary: Option<bool>,
-
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(rename = "role")]
-    pub role: Option<String>,
 
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(rename = "role_id")]
