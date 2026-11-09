@@ -19,21 +19,28 @@
 - **Files changed:** `microservices/crm/scripts/crm-db.sh` (new), `microservices/crm/scripts/test-crm-db.sh`
   (new), `tooling/tests/test_crm_db.py` (new), this report, `docs/llmwiki/log.md`.
 - **Gates:**
-  - `bash microservices/crm/scripts/test-crm-db.sh` against `postgres:16` → `test-crm-db: 27 checks passed`
-    (fresh container and re-run)
-  - `just qa` → `237 passed, 1 skipped` (the skip is `test_crm_db.py` without `CRM_PG_URL`; it runs and
-    passes when the URL is set)
+  - `CRM_TEST_DISPOSABLE=yes bash microservices/crm/scripts/test-crm-db.sh` against a fresh
+    trust-auth `postgres:16` container → `test-crm-db: 30 checks passed` (fresh container and re-run;
+    without the confirmation flag the suite refuses to touch the target)
+  - `just qa` → `237 passed, 1 skipped` (the skip is `test_crm_db.py` without `CRM_PG_URL` and
+    `CRM_TEST_DISPOSABLE=yes`; it runs and passes when both are set)
   - `python3 openapi/crm/tools/check_specs.py` → contracts untouched and OK
-- **Contract or design problems found:** none in the contracts. Two design notes for the supervisor:
+- **Contract or design problems found:** one, found in the #153 review round and fixed there: the first cut
+  of `up` bootstrapped an invented `audit.audit_log` table, but the data model (`14-data-model.md` §
+  `audit.audit_entries`, `workspace.yaml`, CRM-RT-03/CRM-WSP-00) requires `audit.audit_entries` owned by
+  crm/workspace's own migrations. `up` now provisions only the audit schema plus default-privilege grants.
+  Design notes for the supervisor:
   - **Apply runs as the admin, not the service role.** `up` pre-installs schema USAGE + `ALTER DEFAULT
     PRIVILEGES` so every table the admin creates in a service schema is immediately DML-usable by that
     service role and subject to the template's RLS policies (the service role is a non-owner, so
     `ENABLE ROW LEVEL SECURITY` already applies; `FORCE` covers the owner case). The alternative
     (applying as the service role) breaks the template's `CREATE OR REPLACE FUNCTION public.crm_...`
     once a second service re-applies a function owned by the first.
-  - **`audit.audit_log` is created by `up`**, not by a service migration: every service's write path needs
-    it from its first story and no single service owns the audit store. CRM-RT-03/CRM-WSP-05 extend it
-    through migrations; `up` only guarantees it exists with the conventions §3 columns.
+  - **`up` provisions the audit schema, not the table.** `audit.audit_entries` is created by crm/workspace's
+    own migrations (CRM-WSP-00 owns it, workspace.yaml is the contract). `up` installs schema-level default
+    privileges so the moment that table exists every service role can INSERT and only `crm_workspace` can
+    SELECT — proven by the test's admin stand-in table. This also means apply order between services doesn't
+    matter for audit writes once WSP-00 lands.
 - **Needs approval:** none. No new dependencies (pure bash + psql). Service roles carry no repository-visible
   credential: without `CRM_DEV_PASSWORD` they are created LOGIN-without-PASSWORD for the trust-auth dev
   containers (docker `POSTGRES_HOST_AUTH_METHOD=trust`, and the local Tilt Postgres), and with it they take

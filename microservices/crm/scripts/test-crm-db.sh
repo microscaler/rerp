@@ -15,8 +15,16 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-CRM_PG_URL="${CRM_PG_URL:-postgres://postgres:postgres@localhost:5432/postgres}"
+CRM_PG_URL="${CRM_PG_URL:-postgres://postgres@localhost:5432/postgres}"
 export CRM_PG_URL
+
+# This suite DROPS and recreates the three CRM databases. Refuse to run unless the caller confirms the
+# target is disposable, so a default pytest run pointed at a live development Postgres cannot destroy it.
+if [ "${CRM_TEST_DISPOSABLE:-}" != "yes" ]; then
+    echo "test-crm-db.sh: this suite drops and recreates the CRM databases on CRM_PG_URL." >&2
+    echo "Confirm the target is a throwaway instance with CRM_TEST_DISPOSABLE=yes." >&2
+    exit 1
+fi
 SCRIPT="${SCRIPT_DIR}/crm-db.sh"
 
 FIXTURES="$(mktemp -d)"
@@ -175,14 +183,38 @@ fail_with_reason "crm_audience connects to crm_intake" 'permission denied for da
 ok "database CONNECT is scoped per service"
 
 step "audit grants"
-succeeds "crm_audience INSERTs an audit row" as_service audience \
-    "INSERT INTO audit.audit_log (workspace_id, actor_kind, actor_id, entity, entity_id, action, changes)
-     VALUES ('01940f6e-2f00-7abc-8901-234567890abc', 'user', 'crm-db-test', 'contact',
-             gen_random_uuid(), 'test', '{}'::jsonb)"
-succeeds "crm_workspace SELECTs the audit log" as_service workspace "SELECT count(*) FROM audit.audit_log"
-fail_with_reason "crm_audience SELECTs the audit log" "permission denied for table audit_log" \
-    as_service audience "SELECT * FROM audit.audit_log"
-ok "audit: INSERT for services, SELECT only for crm_workspace"
+# audit.audit_entries is created by crm/workspace's own migrations (CRM-WSP-00 owns it); the admin stand-in
+# here proves the schema-level default privileges `up` installed behave exactly as workspace.yaml requires.
+succeeds "admin creates the audit_entries stand-in (as CRM-WSP-00 would)" admin crm \
+    "CREATE TABLE IF NOT EXISTS audit.audit_entries (
+         workspace_id uuid NOT NULL,
+         id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+         service text NOT NULL,
+         entity varchar(64) NOT NULL,
+         entity_id text NOT NULL,
+         action text NOT NULL,
+         actor_kind text NOT NULL,
+         actor_id varchar(64) NOT NULL,
+         changes jsonb,
+         request_id text,
+         created_at timestamptz NOT NULL DEFAULT now()
+     )"
+succeeds "crm_audience INSERTs an audit row (default privilege)" as_service audience \
+    "INSERT INTO audit.audit_entries (workspace_id, service, entity, entity_id, action, actor_kind, actor_id, changes)
+     VALUES ('01940f6e-2f00-7abc-8901-234567890abc', 'crm_audience', 'contact',
+             gen_random_uuid()::text, 'CREATE', 'user', 'crm-db-test', '{}'::jsonb)"
+succeeds "crm_workspace SELECTs the audit log" as_service workspace "SELECT count(*) FROM audit.audit_entries"
+fail_with_reason "crm_audience SELECTs the audit log" "permission denied for table audit_entries" \
+    as_service audience "SELECT * FROM audit.audit_entries"
+# The cross-database auditors: insights/intake hold their data elsewhere but write here (needs CONNECT on
+# `crm`, and still nothing beyond the audit schema).
+succeeds "crm_insights INSERTs an audit row into crm (cross-database auditor)" as_service_db insights crm \
+    "INSERT INTO audit.audit_entries (workspace_id, service, entity, entity_id, action, actor_kind, actor_id, changes)
+     VALUES ('01940f6e-2f00-7abc-8901-234567890abc', 'crm_insights', 'segment',
+             gen_random_uuid()::text, 'CREATE', 'system', 'crm-db-test', '{}'::jsonb)"
+fail_with_reason "crm_insights SELECTs from crm outside audit" "permission denied for schema audience" \
+    as_service_db insights crm "SELECT count(*) FROM audience.contact"
+ok "audit: default privileges give INSERT to services (incl. cross-database auditors), SELECT only to crm_workspace"
 
 step "edge has no database role (ADR 004)"
 edge_role="$(admin postgres "SELECT count(*) FROM pg_roles WHERE rolname = 'crm_edge'")"

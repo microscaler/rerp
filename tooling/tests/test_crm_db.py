@@ -5,8 +5,10 @@ and the fail-closed RLS guard. CI has no Postgres service for the Tooling job, s
 against a throwaway instance:
 
     docker run -d --name crm-db-test -e POSTGRES_HOST_AUTH_METHOD=trust -p 127.0.0.1:55432:5432 postgres:16
-    CRM_PG_URL=postgres://postgres@127.0.0.1:55432/postgres \
+    CRM_PG_URL=postgres://postgres@127.0.0.1:55432/postgres CRM_TEST_DISPOSABLE=yes \
         tooling/.venv/bin/pytest tooling/tests/test_crm_db.py -v
+
+The suite drops and recreates the CRM databases, so it refuses to run unless CRM_TEST_DISPOSABLE=yes.
 """
 
 from __future__ import annotations
@@ -26,6 +28,11 @@ def test_crm_db_script_acceptance() -> None:
     if not url:
         pytest.skip(
             "CRM_PG_URL not set; start a disposable Postgres to run the CRM-DB-01 acceptance suite"
+        )
+    if os.environ.get("CRM_TEST_DISPOSABLE", "") != "yes":
+        pytest.skip(
+            "set CRM_TEST_DISPOSABLE=yes to confirm CRM_PG_URL is a throwaway instance "
+            "(the suite drops and recreates the CRM databases)"
         )
     result = subprocess.run(
         ["bash", str(SUITE)],

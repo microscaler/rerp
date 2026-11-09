@@ -71,27 +71,30 @@ admin_psql() {
 }
 
 url_for_db() {
-    # The admin URL with its database segment swapped (psql silently ignores a URI positional once -d is
-    # given, so the database must live IN the URL).
+    # The admin URL with its database segment swapped, query parameters (sslmode etc.) preserved (psql
+    # silently ignores a URI positional once -d is given, so the database must live IN the URL).
     local database="$1" base="${CRM_PG_URL%%\?*}"
+    local query=""
+    [ "$base" != "$CRM_PG_URL" ] && query="?${CRM_PG_URL#*\?}"
     if [[ "$base" == */* ]]; then
-        echo "${base%/*}/${database}"
+        echo "${base%/*}/${database}${query}"
     else
-        echo "${base}/${database}"
+        echo "${base}/${database}${query}"
     fi
 }
 
 service_psql_url() {
     local service="$1"
-    local base="${CRM_PG_URL}"
-    # Same host/port as the admin URL, credentials swapped to the service role.
+    # Same host/port and query parameters as the admin URL, credentials swapped to the service role.
+    local base="${CRM_PG_URL%%\?*}" query=""
+    [ "$base" != "$CRM_PG_URL" ] && query="?${CRM_PG_URL#*\?}"
     local without_scheme="${base#*://}"
     local authority="${without_scheme%%/*}"
     local hostport="${authority##*@}"
     local password creds
     password="$(role_password)"
     creds="crm_${service}${password:+:${password}}"
-    echo "postgres://${creds}@${hostport}/$(service_database "$service")"
+    echo "postgres://${creds}@${hostport}/$(service_database "$service")${query}"
 }
 
 usage() {
@@ -102,7 +105,7 @@ usage() {
 cmd_up() {
     local database
     for database in crm crm_insights crm_intake; do
-        if ! psql_admin_exists_query crm_database_exists "$database" >/dev/null; then
+        if ! crm_database_exists "$database"; then
             # CREATE DATABASE cannot run inside a transaction or take IF NOT EXISTS; single-runner dev tool, so
             # the query gate only guards the re-run case — concurrent `up` invocations are out of scope.
             admin_psql postgres <<<"CREATE DATABASE ${database} OWNER postgres;" >/dev/null
@@ -162,46 +165,40 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA ${service}
 SQL
     done
 
-    # The audit log (14-data-model.md §1: schema `audit` in `crm`): every write appends a row in its own
-    # transaction; only crm/workspace serves it back (CRM-WSP-05). The table is created here so every service's
-    # insert path works from the first migration; later stories extend it with migrations, never by hand here.
+    # The audit schema (14-data-model.md §1, workspace.yaml `audit_entries`): the table itself belongs to the
+    # crm/workspace migrations (CRM-WSP-00 owns that database), so `up` only provisions the schema and its
+    # grants. Default privileges make every table the admin later creates in this schema INSERT-able by every
+    # service role and SELECT-able by crm_workspace only — append-only audit from the first write path
+    # (09-api-conventions.md §3, US_55_39), without crm-db.sh ever owning the table.
     admin_psql crm <<'SQL' >/dev/null
 CREATE SCHEMA IF NOT EXISTS audit AUTHORIZATION postgres;
 REVOKE ALL ON SCHEMA audit FROM PUBLIC;
-CREATE TABLE IF NOT EXISTS audit.audit_log (
-    id            bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    workspace_id  uuid NOT NULL,
-    actor_kind    text NOT NULL,
-    actor_id      varchar(64) NOT NULL,
-    entity        text NOT NULL,
-    entity_id     uuid NOT NULL,
-    action        text NOT NULL,
-    changes       jsonb NOT NULL,
-    request_id    text,
-    occurred_at   timestamptz NOT NULL DEFAULT now()
-);
--- Every service role may append; only the workspace service may read (09-api-conventions.md §3, US_55_39).
+-- insights and intake keep their data in their own databases but still write audit entries here (the single
+-- audit store in `crm`), so they need CONNECT on `crm` — and nothing else in it (no schema grants).
+GRANT CONNECT ON DATABASE crm TO crm_insights, crm_intake;
 GRANT USAGE ON SCHEMA audit TO crm_audience, crm_messaging, crm_automation, crm_sales,
                               crm_acquisition, crm_workspace, crm_insights, crm_intake;
-GRANT INSERT ON audit.audit_log TO crm_audience, crm_messaging, crm_automation, crm_sales,
-                                  crm_acquisition, crm_workspace, crm_insights, crm_intake;
-REVOKE SELECT, UPDATE, DELETE, TRUNCATE ON audit.audit_log FROM PUBLIC;
-GRANT SELECT ON audit.audit_log TO crm_workspace;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA audit
+    GRANT INSERT ON TABLES TO crm_audience, crm_messaging, crm_automation, crm_sales,
+                               crm_acquisition, crm_workspace, crm_insights, crm_intake;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA audit
+    GRANT SELECT ON TABLES TO crm_workspace;
 SQL
 
     echo "up: databases, roles, schemas and grants ready"
 }
 
-# Helper for the database-existence gate: psql_admin_exists_query <kind> <name> succeeds when it exists.
-psql_admin_exists_query() {
-    local kind="$1" name="$2"
-    case "$kind" in
-        crm_database_exists)
-            psql "$(url_for_db postgres)" -v ON_ERROR_STOP=1 -tA \
-                -c "SELECT 1 FROM pg_database WHERE datname = '${name}'" | grep -qx 1
-            ;;
-        *) return 2 ;;
-    esac
+# Gate for CREATE DATABASE: succeeds only when the database provably does not exist; a failed QUERY aborts
+# (exit 3) instead of being mistaken for a missing database, so a transient connection problem cannot make
+# `up` try to create an existing database.
+crm_database_exists() {
+    local name="$1" out
+    if ! out="$(psql "$(url_for_db postgres)" -v ON_ERROR_STOP=1 -tA \
+        -c "SELECT 1 FROM pg_database WHERE datname = '${name}'" 2>&1)"; then
+        echo "crm-db.sh: cannot query pg_database for '${name}': ${out}" >&2
+        return 3
+    fi
+    [ "$out" = "1" ]
 }
 
 migration_files() {
@@ -254,6 +251,23 @@ cmd_apply() {
 
 cmd_reset() {
     local database service role
+    # Non-destructive pre-check: DROP ROLE fails if any crm_* role still owns or holds grants on objects in
+    # a database outside the three CRM ones. Detect that BEFORE dropping anything, so a failed reset never
+    # leaves the CRM databases recreated without their roles and grants.
+    local external
+    external="$(admin_psql postgres -tA <<'SQL'
+SELECT coalesce(string_agg(d.datname, ', '), '')
+    FROM pg_database d
+    WHERE d.datname NOT IN ('template0','template1','postgres','crm','crm_insights','crm_intake')
+      AND EXISTS (SELECT 1 FROM pg_shdepend sd
+                  WHERE sd.dbid = d.oid AND sd.refclassid = 'pg_authid'::regclass
+                    AND sd.refobjid IN (SELECT oid FROM pg_roles WHERE rolname LIKE 'crm\_%'));
+SQL
+)"
+    if [ -n "$external" ]; then
+        echo "reset: crm_* roles hold privileges in other database(s): ${external} — REVOKE there first; nothing dropped" >&2
+        exit 1
+    fi
     for database in crm crm_insights crm_intake; do
         admin_psql postgres <<SQL >/dev/null
 SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${database}' AND pid <> pg_backend_pid();
