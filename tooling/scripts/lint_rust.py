@@ -8,6 +8,7 @@
 
 Usage: python3 tooling/scripts/lint_rust.py [--no-check] [--list]
 """
+
 from __future__ import annotations
 
 import argparse
@@ -32,11 +33,16 @@ OPTED_IN = re.compile(r"^\[lints\]\s*\n\s*workspace\s*=\s*true\s*$", re.MULTILIN
 def members() -> list[tuple[str, Path]]:
     out = subprocess.run(
         ["cargo", "metadata", "--no-deps", "--format-version", "1"],
-        cwd=WORKSPACE, check=True, capture_output=True, text=True,
+        cwd=WORKSPACE,
+        check=True,
+        capture_output=True,
+        text=True,
     ).stdout
     meta = json.loads(out)
     ids = set(meta["workspace_members"])
-    return [(p["name"], Path(p["manifest_path"]).parent) for p in meta["packages"] if p["id"] in ids]
+    return [
+        (p["name"], Path(p["manifest_path"]).parent) for p in meta["packages"] if p["id"] in ids
+    ]
 
 
 def is_generated(crate_dir: Path) -> bool:
@@ -45,7 +51,9 @@ def is_generated(crate_dir: Path) -> bool:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--no-check", action="store_true", help="skip the workspace-wide cargo check")
+    parser.add_argument(
+        "--no-check", action="store_true", help="skip the workspace-wide cargo check"
+    )
     parser.add_argument("--list", action="store_true", help="print the opted-in crates and exit")
     args = parser.parse_args()
 
@@ -62,14 +70,18 @@ def main() -> int:
         print("\n".join(strict))
         return 0
     if missing:
-        print("These hand-written crates do not opt into the workspace lints; add `[lints]\\nworkspace = true`:")
+        print(
+            "These hand-written crates do not opt into the workspace lints; add `[lints]\\nworkspace = true`:"
+        )
         for rel in missing:
             print(f"  microservices/{rel}/Cargo.toml")
         return 1
 
     if not args.no_check:
         print("== cargo check --workspace --all-targets", flush=True)
-        if subprocess.run(["cargo", "check", "--workspace", "--all-targets"], cwd=WORKSPACE).returncode:
+        if subprocess.run(
+            ["cargo", "check", "--workspace", "--all-targets"], cwd=WORKSPACE
+        ).returncode:
             return 1
 
     for name, why in SKIP_CLIPPY.items():
