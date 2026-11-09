@@ -31,7 +31,7 @@ Order: build step, then the table order. A story may start when everything in **
 
 | Step | Story | Title | Depends on | Points | Serves (Epic 55) | Status |
 |---|---|---|---|---|---|---|
-| 0 | [CRM-DB-01](stories/CRM-DB-01-local-database-and-migrations.md) | Local CRM databases and the migration pipeline | — | 3 | — | ⬜ |
+| 0 | [CRM-DB-01](stories/CRM-DB-01-local-database-and-migrations.md) | Local CRM databases and the migration pipeline | — | 3 | — | ✅ |
 | 0 | [CRM-PLT-01](stories/CRM-PLT-01-gcp-platform.md) | CRM platform resources on GCP (gcp-infrastructure) | — | 8 | — | ⬜ |
 | 0 | [CRM-RT-01](stories/CRM-RT-01-context-and-errors.md) | request context and errors | — | 5 | — | ✅ |
 | 0 | [CRM-RT-02](stories/CRM-RT-02-events.md) | events: envelope, outbox, relay, consumer | CRM-RT-01, CRM-DB-01 | 8 | — | ⬜ |
