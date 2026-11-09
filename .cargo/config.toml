@@ -7,3 +7,33 @@
 # background_thread:true they are back to 22-26 MiB within 15 s (dirty_decay_ms 10 s default, muzzy 0) at no
 # measurable CPU cost, and narenas:2 saves ~4 MiB more (measured 25 Oct 2026, PriceWhisperer 8d08444f).
 JEMALLOC_SYS_WITH_MALLOC_CONF = "background_thread:true,narenas:2"
+
+# CPU baseline per processor family. Cargo picks the table that matches the architecture being compiled for (the
+# host, or --target when cross-compiling), so nothing is toggled by hand: an Apple-silicon Mac, an x86_64 runner and
+# an armv7 board each get their own line. Build scripts and proc macros follow the host; the artifacts follow
+# --target.
+#
+# Each line is the portable baseline for that family, never `native`: binaries go into images and onto other
+# machines, and the shared sccache keys on these flags. Every value below equals rustc's own default for the matching
+# Linux/macOS targets (same target_feature set), except on Intel Macs, where it keeps x86-64 instead of rustc's
+# `penryn`. Pinning them stops one family's CPU name reaching another (an x86 name crashes rustc on Apple silicon).
+# Same block in BRRTRouter, RERP, PriceWhisperer, sesame-idam and hauliage. Target rustflags replace [build]
+# rustflags rather than adding to them: a flag every build needs goes on each line below.
+
+# x86_64: Linux (CI, images, ms02, GKE nodes) and Intel Macs.
+[target.'cfg(target_arch = "x86_64")']
+rustflags = ["-C", "target-cpu=x86-64"]
+
+# Apple silicon (M1 and later).
+[target.'cfg(all(target_arch = "aarch64", target_vendor = "apple"))']
+rustflags = ["-C", "target-cpu=apple-m1"]
+
+# 64-bit ARM Linux: Raspberry Pi 4/5, Graviton/Ampere, Grace. ARMv8.0 floor so a Pi 4 (Cortex-A72) runs the same
+# binary as a server; atomics still use LSE at run time where the CPU has it (outline atomics).
+[target.'cfg(all(target_arch = "aarch64", not(target_vendor = "apple")))']
+rustflags = ["-C", "target-cpu=generic"]
+
+# 32-bit ARM (armv7-unknown-linux-gnueabihf / -musleabihf): v7, VFPv3-D16 and Thumb-2 come from the target triple.
+# NEON is not assumed; boards that have it can use the thumbv7neon-* targets.
+[target.'cfg(target_arch = "arm")']
+rustflags = ["-C", "target-cpu=generic"]
