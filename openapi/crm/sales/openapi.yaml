@@ -1309,16 +1309,6 @@ paths:
           $ref: '#/components/responses/NotFound'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
       - $ref: '#/components/parameters/Id'
@@ -1356,7 +1346,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/DealContact'
+              $ref: '#/components/schemas/DealContactInput'
       responses:
         '200':
           description: OK
@@ -3309,7 +3299,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SavedResponseCategory'
+              $ref: '#/components/schemas/SavedResponseCategoryInput'
       responses:
         '200':
           description: OK
@@ -3356,7 +3346,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SavedResponseCategory'
+              $ref: '#/components/schemas/SavedResponseCategoryInput'
       responses:
         '200':
           description: OK
@@ -6329,7 +6319,7 @@ components:
             format: uuid
         expected_revenue:
           type: number
-          format: double
+          format: decimal
         probability:
           type: number
           format: float
@@ -6364,7 +6354,7 @@ components:
           format: uuid
         recurring_revenue:
           type: number
-          format: double
+          format: decimal
       description: Request body for creating a new lead
     CreateStageRequest:
       type: object
@@ -6971,20 +6961,20 @@ components:
           readOnly: true
         expected_revenue:
           type: number
-          format: double
+          format: decimal
         prorated_revenue:
           type: number
-          format: double
+          format: decimal
           readOnly: true
         recurring_revenue:
           type: number
-          format: double
+          format: decimal
         recurring_plan_id:
           type: string
           format: uuid
         recurring_revenue_monthly:
           type: number
-          format: double
+          format: decimal
           readOnly: true
         partner_id:
           type: string
@@ -7385,10 +7375,10 @@ components:
           format: int32
         total_revenue:
           type: number
-          format: double
+          format: decimal
         total_weighted_revenue:
           type: number
-          format: double
+          format: decimal
         stages:
           type: array
           items:
@@ -7404,10 +7394,10 @@ components:
                 format: int32
               total_revenue:
                 type: number
-                format: double
+                format: decimal
               weighted_revenue:
                 type: number
-                format: double
+                format: decimal
               avg_days_in_stage:
                 type: number
                 format: float
@@ -7519,24 +7509,48 @@ components:
           type: integer
           format: int32
     PaginatedTeam:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Team'
+            $ref: '#/components/schemas/Team'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of Team records
     PaginatedUnassignedLeads:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/UnassignedLead'
+            $ref: '#/components/schemas/UnassignedLead'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of UnassignedLead records
     Pipeline:
       type: object
@@ -7688,10 +7702,10 @@ components:
                 type: integer
               revenue:
                 type: number
-                format: double
+                format: decimal
               weighted_revenue:
                 type: number
-                format: double
+                format: decimal
               probability:
                 type: integer
     RelatedKind:
@@ -8252,7 +8266,7 @@ components:
           readOnly: true
         total_revenue:
           type: number
-          format: double
+          format: decimal
           readOnly: true
       description: A group of sales representatives organized by region or product line
     TeamMember:
@@ -8311,14 +8325,26 @@ components:
           readOnly: true
       description: A team member with their role and details
     TeamMembers:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/TeamMember'
+            $ref: '#/components/schemas/TeamMember'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Collection of team members with metadata
     UnassignedLead:
       type: object
@@ -8426,7 +8452,7 @@ components:
             format: uuid
         expected_revenue:
           type: number
-          format: double
+          format: decimal
         probability:
           type: number
           format: float
@@ -8601,28 +8627,38 @@ components:
                 type: string
               message:
                 type: string
-    PaginatedResponse:
+    DealContactInput:
+      type: object
+      properties:
+        name:
+          type: string
+          readOnly: true
+        email:
+          type: string
+          readOnly: true
+        role_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          readOnly: true
+        primary:
+          type: boolean
+          default: false
+      description: DealContact (request body; contact_id come from the path or headers)
+    SavedResponseCategoryInput:
       type: object
       required:
-      - items
-      - total
-      - page
-      - limit
-      description: A page of items whose shape the operation describes.
+      - name
       properties:
-        items:
-          type: array
-          items:
-            type: object
-        total:
-          type: integer
-          format: int64
-        page:
+        name:
+          type: string
+          maxLength: 64
+        response_count:
           type: integer
           format: int32
-        limit:
-          type: integer
-          format: int32
+          readOnly: true
+      description: SavedResponseCategory (request body; id come from the path or headers)
   parameters:
     Page:
       name: page

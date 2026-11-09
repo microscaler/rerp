@@ -1,0 +1,5903 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Insights
+  version: v1.0.0
+  description: 'What it adds up to: report read models (deals, contacts, email, automations, revenue, analytics), dashboards
+    and prompt-built widgets, and rule-based named scores with their explanations.'
+  x-api-docs:
+    service: insights
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+- url: http://localhost:10352/api/v1/crm/insights
+  description: Local development (port from port-registry)
+- url: /api/v1/crm/insights
+  description: CRM Insights API
+tags:
+- name: analytics
+  description: Analytics
+- name: automation-reports
+  description: 'Automation reports: all automations, per-automation overview / goals / contacts, jump-to tracking, automated
+    1:1 emails'
+- name: contact-reports
+  description: 'Contact reports: performance (active / inactive, trends, top lists and tags), field breakdown, nearby contacts,
+    tag trends'
+- name: conversion
+  description: Lead-to-revenue conversion analytics
+- name: dashboards
+  description: Per-user dashboards of widgets (a saved metric query each), with per-widget scheduled email
+- name: deal-reports
+  description: 'Deal reports: overview, owner overview, funnel, sales performance, forecast (crm/pipeline deals)'
+- name: email-reports
+  description: 'Email engagement reports across campaigns and automations: client trends, open/read trends by weekday and
+    hour, predictive-content variants'
+- name: forecast
+  description: Revenue forecasting
+- name: performance
+  description: Rep and team performance metrics
+- name: pipeline
+  description: Pipeline health and revenue summary
+- name: reports
+  description: Custom report builder and scheduling
+- name: revenue-reports
+  description: Marketing revenue attributed to campaigns and automation emails from conversions (crm/marketing) within an
+    attribution window
+- name: scores
+  description: Scores
+- name: task-reports
+  description: 'Task overview: load, completion and outcome sentiment per rep (crm/tasks)'
+- name: win-loss
+  description: Win rate and loss analysis
+paths:
+  /analytics/automations:
+    get:
+      operationId: get_automation_analytics
+      summary: Automations over the period
+      tags:
+      - analytics
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationAnalytics'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/conversion-rates:
+    get:
+      operationId: get_conversion_rates
+      summary: Get conversion rates by period
+      tags:
+      - conversion
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+          default: MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Conversion rates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedConversionrate'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    total_leads: 500
+                    converted: 62
+                    rate: 12.4
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get conversion rate analytics
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/forecast/accuracy:
+    get:
+      operationId: get_forecast_accuracy
+      summary: Get forecast vs actual variance analysis
+      tags:
+      - forecast
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+      responses:
+        '200':
+          description: Forecast accuracy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedForecastAccuracyEntry'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    forecasted: 420000
+                    actual: 405000
+                    accuracy: 96.4
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get forecast accuracy metrics
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/forecast/monthly:
+    get:
+      operationId: get_monthly_forecast
+      summary: Get monthly revenue forecast
+      tags:
+      - forecast
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Monthly forecast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedForecastentry'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    total_value: 420000
+                    confidence: 0.75
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get monthly forecast
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/forecast/quarterly:
+    get:
+      operationId: get_quarterly_forecast
+      summary: Get quarterly revenue forecast
+      tags:
+      - forecast
+      responses:
+        '200':
+          description: Quarterly forecast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedForecastentry'
+              examples:
+                default:
+                  items:
+                  - period: monthly
+                    total_value: 420000
+                    confidence: 0.75
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get quarterly forecast
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/funnel:
+    get:
+      operationId: get_funnel
+      summary: Get full funnel visualization data
+      tags:
+      - conversion
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Funnel data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunnelData'
+              examples:
+                default:
+                  stages:
+                  - name: visitor
+                    count: 10000
+                  - name: lead
+                    count: 1250
+                  - name: qualified
+                    count: 450
+                  - name: customer
+                    count: 62
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: List all analytics
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/lead-sources:
+    get:
+      operationId: get_lead_source_effectiveness
+      summary: Get lead volume and revenue by source
+      tags:
+      - conversion
+      responses:
+        '200':
+          description: Lead source effectiveness
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeadSourceReport'
+              examples:
+                default:
+                  items:
+                  - total: 850
+                    by_source:
+                      website: 350
+                      referral: 200
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get lead source analytics
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/leaderboard:
+    get:
+      operationId: get_leaderboard
+      summary: Get ranked list of reps
+      tags:
+      - performance
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: metric
+        in: query
+        schema:
+          type: string
+          enum:
+          - REVENUE
+          - DEALS_WON
+          - WEIGHTED_PIPELINE
+          default: REVENUE
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Leaderboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedLeaderboardEntry'
+              examples:
+                default:
+                  items:
+                  - rep_id: 00000000-0000-0000-0000-000000000010
+                    rep_name: Jane Smith
+                    deals_won: 12
+                    rank: 1
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get performance leaderboard
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/list-growth:
+    get:
+      operationId: get_list_growth
+      summary: List growth over the period
+      tags:
+      - analytics
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListGrowthReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/pipeline-summary:
+    get:
+      operationId: get_pipeline_summary
+      summary: Get pipeline summary grouped by stage
+      tags:
+      - pipeline
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Pipeline summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPipelinesummary'
+              examples:
+                default:
+                  items:
+                  - total_leads: 150
+                    stage_breakdown:
+                      discovery: 45
+                      qualified: 35
+                    weighted_value: 375000
+                  total: 1
+                  page: 1
+                  per_page: 20
+                  has_next: false
+                  has_prev: false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get pipeline summary with stage breakdown
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/pipeline-weighted:
+    get:
+      operationId: get_weighted_pipeline
+      summary: Get weighted pipeline by team/rep
+      tags:
+      - pipeline
+      responses:
+        '200':
+          description: Weighted pipeline data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WeightedPipeline'
+              examples:
+                default:
+                  total_leads: 150
+                  stage_breakdown:
+                    discovery:
+                      count: 45
+                      value: 100000
+                      probability: 0.2
+                    qualified:
+                      count: 35
+                      value: 125000
+                      probability: 0.4
+                  weighted_value: 85000
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get weighted pipeline revenue
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/rep-performance:
+    get:
+      operationId: get_rep_performance
+      summary: Get individual rep performance metrics
+      tags:
+      - performance
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Rep performance data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RepPerformance'
+              examples:
+                default:
+                  rep_id: 00000000-0000-0000-0000-000000000010
+                  rep_name: Jane Smith
+                  deals_won: 12
+                  deals_lost: 5
+                  revenue: 125000
+                  conversion_rate: 24.0
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get representative performance metrics
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/team-performance:
+    get:
+      operationId: get_team_performance
+      summary: Get team-level performance summary
+      tags:
+      - performance
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      responses:
+        '200':
+          description: Team performance summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamPerformance'
+              examples:
+                default:
+                  team_id: 00000000-0000-0000-0000-000000000006
+                  team_name: Sales Team Alpha
+                  total_deals: 24
+                  total_revenue: 250000
+                  avg_deal_size: 10416
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get team performance metrics
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/time-to-close:
+    get:
+      operationId: get_time_to_close
+      summary: Get average close duration breakdown
+      tags:
+      - win-loss
+      responses:
+        '200':
+          description: Time-to-close data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeToCloseAnalysis'
+              examples:
+                default:
+                  avg_days: 45
+                  median_days: 38
+                  by_stage:
+                    discovery: 10
+                    qualified: 15
+                    proposal: 12
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get time-to-close analytics
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /analytics/win-loss:
+    get:
+      operationId: get_win_loss_analysis
+      summary: Get historical win/loss analysis
+      tags:
+      - win-loss
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Win/loss analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WinLossAnalysis'
+              examples:
+                default:
+                  won: 45
+                  lost: 30
+                  win_rate: 60.0
+                  by_reason:
+                    price: 12
+                    feature_gap: 8
+                    competitor: 6
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get win/loss analysis
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations:
+    get:
+      operationId: list_automation_reports
+      summary: All automations
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: folder_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ACTIVE
+          - INACTIVE
+          - ALL
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Automations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAutomationListRow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: One row per automation with contacts entered; filter by folder.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations/jump-to:
+    get:
+      operationId: get_jump_to_tracking
+      summary: Jump-to (goal) tracking
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: workflow_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Jump-to rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedJumpToRow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: 'Every GOAL step across automations: how many contacts jumped to it vs passed it.'
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations/one-to-one-emails:
+    get:
+      operationId: get_one_to_one_emails
+      summary: Automated 1:1 emails
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: workflow_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: sender_user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: sent_start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: sent_end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: event_start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: event_end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: 1:1 email rows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOneToOneEmailRow'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: SEND_1TO1_EMAIL steps across automations with opens, clicks, replies and bounces.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations/{id}/contacts:
+    get:
+      operationId: get_automation_contacts
+      summary: Automation contacts
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ANY
+          - ACTIVE
+          - COMPLETED
+          - EXITED
+      - name: q
+        in: query
+        schema:
+          type: string
+        description: Search name / email
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationContactsReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Completion KPIs, top tags / lists, completion-time histogram and the contact list.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations/{id}/goals:
+    get:
+      operationId: get_automation_goals
+      summary: Automation goals
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Goals
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationGoalsReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Achieved / skipped / waiting per goal step.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /automations/{id}/overview:
+    get:
+      operationId: get_automation_overview
+      summary: Automation overview
+      tags:
+      - automation-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: workflow id
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      responses:
+        '200':
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationOverviewReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: KPI tiles, sends/opens/clicks over time and per-message rows for one automation.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/field-breakdown:
+    get:
+      operationId: get_field_breakdown
+      summary: Field breakdown
+      tags:
+      - contact-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: entity
+        in: query
+        schema:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+        required: true
+      - name: field_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Field breakdown
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldBreakdownReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Records per value of one field, for records created in the window.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/nearby:
+    get:
+      operationId: get_nearby_contacts
+      summary: Nearby contacts
+      tags:
+      - contact-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: address
+        in: query
+        schema:
+          type: string
+      - name: lat
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: lng
+        in: query
+        schema:
+          type: number
+          format: double
+      - name: radius
+        in: query
+        schema:
+          type: number
+          format: float
+        required: true
+      - name: unit
+        in: query
+        schema:
+          type: string
+          enum:
+          - KM
+          - MI
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Nearby contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNearbyContact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Contacts within a radius of an address or point (geocoded from the contact address).
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/performance:
+    get:
+      operationId: get_contact_performance
+      summary: Contact performance
+      tags:
+      - contact-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: tag_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: list_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Contact performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactPerformanceReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Total / active / inactive vs previous period, trends, top lists and tags.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /contacts/tag-trends:
+    get:
+      operationId: get_tag_trends
+      summary: Tag trends
+      tags:
+      - contact-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: tag_ids
+        in: query
+        schema:
+          type: array
+          items:
+            type: string
+            format: uuid
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Tag trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagTrendsReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Tag applications over time; a window of up to 3 months keeps it fast.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /dashboards:
+    get:
+      operationId: list_dashboards
+      summary: List my dashboards
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Dashboards
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Dashboards of the calling user.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_dashboard
+      summary: Create a dashboard
+      tags:
+      - dashboards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: An empty dashboard; add widgets next.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /dashboards/{id}:
+    get:
+      operationId: get_dashboard
+      summary: Get a dashboard
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Dashboard
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Dashboard with its widgets.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    patch:
+      operationId: update_dashboard
+      summary: Rename / set default
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Rename or make default.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: delete_dashboard
+      summary: Delete a dashboard
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Removes the dashboard and its widgets.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /dashboards/{id}/widgets:
+    post:
+      operationId: add_widget
+      summary: Add a widget
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetRequest'
+      responses:
+        '201':
+          description: Added
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Add a widget from a metric query (or a natural-language prompt the server turns into one).
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /dashboards/{id}/widgets/{widget_id}:
+    patch:
+      operationId: update_widget
+      summary: Update a widget
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DashboardWidget'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Change title, query, size or position.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+    delete:
+      operationId: remove_widget
+      summary: Remove a widget
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      responses:
+        '204':
+          description: Removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Remove the widget.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /dashboards/{id}/widgets/{widget_id}/data:
+    get:
+      operationId: get_widget_data
+      summary: Widget data
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      - name: refresh
+        in: query
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WidgetData'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Run the widget query (cached a few minutes).
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /dashboards/{id}/widgets/{widget_id}/schedule:
+    put:
+      operationId: schedule_widget
+      summary: Email this widget on a schedule
+      tags:
+      - dashboards
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: widget_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: widget_id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportScheduleRequest'
+      responses:
+        '200':
+          description: Scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Daily / weekly / monthly email of the widget to recipients.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /deals/forecast:
+    get:
+      operationId: get_deal_forecast
+      summary: Deal forecast with accuracy
+      tags:
+      - deal-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: basis
+        in: query
+        schema:
+          $ref: '#/components/schemas/ForecastBasis'
+        description: Default STAGE_PROBABILITY
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+        description: Default MONTH
+      - name: periods
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 24
+        description: How many future periods (default 6)
+      - name: include_accuracy
+        in: query
+        schema:
+          type: boolean
+        description: Also return past forecasts vs actuals (default true)
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+      responses:
+        '200':
+          description: Forecast
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealForecastReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Expected revenue per period from open deals' expected close dates, weighted by the chosen basis, with historical
+        accuracy.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /deals/funnel:
+    get:
+      operationId: get_deal_funnel
+      summary: Deal funnel for a pipeline
+      tags:
+      - deal-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      responses:
+        '200':
+          description: Funnel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealFunnelReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Stage-by-stage progression for one pipeline over the window.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /deals/overview:
+    get:
+      operationId: get_deal_overview
+      summary: Deal overview report
+      tags:
+      - deal-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to one pipeline
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - OPEN
+          - WON
+          - LOST
+          - ALL
+        description: Which deals the owner/stage tables count (default ALL)
+      responses:
+        '200':
+          description: Deal overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealOverviewReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Totals, value histogram, owner and stage tables for deals in the window.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /deals/owner-overview:
+    get:
+      operationId: get_deal_owner_overview
+      summary: Deal owner overview
+      tags:
+      - deal-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to one pipeline
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Owner overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DealOwnerOverviewReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: 'One row per deal owner: created, won, lost, value, average deal value, time to close, tasks completed.'
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /deals/sales-performance:
+    get:
+      operationId: get_sales_performance
+      summary: Sales performance by stage per owner
+      tags:
+      - deal-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: pipeline_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - name: period
+        in: query
+        schema:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+          - YEAR
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Limit to deals owned by one user
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+        description: Inclusive; created_at for overview, close date for won/lost
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+        description: Report currency; deals in other currencies are converted at the tenant rate
+      responses:
+        '200':
+          description: Sales performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SalesPerformanceReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Matrix of open deals per stage per owner, plus won/lost, for one pipeline.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /email/client-trends:
+    get:
+      operationId: get_email_client_trends
+      summary: Email client trends
+      tags:
+      - email-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Client trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EmailClientTrendsReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Opens per email client / device family in the window.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /email/open-trends:
+    get:
+      operationId: get_open_trends
+      summary: Open / read trends
+      tags:
+      - email-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: tag_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: timezone
+        in: query
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Open trends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OpenTrendsReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Opens by weekday and by hour of day.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /email/predictive-content:
+    get:
+      operationId: get_predictive_content
+      summary: Predictive content variants
+      tags:
+      - email-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: campaign_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Predictive content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PredictiveContentReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Sends, clicks and click-to-open per content variant across campaigns.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/build:
+    post:
+      operationId: build_report
+      summary: Build a custom report with filters
+      tags:
+      - reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportBuildRequest'
+            examples:
+              default:
+                name: Monthly Pipeline Report
+                type: pipeline
+                schedule: monthly
+        description: Build a report with current filters and parameters
+      responses:
+        '200':
+          description: Report results
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  report_id:
+                    type: string
+                    format: uuid
+                  data:
+                    type: object
+                  saved:
+                    type: boolean
+              examples:
+                default:
+                  report_id: 00000000-0000-0000-0000-000000000019
+                  data:
+                    total_opportunities: 50
+                    total_revenue: 250000
+                  saved: true
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+              examples:
+                default:
+                  report_id: 00000000-0000-0000-0000-000000000019
+                  data:
+                    total_opportunities: 50
+                    total_revenue: 250000
+                  saved: true
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Build a custom report
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /reports/export:
+    post:
+      operationId: export_report
+      summary: Export report data to CSV/JSON
+      tags:
+      - reports
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                report_id:
+                  type: string
+                  format: uuid
+                format:
+                  type: string
+                  enum:
+                  - CSV
+                  - JSON
+        description: Export report data to a specified file format
+      responses:
+        '200':
+          description: Exported data
+          content:
+            text/csv:
+              schema:
+                type: string
+            application/json:
+              schema:
+                type: object
+              examples:
+                default:
+                  success: true
+                  format: csv
+                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '201':
+          description: Resource created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+              examples:
+                default:
+                  success: true
+                  format: csv
+                  file_url: /reports/export/00000000-0000-0000-0000-000000000019.csv
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Export report data to a file
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /reports/{id}:
+    get:
+      operationId: get_saved_report
+      summary: Get a saved report
+      tags:
+      - reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Saved report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedReport'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000025
+                  name: Monthly Pipeline Report
+                  type: pipeline
+                  created_at: '2024-01-15T10:30:00Z'
+                  updated_at: '2024-01-15T10:30:00Z'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          description: Forbidden — insufficient permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Get reports by ID
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/{id}/schedule:
+    post:
+      operationId: schedule_report
+      summary: Schedule a report for delivery
+      tags:
+      - reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportScheduleRequest'
+            examples:
+              default:
+                name: Monthly Pipeline Report
+                type: pipeline
+                schedule: monthly
+        description: Schedule a report to be generated periodically
+      responses:
+        '201':
+          description: Report scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportSchedule'
+              examples:
+                default:
+                  id: 00000000-0000-0000-0000-000000000031
+                  report_id: 00000000-0000-0000-0000-000000000025
+                  frequency: monthly
+                  next_run: '2024-02-01T00:00:00Z'
+                  enabled: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Conflict — resource version mismatch
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      description: Schedule a report to run on a recurring basis
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /revenue/marketing:
+    get:
+      operationId: get_marketing_revenue
+      summary: Marketing revenue
+      tags:
+      - revenue-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: attribution_window_days
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 90
+        description: Default 7
+      - name: currency
+        in: query
+        schema:
+          type: string
+          maxLength: 3
+      - name: granularity
+        in: query
+        schema:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Marketing revenue
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketingRevenueReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Revenue attributed to campaigns and automation messages from conversions within the attribution window.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /scores:
+    get:
+      operationId: list_scores
+      summary: Named scores
+      tags:
+      - scores
+      responses:
+        '200':
+          description: Page of scores
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScorePage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: entity
+        in: query
+        schema:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_score
+      summary: Create a score
+      tags:
+      - scores
+      responses:
+        '201':
+          description: Created as DRAFT
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Score'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScoreRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /scores/{id}:
+    get:
+      operationId: get_score
+      summary: A score with its rules and distribution
+      tags:
+      - scores
+      responses:
+        '200':
+          description: Score
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Score'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    patch:
+      operationId: update_score
+      summary: Change a score's thresholds or rules
+      tags:
+      - scores
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Score'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScoreRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /scores/{id}/activate:
+    post:
+      operationId: activate_score
+      summary: Activate a draft score
+      tags:
+      - scores
+      responses:
+        '200':
+          description: Active
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Score'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Activation queues a full recalculation.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /scores/{id}/explain:
+    get:
+      operationId: explain_score
+      summary: Why a contact or deal has its score
+      tags:
+      - scores
+      responses:
+        '200':
+          description: Explanation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreExplanation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: deal_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/Id'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /scores/{id}/recalculate:
+    post:
+      operationId: recalculate_score
+      summary: Recompute the score for every contact or deal
+      tags:
+      - scores
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScoreRecalculation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+  /tasks/overview:
+    get:
+      operationId: get_task_overview
+      summary: Task overview report
+      tags:
+      - task-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: owner_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: team_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: task_type_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: related_kind
+        in: query
+        schema:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Task overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskOverviewReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Open/overdue/completed tasks and outcome sentiment per rep and per task type.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+components:
+  schemas:
+    AutomationAnalytics:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              workflow_id:
+                type: string
+                format: uuid
+              name:
+                type: string
+              entered_30d:
+                type: integer
+                format: int64
+              completed_30d:
+                type: integer
+                format: int64
+              goal_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              messages_30d:
+                type: integer
+                format: int64
+              open_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              deals_created:
+                type: integer
+                format: int64
+              revenue:
+                type: number
+                format: decimal
+      required:
+      - items
+    AutomationContactRow:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - ACTIVE
+          - COMPLETED
+          - EXITED
+          - PAUSED
+        entered_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+        current_step_id:
+          type: string
+          format: uuid
+      required:
+      - contact_id
+      - status
+      - entered_at
+    AutomationContactsReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        contacts_entered:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        completion_rate_change_30d:
+          type: number
+          format: float
+          description: 0-100
+        avg_seconds_to_complete:
+          type: integer
+        top_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        top_lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        completion_times:
+          type: array
+          items:
+            $ref: '#/components/schemas/CompletionBucket'
+        contacts:
+          $ref: '#/components/schemas/PaginatedAutomationContactRow'
+      required:
+      - workflow_id
+      - contacts_entered
+      - completion_rate
+      description: 'Per-automation contacts: completion KPIs, which tags/lists complete best, completion-time histogram, and
+        the contact list (filter by status, search).'
+    AutomationGoalRow:
+      type: object
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contacts_achieved:
+          type: integer
+        contacts_skipped:
+          type: integer
+          description: Passed the goal without meeting it (if_not_met = CONTINUE)
+        contacts_waiting:
+          type: integer
+        achieved_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_seconds_to_achieve:
+          type: integer
+      required:
+      - step_id
+      - name
+      - contacts_achieved
+      - achieved_rate
+    AutomationGoalsReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        goals:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationGoalRow'
+      required:
+      - workflow_id
+      - goals
+    AutomationListRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        folder_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        contacts_entered:
+          type: integer
+        contacts_active:
+          type: integer
+        contacts_completed:
+          type: integer
+        message_count:
+          type: integer
+          description: SEND_MESSAGE steps in the graph
+      required:
+      - workflow_id
+      - name
+      - contacts_entered
+    AutomationMessageRow:
+      type: object
+      properties:
+        step_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        last_sent_at:
+          type: string
+          format: date-time
+        sends:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_clicks:
+          type: integer
+        open_rate:
+          type: number
+          format: float
+          description: 0-100
+        click_rate:
+          type: number
+          format: float
+          description: 0-100
+        revenue:
+          type: number
+          format: decimal
+      required:
+      - step_id
+      - name
+      - sends
+    AutomationOverviewReport:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        contacts_total:
+          type: integer
+        contacts_finished:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        emails_sent:
+          type: integer
+        email_sent_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_opens:
+          type: integer
+        open_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_clicks:
+          type: integer
+        click_rate:
+          type: number
+          format: float
+          description: 0-100
+        revenue:
+          type: number
+          format: decimal
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationMessageRow'
+      required:
+      - workflow_id
+      - name
+      - contacts_total
+      - contacts_finished
+      - completion_rate
+      - emails_sent
+      - messages
+      description: 'Per-automation overview: tiles, sends/opens/clicks over time (`series` keys sends, opens, clicks), and
+        one row per message step.'
+    CompletionBucket:
+      type: object
+      properties:
+        label:
+          type: string
+          examples:
+          - < 1 day
+          - 1-3 days
+        min_seconds:
+          type: integer
+        max_seconds:
+          type: integer
+        count:
+          type: integer
+      required:
+      - label
+      - count
+    ContactCounts:
+      type: object
+      properties:
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+      required:
+      - total
+      - active
+      - inactive
+    ContactGroupRow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        total:
+          type: integer
+        active:
+          type: integer
+        inactive:
+          type: integer
+        growth_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - id
+      - name
+      - total
+      - active
+    ContactPerformanceReport:
+      type: object
+      properties:
+        current:
+          $ref: '#/components/schemas/ContactCounts'
+        previous:
+          $ref: '#/components/schemas/ContactCounts'
+        granularity:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+        trend:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        top_lists:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactGroupRow'
+        top_tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContactGroupRow'
+      required:
+      - current
+      - previous
+      - trend
+      - top_lists
+      - top_tags
+      description: Total / active / inactive contacts vs the previous period, trend lines (`trend` keys total, active, inactive)
+        and the top-5 lists and tags.
+    ConversionRate:
+      type: object
+      properties:
+        period:
+          type: string
+        leads_created:
+          type: integer
+          format: int32
+        opportunities_created:
+          type: integer
+          format: int32
+        opportunities_won:
+          type: integer
+          format: int32
+        opportunities_lost:
+          type: integer
+          format: int32
+        lead_to_opp_rate:
+          type: number
+          format: float
+        opp_to_won_rate:
+          type: number
+          format: float
+        overall_conversion_rate:
+          type: number
+          format: float
+        total_won_revenue:
+          type: number
+          format: decimal
+      required:
+      - period
+      - leads_created
+      - opportunities_created
+      - opportunities_won
+      - opportunities_lost
+      - lead_to_opp_rate
+      - opp_to_won_rate
+      - overall_conversion_rate
+      - total_won_revenue
+      description: Conversion rate analytics with breakdown by source
+    Dashboard:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        is_default:
+          type: boolean
+        widgets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DashboardWidget'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - name
+      - widgets
+    DashboardRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        is_default:
+          type: boolean
+    DashboardWidget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        kind:
+          type: string
+          enum:
+          - NUMBER
+          - NUMBERS
+          - LINE
+          - BAR
+          - TABLE
+        query:
+          $ref: '#/components/schemas/WidgetQuery'
+        prompt:
+          type: string
+          description: The natural-language ask the widget was built from, if any
+        position:
+          type: integer
+        width:
+          type: integer
+          enum:
+          - 1
+          - 2
+        schedule:
+          $ref: '#/components/schemas/ReportSchedule'
+        refreshed_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - title
+      - kind
+      - query
+    DealForecastReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        basis:
+          $ref: '#/components/schemas/ForecastBasis'
+        granularity:
+          type: string
+          enum:
+          - WEEK
+          - MONTH
+          - QUARTER
+        periods:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastPeriod'
+        accuracy:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastAccuracyEntry'
+        generated_at:
+          type: string
+          format: date-time
+      required:
+      - pipeline_id
+      - basis
+      - granularity
+      - periods
+      description: 'Deal Forecast: expected revenue per period bucketed by expected close date and weighted by the chosen
+        basis; `accuracy` compares past forecasts with what closed.'
+    DealFunnelReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStage'
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        overall_conversion_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - pipeline_id
+      - stages
+      - won_count
+      - lost_count
+      - overall_conversion_pct
+      description: 'Funnel report for one pipeline: stage-to-stage progression percentages and time in stage.'
+    DealOverviewReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        totals:
+          $ref: '#/components/schemas/DealTotals'
+        value_brackets:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealValueBracket'
+        by_owner:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealOwnerRow'
+        by_stage:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        created_per_period:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodCount'
+      required:
+      - currency
+      - totals
+      - value_brackets
+      - by_owner
+      - by_stage
+      description: 'Deal Overview report: totals, deal-value histogram, owner table, stage table, deals created over time.'
+    DealOwnerOverviewReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealOwnerRow'
+        period:
+          type: string
+      required:
+      - currency
+      - owners
+      description: 'Deal Owner Overview: one row per owner with created/won/lost/value/avg/time-to-close/tasks completed.'
+    DealOwnerRow:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        lost_value:
+          type: number
+          format: double
+        win_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_deal_value:
+          type: number
+          format: double
+        avg_days_to_close:
+          type: number
+          format: float
+        deals_created:
+          type: integer
+        tasks_completed:
+          type: integer
+        last_activity_at:
+          type: string
+          format: date-time
+      required:
+      - user_id
+      - open_count
+      - open_value
+      - won_count
+      - won_value
+      - lost_count
+      - lost_value
+      - win_rate
+      description: One owner's line in the overview / owner-overview tables
+    DealStageRow:
+      type: object
+      properties:
+        stage_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+        weighted_value:
+          type: number
+          format: double
+      required:
+      - stage_id
+      - name
+      - count
+      - value
+    DealTotals:
+      type: object
+      properties:
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        lost_value:
+          type: number
+          format: double
+        win_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_deal_value:
+          type: number
+          format: double
+        avg_days_to_close:
+          type: number
+          format: float
+      required:
+      - open_count
+      - open_value
+      - won_count
+      - won_value
+      - lost_count
+      - lost_value
+      - win_rate
+    DealValueBracket:
+      type: object
+      properties:
+        label:
+          type: string
+          examples:
+          - $1k - $5k
+        min:
+          type: number
+          format: double
+        max:
+          oneOf:
+          - type: number
+            format: double
+          - type: 'null'
+          description: null = open-ended top bracket
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+      required:
+      - label
+      - count
+      - value
+      description: One bar of the deal-value histogram. Brackets are tenant settings (default 0-1k, 1k-5k, 5k-25k, 25k+).
+    EmailClientRow:
+      type: object
+      properties:
+        client:
+          type: string
+          examples:
+          - Gmail
+          - Apple Mail
+          - Outlook
+        family:
+          type: string
+          enum:
+          - WEBMAIL
+          - DESKTOP
+          - MOBILE
+          - OTHER
+        opens:
+          type: integer
+        share_pct:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - client
+      - opens
+    EmailClientTrendsReport:
+      type: object
+      properties:
+        total_opens:
+          type: integer
+        clients:
+          type: array
+          items:
+            $ref: '#/components/schemas/EmailClientRow'
+        by_family:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+      required:
+      - total_opens
+      - clients
+    FieldBreakdownReport:
+      type: object
+      properties:
+        entity:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+          - ACCOUNT
+        field_id:
+          type: string
+          format: uuid
+        field_label:
+          type: string
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        blank:
+          type: integer
+      required:
+      - entity
+      - field_id
+      - values
+      description: Count of records per value of one (custom or standard) field.
+    ForecastAccuracyEntry:
+      type: object
+      required:
+      - period
+      - expected
+      - actual
+      - variance
+      - variance_pct
+      properties:
+        period:
+          type: string
+        expected:
+          type: number
+          format: double
+        actual:
+          type: number
+          format: double
+        variance:
+          type: number
+          format: double
+        variance_pct:
+          type: number
+          format: float
+      description: Forecast accuracy comparison (forecasted vs actual)
+    ForecastBasis:
+      type: string
+      enum:
+      - STAGE_PROBABILITY
+      - DEAL_PROBABILITY
+      - OPEN_VALUE
+      description: 'How weighted value is computed: stage probability (Stage.probability), per-deal win probability (ML /
+        manual), or unweighted open value'
+    ForecastDeal:
+      type: object
+      properties:
+        deal_id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+        stage_id:
+          type: string
+          format: uuid
+        value:
+          type: number
+          format: double
+        probability:
+          type: number
+          format: float
+          description: 0-100
+        weighted_value:
+          type: number
+          format: double
+        expected_close_date:
+          type: string
+          format: date
+      required:
+      - deal_id
+      - title
+      - value
+      - probability
+      - weighted_value
+    ForecastEntry:
+      type: object
+      properties:
+        period:
+          type: string
+          description: Month/quarter string (e.g., "2026-06")
+        weighted_pipeline:
+          type: number
+          format: double
+        expected_close_revenue:
+          type: number
+          format: decimal
+        confidence:
+          type: number
+          format: float
+          minimum: 0
+          maximum: 100
+        actual_close_revenue:
+          type: number
+          format: decimal
+        variance:
+          type: number
+          format: double
+      required:
+      - period
+      - weighted_pipeline
+      - expected_close_revenue
+      - confidence
+      - actual_close_revenue
+      - variance
+      description: A single forecast entry for a period
+    ForecastPeriod:
+      type: object
+      properties:
+        period:
+          type: string
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        weighted_value:
+          type: number
+          format: double
+        won_value:
+          type: number
+          format: double
+        forecast:
+          type: number
+          format: double
+        quota:
+          type: number
+          format: double
+        deals:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastDeal'
+      required:
+      - period
+      - open_count
+      - open_value
+      - weighted_value
+      - won_value
+      - forecast
+    FunnelData:
+      type: object
+      properties:
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              count:
+                type: integer
+                format: int32
+              revenue:
+                type: number
+                format: decimal
+              conversion_from_previous:
+                type: number
+                format: float
+      required:
+      - stages
+      description: Sales funnel data showing conversion between stages
+    FunnelStage:
+      type: object
+      properties:
+        stage_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        sequence:
+          type: integer
+        entered:
+          type: integer
+          description: Deals that have ever been in this stage in the window
+        current:
+          type: integer
+          description: Deals in the stage now
+        value:
+          type: number
+          format: double
+        progressed:
+          type: integer
+          description: Entered deals that moved to a later stage or won
+        progression_pct:
+          type: number
+          format: float
+          description: 0-100
+        avg_days_in_stage:
+          type: number
+          format: float
+        lost_from_stage:
+          type: integer
+      required:
+      - stage_id
+      - name
+      - sequence
+      - entered
+      - current
+      - progressed
+      - progression_pct
+    JumpToRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+        step_id:
+          type: string
+          format: uuid
+        goal_name:
+          type: string
+        contacts_jumped:
+          type: integer
+        contacts_passed:
+          type: integer
+        jump_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - workflow_id
+      - step_id
+      - goal_name
+      - contacts_jumped
+    LeadSourceReport:
+      type: object
+      required:
+      - source_id
+      - source_name
+      - lead_count
+      - opportunities
+      - won_deals
+      - revenue
+      - win_rate
+      properties:
+        source_id:
+          type: string
+          format: uuid
+        source_name:
+          type: string
+        lead_count:
+          type: integer
+          format: int32
+        opportunities:
+          type: integer
+          format: int32
+        won_deals:
+          type: integer
+          format: int32
+        revenue:
+          type: number
+          format: decimal
+        win_rate:
+          type: number
+          format: float
+      description: Lead source attribution report with counts by channel
+    LeaderboardEntry:
+      type: object
+      required:
+      - user_id
+      - user_name
+      - rank
+      - value
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        rank:
+          type: integer
+          format: int32
+        value:
+          type: number
+          format: double
+      description: A leaderboard entry with ranking and metrics
+    ListGrowthReport:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              list_id:
+                type: string
+                format: uuid
+              list_name:
+                type: string
+              start:
+                type: integer
+                format: int64
+              subscribed:
+                type: integer
+                format: int64
+              unsubscribed:
+                type: integer
+                format: int64
+              bounced:
+                type: integer
+                format: int64
+              end:
+                type: integer
+                format: int64
+              top_source:
+                type: string
+      required:
+      - items
+    MarketingRevenueReport:
+      type: object
+      properties:
+        currency:
+          type: string
+        attribution_window_days:
+          type: integer
+        total_revenue:
+          type: number
+          format: decimal
+        from_campaigns:
+          type: number
+          format: double
+        from_automation_messages:
+          type: number
+          format: double
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        top_campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevenueSourceRow'
+        top_automation_messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/RevenueSourceRow'
+      required:
+      - currency
+      - attribution_window_days
+      - total_revenue
+      - from_campaigns
+      - from_automation_messages
+      description: Revenue from crm/marketing conversions with a value that occurred within `attribution_window_days` of a
+        send, credited to that campaign or automation message (last touch).
+    NameCount:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        count:
+          type: integer
+      required:
+      - name
+      - count
+    NamedSeries:
+      type: object
+      properties:
+        key:
+          type: string
+        label:
+          type: string
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/Point'
+      required:
+      - key
+      - points
+    NearbyContact:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        email:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        distance:
+          type: number
+          format: float
+      required:
+      - contact_id
+      - distance
+    OneToOneEmailRow:
+      type: object
+      properties:
+        workflow_id:
+          type: string
+          format: uuid
+        workflow_name:
+          type: string
+        step_id:
+          type: string
+          format: uuid
+        email_name:
+          type: string
+        sender_user_id:
+          type: string
+          format: uuid
+        sent:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_clicks:
+          type: integer
+        unique_click_rate:
+          type: number
+          format: float
+          description: 0-100
+        unique_replies:
+          type: integer
+        unique_reply_rate:
+          type: number
+          format: float
+          description: 0-100
+        bounces:
+          type: integer
+        bounce_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - workflow_id
+      - step_id
+      - email_name
+      - sent
+    OpenTrendsReport:
+      type: object
+      properties:
+        timezone:
+          type: string
+        by_weekday:
+          type: array
+          items:
+            type: object
+            properties:
+              weekday:
+                type: integer
+                minimum: 0
+                maximum: 6
+                description: 0 = Monday
+              opens:
+                type: integer
+        by_hour:
+          type: array
+          items:
+            type: object
+            properties:
+              hour:
+                type: integer
+                minimum: 0
+                maximum: 23
+              opens:
+                type: integer
+      required:
+      - by_weekday
+      - by_hour
+      description: 'When contacts open mail: counts per weekday and per hour of day, in the chosen timezone.'
+    PaginatedAutomationContactRow:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationContactRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedAutomationListRow:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationListRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedConversionrate:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversionRate'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ConversionRate records
+    PaginatedDashboard:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Dashboard'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedForecastAccuracyEntry:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastAccuracyEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ForecastAccuracyEntry records
+    PaginatedForecastentry:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ForecastEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of ForecastEntry records
+    PaginatedJumpToRow:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/JumpToRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedLeadSourceReport:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeadSourceReport'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of LeadSourceReport records
+    PaginatedLeaderboardEntry:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LeaderboardEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+      description: Paginated list of LeaderboardEntry records
+    PaginatedNearbyContact:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/NearbyContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedOneToOneEmailRow:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OneToOneEmailRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedPipelinesummary:
+      type: object
+      required:
+      - total_opportunities
+      - total_revenue
+      - total_weighted_revenue
+      - stages
+      properties:
+        total_opportunities:
+          type: integer
+          format: int32
+        total_revenue:
+          type: number
+          format: decimal
+        total_weighted_revenue:
+          type: number
+          format: decimal
+        stages:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_id:
+                type: string
+                format: uuid
+              stage_name:
+                type: string
+              count:
+                type: integer
+                format: int32
+              total_revenue:
+                type: number
+                format: decimal
+              weighted_revenue:
+                type: number
+                format: decimal
+              avg_days_in_stage:
+                type: number
+                format: float
+      description: Paginated list of PipelineSummary records
+    PeriodCount:
+      type: object
+      properties:
+        period:
+          type: string
+          examples:
+          - 2026-11
+        count:
+          type: integer
+        value:
+          type: number
+          format: double
+      required:
+      - period
+      - count
+    Point:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        value:
+          type: number
+          format: double
+      required:
+      - date
+      - value
+    PredictiveContentReport:
+      type: object
+      properties:
+        total_sent:
+          type: integer
+        total_unique_clicks:
+          type: integer
+        click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        sent_by_variant:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        clicks_by_variant:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariantRow'
+      required:
+      - total_sent
+      - total_unique_clicks
+      - variants
+    RepPerformance:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        user_name:
+          type: string
+        team_id:
+          type: string
+          format: uuid
+        period:
+          type: string
+        leads_created:
+          type: integer
+          format: int32
+        opportunities_active:
+          type: integer
+          format: int32
+        opportunities_won:
+          type: integer
+          format: int32
+        opportunities_lost:
+          type: integer
+          format: int32
+        revenue_expected:
+          type: number
+          format: decimal
+        revenue_won:
+          type: number
+          format: decimal
+        weighted_pipeline:
+          type: number
+          format: double
+        avg_deal_size:
+          type: number
+          format: double
+        avg_sales_cycle_days:
+          type: number
+          format: float
+        quota_attainment:
+          type: number
+          format: float
+        activity_count:
+          type: integer
+          format: int32
+      required:
+      - user_id
+      - user_name
+      - team_id
+      - period
+      - leads_created
+      - opportunities_active
+      - opportunities_won
+      - opportunities_lost
+      - revenue_expected
+      - revenue_won
+      - weighted_pipeline
+      - avg_deal_size
+      - avg_sales_cycle_days
+      - quota_attainment
+      - activity_count
+      description: Sales representative performance metrics
+    ReportBuildRequest:
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          type: string
+          enum:
+          - PIPELINE
+          - CONVERSION
+          - PERFORMANCE
+          - WIN_LOSS
+          - FORECAST
+          - CUSTOM
+        filters:
+          type: object
+          description: Filter criteria
+        group_by:
+          type: array
+          items:
+            type: string
+        saved:
+          type: boolean
+          default: false
+      description: Request body for building a report with filters and groupings
+    ReportSchedule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        report_id:
+          type: string
+          format: uuid
+        frequency:
+          type: string
+        recipient_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        is_active:
+          type: boolean
+        last_sent:
+          type: string
+          format: date-time
+      required:
+      - report_id
+      - frequency
+      - recipient_ids
+      - is_active
+      - last_sent
+      description: Schedule configuration for automated report generation
+    ReportScheduleRequest:
+      type: object
+      required:
+      - frequency
+      - recipient_ids
+      properties:
+        frequency:
+          type: string
+          enum:
+          - DAILY
+          - WEEKLY
+          - MONTHLY
+        recipient_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        schedule:
+          type: string
+          description: Cron expression
+      description: Request body for scheduling a report
+    RevenueSourceRow:
+      type: object
+      properties:
+        kind:
+          type: string
+          enum:
+          - CAMPAIGN
+          - AUTOMATION_MESSAGE
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        revenue:
+          type: number
+          format: decimal
+        conversions:
+          type: integer
+      required:
+      - kind
+      - id
+      - name
+      - revenue
+    SalesPerformanceReport:
+      type: object
+      properties:
+        pipeline_id:
+          type: string
+          format: uuid
+        currency:
+          type: string
+        period:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        owners:
+          type: array
+          items:
+            $ref: '#/components/schemas/SalesPerformanceRow'
+      required:
+      - pipeline_id
+      - stages
+      - owners
+      description: 'Sales Performance: deals by stage per owner (matrix), plus won/lost per owner.'
+    SalesPerformanceRow:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+      required:
+      - user_id
+    SavedReport:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        type:
+          type: string
+        filters:
+          type: object
+        data:
+          type: object
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - name
+      - type
+      description: Saved report with configuration and cached results
+    Score:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        entity:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - ACTIVE
+        thresholds:
+          type: object
+          properties:
+            warm:
+              type: integer
+              format: int32
+            hot:
+              type: integer
+              format: int32
+          required:
+          - warm
+          - hot
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreRule'
+        distribution:
+          type: array
+          items:
+            type: integer
+            format: int64
+          description: Counts per 10-point bucket
+        counts:
+          type: object
+          properties:
+            cold:
+              type: integer
+              format: int64
+            warm:
+              type: integer
+              format: int64
+            hot:
+              type: integer
+              format: int64
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - entity
+      - status
+      - thresholds
+      description: A named, rule-based score on contacts or deals.
+    ScoreExplanation:
+      type: object
+      properties:
+        score_id:
+          type: string
+          format: uuid
+        entity_id:
+          type: string
+          format: uuid
+        entity_name:
+          type: string
+        score:
+          type: integer
+          format: int32
+        band:
+          type: string
+          enum:
+          - COLD
+          - WARM
+          - HOT
+        factors:
+          type: array
+          items:
+            type: object
+            properties:
+              rule_id:
+                type: string
+                format: uuid
+              label:
+                type: string
+              points:
+                type: integer
+                format: int32
+              at:
+                type: string
+                format: date-time
+              decays_at:
+                type: string
+                format: date-time
+            required:
+            - label
+            - points
+      required:
+      - score_id
+      - entity_id
+      - score
+      - factors
+    ScorePage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Score'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    ScoreRecalculation:
+      type: object
+      properties:
+        score_id:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - RUNNING
+          - DONE
+        queued_at:
+          type: string
+          format: date-time
+      required:
+      - score_id
+      - status
+    ScoreRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        entity:
+          type: string
+          enum:
+          - CONTACT
+          - DEAL
+        thresholds:
+          type: object
+          properties:
+            warm:
+              type: integer
+              format: int32
+            hot:
+              type: integer
+              format: int32
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ScoreRule'
+      required:
+      - name
+      - entity
+    ScoreRule:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        subject:
+          type: string
+          description: Condition subject, as in the segment condition tree
+        operator:
+          type: string
+        value:
+          type: string
+        points:
+          type: integer
+          format: int32
+        decay_days:
+          type: integer
+          format: int32
+          description: 0 = never
+        hits_30d:
+          type: integer
+          format: int64
+      required:
+      - subject
+      - operator
+      - points
+    SentimentCounts:
+      type: object
+      properties:
+        positive:
+          type: integer
+        neutral:
+          type: integer
+        negative:
+          type: integer
+      required:
+      - positive
+      - neutral
+      - negative
+    TagTrendRow:
+      type: object
+      properties:
+        tag_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        first_applied_at:
+          type: string
+          format: date-time
+        last_applied_at:
+          type: string
+          format: date-time
+        applied_in_range:
+          type: integer
+        avg_per_day:
+          type: number
+          format: float
+        total_contacts:
+          type: integer
+      required:
+      - tag_id
+      - name
+      - applied_in_range
+      - total_contacts
+    TagTrendsReport:
+      type: object
+      properties:
+        tags_applied:
+          type: integer
+        avg_per_day:
+          type: number
+          format: float
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        most_used_in_range:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        most_used_overall:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagTrendRow'
+      required:
+      - tags_applied
+      - avg_per_day
+      - series
+      - tags
+      description: Tag applications over time (one series per tag), top tags in range and overall, and a per-tag detail table.
+    TaskOutcomeRow:
+      type: object
+      properties:
+        outcome_id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        sentiment:
+          type: string
+          enum:
+          - POSITIVE
+          - NEUTRAL
+          - NEGATIVE
+        count:
+          type: integer
+      required:
+      - outcome_id
+      - label
+      - sentiment
+      - count
+    TaskOverviewReport:
+      type: object
+      properties:
+        totals:
+          $ref: '#/components/schemas/TaskTotals'
+        by_owner:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskOwnerRow'
+        by_type:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskTypeRow'
+        by_outcome:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskOutcomeRow'
+        completed_per_period:
+          type: array
+          items:
+            $ref: '#/components/schemas/PeriodCount'
+      required:
+      - totals
+      - by_owner
+      - by_type
+      - by_outcome
+      description: 'Task Overview: load and completion per rep and per type, outcome sentiment per rep (crm/tasks outcomes).'
+    TaskOwnerRow:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+        outcomes:
+          $ref: '#/components/schemas/SentimentCounts'
+      required:
+      - user_id
+      - open
+      - overdue
+      - completed
+      - completion_rate
+    TaskTotals:
+      type: object
+      properties:
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+      required:
+      - open
+      - overdue
+      - completed
+      - completion_rate
+    TaskTypeRow:
+      type: object
+      properties:
+        task_type_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+      required:
+      - task_type_id
+      - name
+      - open
+      - overdue
+      - completed
+      - completion_rate
+    TeamPerformance:
+      type: object
+      properties:
+        team_id:
+          type: string
+          format: uuid
+        team_name:
+          type: string
+        member_count:
+          type: integer
+          format: int32
+        total_opportunities:
+          type: integer
+          format: int32
+        total_revenue:
+          type: number
+          format: decimal
+        weighted_revenue:
+          type: number
+          format: decimal
+        win_rate:
+          type: number
+          format: float
+      required:
+      - team_id
+      - team_name
+      - member_count
+      - total_opportunities
+      - total_revenue
+      - weighted_revenue
+      - win_rate
+      description: Team-level performance metrics
+    TimeToCloseAnalysis:
+      type: object
+      properties:
+        overall_avg_days:
+          type: number
+          format: float
+        by_stage:
+          type: array
+          items:
+            type: object
+            properties:
+              stage_name:
+                type: string
+                avg_days:
+                  type: number
+                  format: float
+        by_source:
+          type: array
+          items:
+            type: object
+            properties:
+              source_name:
+                type: string
+              avg_days:
+                type: number
+                format: float
+      required:
+      - overall_avg_days
+      - by_stage
+      - by_source
+      description: Time-to-close analysis by pipeline stage
+    VariantRow:
+      type: object
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        campaign_name:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+        variant_id:
+          type: string
+          format: uuid
+        variant_name:
+          type: string
+        sent:
+          type: integer
+        unique_opens:
+          type: integer
+        unique_clicks:
+          type: integer
+        click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+        benchmark_click_to_open_rate:
+          type: number
+          format: float
+          description: 0-100
+      required:
+      - campaign_id
+      - variant_id
+      - sent
+    WeightedPipeline:
+      type: object
+      properties:
+        by_team:
+          type: array
+          items:
+            type: object
+            properties:
+              team_id:
+                type: string
+                format: uuid
+              team_name:
+                type: string
+              count:
+                type: integer
+                format: int32
+              weighted_revenue:
+                type: number
+                format: decimal
+        by_user:
+          type: array
+          items:
+            type: object
+            properties:
+              user_id:
+                type: string
+                format: uuid
+              user_name:
+                type: string
+              weighted_revenue:
+                type: number
+                format: decimal
+      required:
+      - by_team
+      - by_user
+      description: Pipeline data with weighted values by stage
+    WidgetData:
+      type: object
+      properties:
+        widget_id:
+          type: string
+          format: uuid
+        refreshed_at:
+          type: string
+          format: date-time
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/NameCount'
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/NamedSeries'
+        rows:
+          type: array
+          items:
+            type: object
+      required:
+      - widget_id
+      - refreshed_at
+    WidgetQuery:
+      type: object
+      properties:
+        metric:
+          type: string
+          examples:
+          - campaigns_sent
+          - open_rate
+          - click_rate
+          - total_contacts
+          - contacts_growth
+          - automation_entries
+          - tag_count
+          - list_count
+          - deals_won_value
+        dimension:
+          type: string
+          description: Group-by (campaign, tag, list, automation, owner, period…); omit for a single number
+        range:
+          type: string
+          enum:
+          - LAST_7_DAYS
+          - LAST_30_DAYS
+          - LAST_90_DAYS
+          - LAST_12_MONTHS
+          - ALL_TIME
+          - CUSTOM
+        start_date:
+          type: string
+          format: date
+        end_date:
+          type: string
+          format: date
+        granularity:
+          type: string
+          enum:
+          - DAY
+          - WEEK
+          - MONTH
+        filters:
+          type: object
+        limit:
+          type: integer
+      required:
+      - metric
+      - range
+    WidgetRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        kind:
+          type: string
+          enum:
+          - NUMBER
+          - NUMBERS
+          - LINE
+          - BAR
+          - TABLE
+        query:
+          $ref: '#/components/schemas/WidgetQuery'
+        prompt:
+          type: string
+        position:
+          type: integer
+        width:
+          type: integer
+          enum:
+          - 1
+          - 2
+    WinLossAnalysis:
+      type: object
+      properties:
+        period:
+          type: string
+        total_closed:
+          type: integer
+          format: int32
+        won_count:
+          type: integer
+          format: int32
+        lost_count:
+          type: integer
+          format: int32
+        win_rate:
+          type: number
+          format: float
+        revenue_won:
+          type: number
+          format: decimal
+        lost_reasons:
+          type: array
+          items:
+            type: object
+            properties:
+              reason_name:
+                type: string
+              count:
+                type: integer
+                format: int32
+              percentage:
+                type: number
+                format: float
+              revenue_impact:
+                type: number
+                format: decimal
+      required:
+      - period
+      - total_closed
+      - won_count
+      - lost_count
+      - win_rate
+      - revenue_won
+      - lost_reasons
+      description: Win/loss analysis with breakdown by reason
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      description: 'The workspace (brand) the call acts in. Checked against the caller''s memberships: a foreign workspace
+        is 403, a record in another workspace is 404 (ADR 004).'
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Malformed request
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 'Not allowed: the role, or a workspace the caller is not a member of'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

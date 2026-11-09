@@ -236,6 +236,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Enrolment'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -275,16 +277,6 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       parameters:
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
@@ -464,6 +456,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/WorkflowRecipe'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2807,14 +2801,26 @@ components:
           type: boolean
           description: Record a goal event (crm/marketing conversions report) when a contact meets it
     PaginatedEnrolment:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Enrolment'
+            $ref: '#/components/schemas/Enrolment'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of Enrolment records
     RecipeParameter:
       type: object
@@ -4027,28 +4033,6 @@ components:
                 type: string
               message:
                 type: string
-    PaginatedResponse:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: A page of items whose shape the operation describes.
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
   parameters:
     Page:
       name: page

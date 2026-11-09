@@ -1,0 +1,6150 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Messaging
+  version: v1.0.0
+  description: 'What we send: versioned templates, snippets, assets and the merge-field catalogue; campaigns (one-time, A/B,
+    RSS, recurring, reminder; email and SMS) with their per-recipient send ledger and engagement; senders and sending domains,
+    SMS senders, tracking domains, postal addresses, list exclusions, providers; connected 1:1 mailboxes; social accounts
+    and posts; campaign and deliverability reports.'
+  x-api-docs:
+    service: messaging
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+- url: http://localhost:10352/api/v1/crm/messaging
+  description: Local development (port from port-registry)
+- url: /api/v1/crm/messaging
+  description: CRM Messaging API
+tags:
+- name: assets
+  description: Assets
+- name: campaigns
+  description: One-time and A/B campaigns, their schedule and send
+- name: events
+  description: Engagement events (delivered, opened, clicked, bounced, complained, unsubscribed)
+- name: list-exclusions
+  description: List exclusions
+- name: mailboxes
+  description: 'Connected email accounts (OAuth Google/Microsoft or IMAP/SMTP): two-way sync of 1:1 mail onto contacts and
+    deals, 1:1 sends with tracking'
+- name: outreach-reports
+  description: Campaign and list performance
+- name: postal-addresses
+  description: Postal addresses
+- name: providers
+  description: Providers
+- name: reports
+  description: Reports
+- name: senders
+  description: Sender identities and sending domains (DKIM / DMARC state)
+- name: sends
+  description: Per-recipient delivery log
+- name: sms
+  description: Sms
+- name: snippets
+  description: Snippets
+- name: social
+  description: Social
+- name: social-accounts
+  description: Connected platform accounts
+- name: social-calendar
+  description: Calendar view of scheduled and published posts
+- name: social-engagement
+  description: Engagement metrics per post and per account
+- name: social-leads
+  description: Capturing leads from social interactions
+- name: social-posts
+  description: Posts, scheduling and approval
+- name: templates
+  description: Message templates (email, SMS, WhatsApp) with merge fields
+- name: tracking-domains
+  description: Tracking domains
+- name: transactional
+  description: Application-triggered single sends sharing the suppression list
+paths:
+  /assets:
+    get:
+      operationId: list_assets
+      summary: Images in the asset store
+      tags:
+      - assets
+      responses:
+        '200':
+          description: Page of assets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_asset
+      summary: Start an image upload
+      tags:
+      - assets
+      responses:
+        '201':
+          description: Upload ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetUpload'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Returns a signed URL to PUT the bytes to (images up to 5 MB).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAssetRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns:
+    get:
+      operationId: list_campaigns
+      summary: List campaigns
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/CampaignStatus'
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/CampaignKind'
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Campaigns
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaign'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_campaign
+      summary: Create a campaign (draft)
+      tags:
+      - campaigns
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCampaignRequest'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns/{id}:
+    get:
+      operationId: get_campaign
+      summary: Get a campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Campaign
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_campaign
+      summary: Update a draft or scheduled campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCampaignRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_campaign
+      summary: Delete a draft campaign
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns/{id}/audience:
+    get:
+      operationId: preview_campaign_audience
+      summary: Resolve the campaign's audience now
+      description: Lists minus exclusions minus suppressed minus unsubscribed, filtered by the segment. Returns the count
+        and a sample.
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Audience
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AudiencePreview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /campaigns/{id}/cancel:
+    post:
+      operationId: cancel_campaign
+      summary: Cancel a scheduled campaign or stop one mid-send
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Cancelled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns/{id}/duplicate:
+    post:
+      operationId: duplicate_campaign
+      summary: Copy a campaign as a new draft
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '201':
+          description: Draft created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns/{id}/report:
+    get:
+      operationId: get_campaign_report
+      summary: Campaign performance
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /campaigns/{id}/report/contacts:
+    get:
+      operationId: list_campaign_report_contacts
+      summary: Recipients of a campaign by engagement
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: status
+        in: query
+        schema:
+          type: string
+          enum:
+          - ALL
+          - OPENED
+          - CLICKED
+          - BOUNCED
+          - UNSUBSCRIBED
+          - COMPLAINED
+          - FORWARDED
+          - REPLIED
+          - NOT_OPENED
+      - name: link_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+        description: Only contacts who clicked this link
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCampaignReportContact'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Who opened / clicked / bounced / unsubscribed / forwarded / replied / did not open, with a link filter.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /campaigns/{id}/schedule:
+    post:
+      operationId: schedule_campaign
+      summary: Schedule or send now
+      description: Validates the campaign (sender verified, template renders, audience non-empty, unsubscribe link present)
+        and moves it to SCHEDULED. Omit send_at to send immediately.
+      tags:
+      - campaigns
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ScheduleCampaignRequest'
+      responses:
+        '200':
+          description: Scheduled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaign'
+        '400':
+          description: Validation failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignValidation'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /campaigns/{id}/sends:
+    get:
+      operationId: list_campaign_sends
+      summary: Per-recipient sends for a campaign
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/SendStatus'
+      responses:
+        '200':
+          description: Sends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSend'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /campaigns/{id}/test-send:
+    post:
+      operationId: test_send_campaign
+      summary: Send the campaign to up to 5 addresses
+      tags:
+      - campaigns
+      responses:
+        '200':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TestSendResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Marked as a test and left out of every report.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSendRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /contacts/{id}/sends:
+    get:
+      operationId: list_contact_sends
+      summary: Everything sent to a contact
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Sends
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSend'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /events:
+    get:
+      operationId: list_events
+      summary: Engagement events
+      description: Filter by contact, campaign, send or type. The automation service subscribes to these to fire EMAIL_OPENED
+        / EMAIL_CLICKED triggers.
+      tags:
+      - events
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: campaign_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: send_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: type
+        in: query
+        schema:
+          $ref: '#/components/schemas/EventType'
+      - name: since
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Events
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMessageEvent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /list-exclusions:
+    get:
+      operationId: list_list_exclusions
+      summary: List exclusions
+      tags:
+      - list-exclusions
+      responses:
+        '200':
+          description: Page of exclusions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListExclusionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_list_exclusion
+      summary: Add a list exclusion
+      tags:
+      - list-exclusions
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListExclusion'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateListExclusionRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /list-exclusions/{id}:
+    delete:
+      operationId: delete_list_exclusion
+      summary: Remove a list exclusion
+      tags:
+      - list-exclusions
+      responses:
+        '204':
+          description: Removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /mailboxes:
+    get:
+      operationId: list_mailboxes
+      summary: List connected mailboxes
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: user_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/MailboxStatus'
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Mailboxes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Mailboxes the caller owns or that are shared with them.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: connect_mailbox
+      summary: Connect a mailbox
+      tags:
+      - mailboxes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectMailboxRequest'
+      responses:
+        '201':
+          description: Mailbox created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConnectMailboxResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Start an OAuth connection (returns authorize_url) or connect an IMAP/SMTP account directly.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /mailboxes/{id}:
+    get:
+      operationId: get_mailbox
+      summary: Get a mailbox
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '200':
+          description: Mailbox
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Settings and sync state of one mailbox.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    patch:
+      operationId: update_mailbox
+      summary: Update mailbox settings
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMailboxRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Sync, tracking, signature, sharing and IMAP settings.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: disconnect_mailbox
+      summary: Disconnect a mailbox
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      responses:
+        '204':
+          description: Disconnected
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Revokes tokens and stops sync; synced messages stay on the timelines.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /mailboxes/{id}/messages:
+    get:
+      operationId: list_mailbox_messages
+      summary: List synced messages
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - name: contact_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: deal_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: direction
+        in: query
+        schema:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+      - name: since
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMailboxMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: Messages synced from or sent through this mailbox.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /mailboxes/{id}/send:
+    post:
+      operationId: send_mailbox_message
+      summary: Send a 1:1 email
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMailboxMessageRequest'
+      responses:
+        '201':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MailboxMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Send (or schedule) a one-to-one email from this mailbox as its user, logged to the contact / deal.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /mailboxes/{id}/sync:
+    post:
+      operationId: sync_mailbox
+      summary: Run a sync now
+      tags:
+      - mailboxes
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+        description: id
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Sync queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Mailbox'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      description: Queue an immediate sync; returns the mailbox with status SYNCING.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /merge-fields:
+    get:
+      operationId: list_merge_fields
+      summary: Merge fields available to templates
+      description: Contact fields, custom fields (crm/platform), list and campaign fields, and system links (unsubscribe,
+        preferences, web view).
+      tags:
+      - templates
+      responses:
+        '200':
+          description: Merge fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MergeField'
+                required:
+                - items
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /postal-addresses:
+    get:
+      operationId: list_postal_addresses
+      summary: Postal addresses for footers
+      tags:
+      - postal-addresses
+      responses:
+        '200':
+          description: Page of addresses
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostalAddressPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_postal_address
+      summary: Add a postal address
+      tags:
+      - postal-addresses
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostalAddress'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostalAddressRequest'
+      x-required-role:
+      - owner
+      - admin
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+  /postal-addresses/{id}:
+    patch:
+      operationId: update_postal_address
+      summary: Change a postal address
+      tags:
+      - postal-addresses
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PostalAddress'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostalAddressRequest'
+      x-required-role:
+      - owner
+      - admin
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+  /providers:
+    get:
+      operationId: get_sending_providers
+      summary: Configured sending providers
+      tags:
+      - providers
+      responses:
+        '200':
+          description: Providers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendingProviders'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/campaigns:
+    get:
+      operationId: get_campaign_performance
+      summary: All campaigns performance
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: kind
+        in: query
+        schema:
+          type: string
+      - name: folder_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: q
+        in: query
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: end_date
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: compare_to
+        in: query
+        schema:
+          type: string
+          enum:
+          - NONE
+          - PERIOD_AVERAGE
+          - CAMPAIGN_TYPE_AVERAGE
+      - name: exclude_unverified_opens
+        in: query
+        schema:
+          type: boolean
+      - name: sort
+        in: query
+        schema:
+          type: string
+      - name: order
+        in: query
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+      - name: page
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 200
+      responses:
+        '200':
+          description: Campaign performance
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignPerformanceReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      description: KPI tiles and per-campaign rows over a window, with period / type comparison and an option to exclude unverified
+        (privacy-prefetch) opens.
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/deliverability:
+    get:
+      operationId: get_deliverability_report
+      summary: Bounce, complaint and reputation by provider and domain
+      tags:
+      - reports
+      responses:
+        '200':
+          description: Report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliverabilityReport'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/lists/{id}/growth:
+    get:
+      operationId: get_list_growth
+      summary: Subscriptions and unsubscribes per day for a list
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - name: days
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 90
+      responses:
+        '200':
+          description: Growth series
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListGrowth'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /reports/overview:
+    get:
+      operationId: get_outreach_overview
+      summary: Sends, open and click rates over a period
+      tags:
+      - outreach-reports
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: list_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Overview
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutreachOverview'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /senders:
+    get:
+      operationId: list_senders
+      summary: Sender identities
+      tags:
+      - senders
+      responses:
+        '200':
+          description: Senders
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Sender'
+                required:
+                - items
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_sender
+      summary: Add a sender identity
+      description: Starts domain verification; the response carries the DNS records (DKIM, SPF, DMARC, return-path) the operator
+        publishes through their DNS tooling.
+      tags:
+      - senders
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSenderRequest'
+      responses:
+        '201':
+          description: Sender created, verification pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /senders/{id}:
+    get:
+      operationId: get_sender
+      summary: Sender with verification state
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    delete:
+      operationId: delete_sender
+      summary: Remove a sender identity
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Removed
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /senders/{id}/verify:
+    post:
+      operationId: verify_sender
+      summary: Re-check the sender's DNS records
+      tags:
+      - senders
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Verification result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /sends/{id}:
+    get:
+      operationId: get_send
+      summary: One send with its events
+      tags:
+      - sends
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Send
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /sms/senders:
+    get:
+      operationId: list_sms_senders
+      summary: SMS senders
+      tags:
+      - sms
+      responses:
+        '200':
+          description: Page of SMS senders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsSenderPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /snippets:
+    get:
+      operationId: list_snippets
+      summary: Snippets
+      tags:
+      - snippets
+      responses:
+        '200':
+          description: Page of snippets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SnippetPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_snippet
+      summary: Create a snippet
+      tags:
+      - snippets
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnippetRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /snippets/{id}:
+    put:
+      operationId: update_snippet
+      summary: Change a snippet
+      tags:
+      - snippets
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Snippet'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: Templates that include it pick up the change on their next render.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SnippetRequest'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_snippet
+      summary: Delete a snippet
+      tags:
+      - snippets
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      description: 409 while a template uses it.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/accounts:
+    get:
+      operationId: list_social_accounts
+      summary: Connected social accounts
+      tags:
+      - social-accounts
+      responses:
+        '200':
+          description: Accounts
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/SocialAccount'
+                required:
+                - items
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: connect_social_account
+      summary: Connect an account
+      description: Returns the OAuth authorization URL for the platform; the callback completes the connection.
+      tags:
+      - social-accounts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConnectSocialAccountRequest'
+      responses:
+        '201':
+          description: Connection started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/accounts/{id}:
+    get:
+      operationId: get_social_account
+      summary: Get an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    delete:
+      operationId: disconnect_social_account
+      summary: Disconnect an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Disconnected
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/accounts/{id}/engagement:
+    get:
+      operationId: get_account_engagement
+      summary: Engagement over time for an account
+      tags:
+      - social-engagement
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - name: days
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 30
+      responses:
+        '200':
+          description: Daily series
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountEngagementSeries'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /social/accounts/{id}/pause:
+    post:
+      operationId: pause_social_account
+      summary: Pause or resume publishing on an account
+      tags:
+      - social-accounts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - paused
+              properties:
+                paused:
+                  type: boolean
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialAccount'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/audit:
+    get:
+      operationId: list_social_audit
+      summary: Who did what to the feed
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Audit entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuditEntry'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /social/calendar:
+    get:
+      operationId: get_social_calendar
+      summary: Posts by day for a date range
+      tags:
+      - social-calendar
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        '200':
+          description: Calendar
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialCalendar'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /social/engagement:
+    get:
+      operationId: get_social_engagement
+      summary: Engagement per connected account
+      tags:
+      - social
+      responses:
+        '200':
+          description: Engagement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialEngagementSummary'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /social/leads/capture:
+    post:
+      operationId: capture_social_lead
+      summary: Create a lead in crm/pipeline from a social interaction
+      tags:
+      - social-leads
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SocialLeadCaptureRequest'
+      responses:
+        '201':
+          description: Lead created or matched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  lead_id:
+                    type: string
+                    format: uuid
+                  matched_existing:
+                    type: boolean
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/posts:
+    get:
+      operationId: list_social_posts
+      summary: List posts
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/PostStatus'
+      - name: account_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: Posts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedSocialPost'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_social_post
+      summary: Create a post (draft or scheduled)
+      tags:
+      - social-posts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSocialPostRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/posts/{id}:
+    get:
+      operationId: get_social_post
+      summary: Get a post with its per-platform results
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_social_post
+      summary: Update a draft or scheduled post
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSocialPostRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_social_post
+      summary: Delete a draft or scheduled post
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/posts/{id}/approve:
+    post:
+      operationId: approve_social_post
+      summary: Approve a post awaiting approval
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Approved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/posts/{id}/engagement:
+    get:
+      operationId: get_post_engagement
+      summary: Engagement metrics for a post
+      tags:
+      - social-engagement
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Metrics per platform
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Engagement'
+                required:
+                - items
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /social/posts/{id}/publish:
+    post:
+      operationId: publish_social_post_now
+      summary: Publish immediately
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '202':
+          description: Publishing
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /social/posts/{id}/skip:
+    post:
+      operationId: skip_social_post
+      summary: Skip a scheduled post with a reason
+      tags:
+      - social-posts
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+      responses:
+        '200':
+          description: Skipped
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SocialPost'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /templates:
+    get:
+      operationId: list_templates
+      summary: List message templates
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - $ref: '#/components/parameters/Search'
+      - name: channel
+        in: query
+        schema:
+          $ref: '#/components/schemas/Channel'
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/TemplateKind'
+      responses:
+        '200':
+          description: Templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTemplate'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_template
+      summary: Create a message template
+      tags:
+      - templates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+            examples:
+              default:
+                name: 'Onboarding day 7: your first week'
+                channel: EMAIL
+                kind: AUTOMATION
+                subject: 'Day 7: what you have set up so far'
+                preheader: A week in, and three things worth doing next
+                body_format: MARKDOWN
+                body: 'Hi {{contact.first_name}},
+
+
+                  A week ago you signed up...'
+      responses:
+        '201':
+          description: Template created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /templates/{id}:
+    get:
+      operationId: get_template
+      summary: Get a template
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    put:
+      operationId: update_template
+      summary: Update a template (creates a new version)
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Template'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+    delete:
+      operationId: delete_template
+      summary: Archive a template
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: Archived
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /templates/{id}/render:
+    post:
+      operationId: render_template
+      summary: Render a template for a contact (preview)
+      description: Merge fields are resolved from the given contact, or from the sample values supplied. Nothing is sent.
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenderRequest'
+      responses:
+        '200':
+          description: Rendered message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RenderedMessage'
+        '400':
+          description: Unresolvable merge field
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /templates/{id}/test-send:
+    post:
+      operationId: test_send_template
+      summary: Send a template to a staff address
+      tags:
+      - templates
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestSendRequest'
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /tracking-domains:
+    get:
+      operationId: list_tracking_domains
+      summary: Tracking domains
+      tags:
+      - tracking-domains
+      responses:
+        '200':
+          description: Page of tracking domains
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingDomainPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    post:
+      operationId: create_tracking_domain
+      summary: Add a tracking domain
+      tags:
+      - tracking-domains
+      responses:
+        '201':
+          description: Created with the DNS records to add
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingDomain'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrackingDomainRequest'
+      x-required-role:
+      - owner
+      - admin
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      security:
+      - bearerAuth: []
+  /tracking-domains/{id}/verify:
+    post:
+      operationId: verify_tracking_domain
+      summary: Re-check DNS and TLS
+      tags:
+      - tracking-domains
+      responses:
+        '200':
+          description: Checked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackingDomain'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      x-required-role:
+      - owner
+      - admin
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+  /transactional/send:
+    post:
+      operationId: send_transactional
+      summary: Send one message to one recipient from the application
+      description: 'For welcome, password, receipt and alert mail. Honors the suppression list and hard bounces but not list
+
+        subscription state (a transactional message is not marketing). Requires a template of kind TRANSACTIONAL.
+
+        '
+      tags:
+      - transactional
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransactionalSendRequestBody'
+      responses:
+        '202':
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Send'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          description: Recipient suppressed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      security:
+      - bearerAuth: []
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+components:
+  schemas:
+    ABTestConfig:
+      type: object
+      required:
+      - sample_percent
+      - winner_metric
+      - decide_after_minutes
+      properties:
+        test_scope:
+          type: string
+          enum:
+          - SUBJECT_FROM
+          - SUBJECT_FROM_CONTENT
+          default: SUBJECT_FROM
+          description: What differs between variants - subject and/or from only, or the whole message too
+        sample_percent:
+          type: integer
+          format: int32
+          minimum: 10
+          maximum: 100
+          description: Share of the audience split across variants (by `ratios`, evenly when absent); the rest get the winner
+        ratios:
+          type: array
+          items:
+            type: integer
+            format: int32
+          description: Per-variant share of the sample, in variant order; sums to 100
+        decide_winner:
+          type: boolean
+          default: true
+          description: false sends the variants by ratio to everyone and never picks a winner
+        winner_metric:
+          type: string
+          enum:
+          - OPENS
+          - CLICKS
+        decide_after_minutes:
+          type: integer
+          format: int32
+          minimum: 60
+        winner_key:
+          type: string
+          readOnly: true
+    AccountEngagementSeries:
+      type: object
+      required:
+      - account_id
+      - points
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        points:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            properties:
+              date:
+                type: string
+                format: date
+              posts:
+                type: integer
+                format: int32
+              impressions:
+                type: integer
+                format: int64
+              engagements:
+                type: integer
+                format: int64
+              followers:
+                type: integer
+                format: int64
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+        content_type:
+          type: string
+        size_bytes:
+          type: integer
+          format: int64
+        width:
+          type: integer
+          format: int32
+        height:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - name
+      - url
+    AssetPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Asset'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    AssetUpload:
+      type: object
+      properties:
+        asset:
+          $ref: '#/components/schemas/Asset'
+        upload_url:
+          type: string
+          format: uri
+          description: Signed PUT URL
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - asset
+      - upload_url
+      - expires_at
+    AudiencePreview:
+      type: object
+      required:
+      - count
+      properties:
+        count:
+          type: integer
+          format: int64
+        excluded_unsubscribed:
+          type: integer
+          format: int64
+        excluded_suppressed:
+          type: integer
+          format: int64
+        excluded_by_segment:
+          type: integer
+          format: int64
+        sample:
+          type: array
+          items:
+            type: object
+            properties:
+              contact_id:
+                type: string
+                format: uuid
+              email:
+                type: string
+              name:
+                type: string
+    AuditEntry:
+      type: object
+      required:
+      - id
+      - at
+      - actor
+      - action
+      properties:
+        id:
+          type: string
+          format: uuid
+        at:
+          type: string
+          format: date-time
+        actor:
+          type: string
+        action:
+          type: string
+          enum:
+          - CREATED
+          - UPDATED
+          - APPROVED
+          - SKIPPED
+          - PUBLISHED
+          - FAILED
+          - PAUSED
+          - RESUMED
+          - CONNECTED
+          - DISCONNECTED
+        post_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        note:
+          type: string
+    BodyFormat:
+      type: string
+      enum:
+      - MARKDOWN
+      - MJML
+      - HTML
+      - TEXT
+      description: How the body is authored. MARKDOWN and MJML are compiled to HTML at render; TEXT is for SMS/WhatsApp and
+        the plain-text part
+    Campaign:
+      type: object
+      required:
+      - id
+      - name
+      - kind
+      - channel
+      - status
+      - list_ids
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+          description: Internal name; the subject lives on the template
+        kind:
+          $ref: '#/components/schemas/CampaignKind'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        status:
+          $ref: '#/components/schemas/CampaignStatus'
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+          description: ONE_TIME and RSS
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+          description: AB_TEST only; two to five variants
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+          description: crm/contacts segment definition (AND/OR conditions on fields, tags, engagement); null means the whole
+            list
+        audience:
+          $ref: '#/components/schemas/CampaignAudience'
+        reminder:
+          $ref: '#/components/schemas/ReminderConfig'
+        recurrence:
+          type: object
+          description: RECURRING; {cron, timezone, ends_at?}
+        reply_to:
+          type: string
+          format: email
+          description: Defaults to the sender's address
+        preheader:
+          type: string
+          maxLength: 255
+          description: Overrides the template's preheader for this send
+        track_replies:
+          type: boolean
+          default: false
+        links:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackedLink'
+          description: Per-link tracking overrides, filled from the template's links at schedule time
+        on_open_workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Workflows to start when a contact opens
+        postal_address_id:
+          type: string
+          format: uuid
+          description: The footer address; defaults to the first list's
+        public_archive:
+          type: boolean
+          default: false
+          description: Listed on the hosted campaign archive page
+        readiness:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/ReadinessProblem'
+          description: What still blocks scheduling (empty when ready)
+        utm_campaign_id:
+          type: string
+          format: uuid
+          description: crm/marketing UTM campaign stamped on every tracked link
+        send_at:
+          type: string
+          format: date-time
+        send_in_contact_timezone:
+          type: boolean
+          default: false
+        track_opens:
+          type: boolean
+          default: true
+        track_clicks:
+          type: boolean
+          default: true
+        folder:
+          type: string
+        audience_count:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Resolved at schedule time
+        sent_count:
+          type: integer
+          format: int64
+          readOnly: true
+        started_at:
+          type: string
+          format: date-time
+          readOnly: true
+        completed_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_by:
+          type: string
+          description: Staff user id
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A broadcast to the resolved audience of one or more lists
+    CampaignAudience:
+      type: object
+      description: Who, within `list_ids`, receives the campaign
+      properties:
+        mode:
+          type: string
+          enum:
+          - ALL
+          - SEGMENT
+          - TAG
+          - CONDITIONS
+          default: ALL
+        segment_id:
+          type: string
+          format: uuid
+        tag:
+          type: string
+        conditions:
+          type: object
+          description: An inline crm/contacts condition tree
+    CampaignKind:
+      type: string
+      enum:
+      - ONE_TIME
+      - AB_TEST
+      - RSS
+      - REMINDER
+      - RECURRING
+      description: 'ONE_TIME sends once; AB_TEST sends variants to a sample then the winner; RSS sends on feed updates;
+
+        REMINDER sends to each contact on/before/after one of their date fields (birthday, renewal, anniversary),
+
+        yearly or once (`reminder`); RECURRING sends on a schedule to whoever matches the audience at that moment
+
+        (`recurrence`). Auto-responders and drips are workflows (crm/automation), not campaigns.
+
+        '
+    CampaignPerformanceReport:
+      type: object
+      properties:
+        totals:
+          $ref: '#/components/schemas/OutreachOverview'
+        comparison:
+          $ref: '#/components/schemas/OutreachOverview'
+        comparison_basis:
+          type: string
+          enum:
+          - NONE
+          - PERIOD_AVERAGE
+          - CAMPAIGN_TYPE_AVERAGE
+        campaigns:
+          $ref: '#/components/schemas/PaginatedCampaignPerformanceRow'
+      required:
+      - totals
+      - campaigns
+      description: 'All Campaigns Performance: KPI tiles (with an optional comparison baseline) and a sortable per-campaign
+        table.'
+    CampaignPerformanceRow:
+      type: object
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        kind:
+          type: string
+        folder_id:
+          type: string
+          format: uuid
+        sent_at:
+          type: string
+          format: date-time
+        sent:
+          type: integer
+        delivered:
+          type: integer
+        unique_opens:
+          type: integer
+        open_rate:
+          type: number
+          format: double
+        unique_clicks:
+          type: integer
+        click_rate:
+          type: number
+          format: double
+        click_to_open_rate:
+          type: number
+          format: double
+        bounces:
+          type: integer
+        bounce_rate:
+          type: number
+          format: double
+        unsubscribes:
+          type: integer
+        unsubscribe_rate:
+          type: number
+          format: double
+        anonymous_open_rate:
+          type: number
+          format: double
+        revenue:
+          type: number
+          format: decimal
+      required:
+      - campaign_id
+      - name
+      - sent
+    CampaignReport:
+      type: object
+      required:
+      - campaign_id
+      - sent
+      - delivered
+      - opened
+      - clicked
+      - bounced
+      - complained
+      - unsubscribed
+      properties:
+        campaign_id:
+          type: string
+          format: uuid
+        sent:
+          type: integer
+          format: int64
+        delivered:
+          type: integer
+          format: int64
+        opened:
+          type: integer
+          format: int64
+          description: Unique contacts
+        clicked:
+          type: integer
+          format: int64
+          description: Unique contacts
+        bounced:
+          type: integer
+          format: int64
+        complained:
+          type: integer
+          format: int64
+        unsubscribed:
+          type: integer
+          format: int64
+        open_rate:
+          type: number
+          format: double
+        click_rate:
+          type: number
+          format: double
+        click_to_open_rate:
+          type: number
+          format: double
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                format: uri
+              clicks:
+                type: integer
+                format: int64
+              unique_clicks:
+                type: integer
+                format: int64
+              link_id:
+                type: string
+                format: uuid
+              label:
+                type: string
+              share_pct:
+                type: number
+                format: float
+        opens_by_hour:
+          type: array
+          items:
+            type: object
+            properties:
+              hour:
+                type: string
+                format: date-time
+              opens:
+                type: integer
+                format: int64
+              clicks:
+                type: integer
+                format: int64
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        revenue:
+          type: number
+          format: decimal
+          description: Attributed through crm/marketing campaign revenue when a UTM campaign is set
+        total_opens:
+          type: integer
+          format: int64
+          description: All open events (opened = unique contacts)
+        verified_opens:
+          type: integer
+          format: int64
+          description: Opens not attributable to mailbox privacy prefetch (Apple MPP etc.)
+        unverified_opens:
+          type: integer
+          format: int64
+        anonymous_open_rate:
+          type: number
+          format: double
+          description: Share of opens that were machine / privacy prefetches
+        total_clicks:
+          type: integer
+          format: int64
+        forwarded:
+          type: integer
+          format: int64
+        replied:
+          type: integer
+          format: int64
+        updated:
+          type: integer
+          format: int64
+          description: Contacts who updated their profile from the email
+        social_shares:
+          type: array
+          items:
+            type: object
+            properties:
+              network:
+                type: string
+              shares:
+                type: integer
+        opens_by_date:
+          type: array
+          items:
+            type: object
+            properties:
+              date:
+                type: string
+                format: date
+              opens:
+                type: integer
+              clicks:
+                type: integer
+        opens_by_location:
+          type: array
+          items:
+            type: object
+            properties:
+              country:
+                type: string
+              region:
+                type: string
+              city:
+                type: string
+              opens:
+                type: integer
+              clicks:
+                type: integer
+        email_clients:
+          type: array
+          items:
+            type: object
+            properties:
+              client:
+                type: string
+              family:
+                type: string
+                enum:
+                - WEBMAIL
+                - DESKTOP
+                - MOBILE
+                - OTHER
+              opens:
+                type: integer
+              share_pct:
+                type: number
+                format: float
+        audience:
+          type: object
+          properties:
+            list_ids:
+              type: array
+              items:
+                type: string
+                format: uuid
+            segment_id:
+              type: string
+              format: uuid
+            size:
+              type: integer
+        sent_at:
+          type: string
+          format: date-time
+        subject:
+          type: string
+        from:
+          type: string
+    CampaignReportContact:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+        name:
+          type: string
+        status:
+          type: string
+          enum:
+          - DELIVERED
+          - OPENED
+          - CLICKED
+          - BOUNCED
+          - UNSUBSCRIBED
+          - COMPLAINED
+          - FORWARDED
+          - REPLIED
+          - NOT_OPENED
+        opens:
+          type: integer
+        clicks:
+          type: integer
+        first_open_at:
+          type: string
+          format: date-time
+        last_click_at:
+          type: string
+          format: date-time
+        clicked_link_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        bounce_kind:
+          type: string
+          enum:
+          - HARD
+          - SOFT
+      required:
+      - contact_id
+      - email
+      - status
+    CampaignStatus:
+      type: string
+      enum:
+      - DRAFT
+      - SCHEDULED
+      - SENDING
+      - SENT
+      - CANCELLED
+      - FAILED
+    CampaignValidation:
+      type: object
+      required:
+      - ok
+      - problems
+      properties:
+        ok:
+          type: boolean
+        problems:
+          type: array
+          items:
+            type: object
+            required:
+            - code
+            - message
+            properties:
+              code:
+                type: string
+                enum:
+                - SENDER_UNVERIFIED
+                - TEMPLATE_MISSING
+                - UNSUBSCRIBE_LINK_MISSING
+                - AUDIENCE_EMPTY
+                - UNRESOLVED_MERGE_FIELD
+                - VARIANTS_INVALID
+              message:
+                type: string
+    CampaignVariant:
+      type: object
+      required:
+      - key
+      - template_id
+      properties:
+        key:
+          type: string
+          maxLength: 1
+          example: A
+        template_id:
+          type: string
+          format: uuid
+        sent_count:
+          type: integer
+          format: int64
+          readOnly: true
+        open_rate:
+          type: number
+          format: double
+          readOnly: true
+        click_rate:
+          type: number
+          format: double
+          readOnly: true
+    Channel:
+      type: string
+      enum:
+      - EMAIL
+      - SMS
+      - WHATSAPP
+      description: Delivery channel. EMAIL is delivered; SMS and WHATSAPP need a provider adapter.
+    ConnectMailboxRequest:
+      type: object
+      properties:
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        sync_enabled:
+          type: boolean
+        sync_since:
+          type: string
+          format: date-time
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+        log_to_deals:
+          type: boolean
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        redirect_uri:
+          type: string
+          format: uri
+          description: 'OAuth providers only: where to send the user after consent'
+      required:
+      - provider
+      description: 'IMAP: connects immediately. GOOGLE/MICROSOFT: returns status AUTHORIZING and an `authorize_url` to open.'
+    ConnectMailboxResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          description: Owner; shared mailboxes also list `shared_with_user_ids`
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        status:
+          $ref: '#/components/schemas/MailboxStatus'
+        sync_enabled:
+          type: boolean
+          description: Pull inbound/outbound mail into the CRM
+        sync_since:
+          type: string
+          format: date-time
+          description: 'Only messages after this time are synced (default: connection time)'
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+          description: KNOWN_CONTACTS logs only mail whose counterpart is a CRM contact (default)
+        log_to_deals:
+          type: boolean
+          description: Attach synced mail to the contact's open deals
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        last_sync_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        authorize_url:
+          type: string
+          format: uri
+          description: Present when the provider needs OAuth consent
+      required:
+      - id
+      - user_id
+      - address
+      - provider
+      - status
+      - sync_enabled
+    ConnectSocialAccountRequest:
+      type: object
+      required:
+      - platform
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        redirect_uri:
+          type: string
+          format: uri
+    CreateAssetRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        content_type:
+          type: string
+          pattern: ^image/
+        size_bytes:
+          type: integer
+          format: int64
+          maximum: 5242880
+      required:
+      - name
+      - content_type
+      - size_bytes
+    CreateCampaignRequest:
+      type: object
+      required:
+      - name
+      - kind
+      - channel
+      - list_ids
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        kind:
+          $ref: '#/components/schemas/CampaignKind'
+        channel:
+          $ref: '#/components/schemas/Channel'
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+        utm_campaign_id:
+          type: string
+          format: uuid
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        folder:
+          type: string
+    CreateListExclusionRequest:
+      type: object
+      properties:
+        pattern:
+          type: string
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        reason:
+          type: string
+      required:
+      - pattern
+    CreateSenderRequest:
+      type: object
+      required:
+      - from_name
+      - from_address
+      properties:
+        from_name:
+          type: string
+          maxLength: 128
+        from_address:
+          type: string
+          format: email
+        reply_to:
+          type: string
+          format: email
+        provider:
+          $ref: '#/components/schemas/Provider'
+        postal_address:
+          type: string
+    CreateSocialPostRequest:
+      type: object
+      required:
+      - body
+      - targets
+      properties:
+        body:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+        targets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+        source:
+          type: string
+    CreateTemplateRequest:
+      type: object
+      required:
+      - name
+      - channel
+      - kind
+      - body_format
+      - body
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        channel:
+          $ref: '#/components/schemas/Channel'
+        kind:
+          $ref: '#/components/schemas/TemplateKind'
+        subject:
+          type: string
+          maxLength: 255
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+        text_body:
+          type: string
+        design:
+          type: object
+    CreateTrackingDomainRequest:
+      type: object
+      properties:
+        domain:
+          type: string
+      required:
+      - domain
+    DeliverabilityReport:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        delivered_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        soft_bounce_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        hard_bounce_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        complaint_rate:
+          type: number
+          format: double
+          minimum: 0
+          maximum: 1
+        suppressed_30d:
+          type: integer
+          format: int64
+        domain_reputation:
+          type: string
+          enum:
+          - GOOD
+          - FAIR
+          - POOR
+          - UNKNOWN
+        by_provider:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+              share:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              open_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              bounce_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+        by_domain:
+          type: array
+          items:
+            type: object
+            properties:
+              domain:
+                type: string
+              complaint_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              bounce_rate:
+                type: number
+                format: double
+                minimum: 0
+                maximum: 1
+              paused:
+                type: boolean
+    DnsRecord:
+      type: object
+      required:
+      - purpose
+      - type
+      - name
+      - value
+      - verified
+      properties:
+        purpose:
+          type: string
+          enum:
+          - DKIM
+          - SPF
+          - DMARC
+          - RETURN_PATH
+        type:
+          type: string
+          enum:
+          - TXT
+          - CNAME
+          - MX
+        name:
+          type: string
+        value:
+          type: string
+        verified:
+          type: boolean
+    Engagement:
+      type: object
+      required:
+      - account_id
+      - platform
+      - fetched_at
+      properties:
+        post_id:
+          type: string
+          format: uuid
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        impressions:
+          type: integer
+          format: int64
+        likes:
+          type: integer
+          format: int64
+        comments:
+          type: integer
+          format: int64
+        shares:
+          type: integer
+          format: int64
+        clicks:
+          type: integer
+          format: int64
+        saves:
+          type: integer
+          format: int64
+        fetched_at:
+          type: string
+          format: date-time
+    EventType:
+      type: string
+      enum:
+      - QUEUED
+      - SENT
+      - DELIVERED
+      - DEFERRED
+      - OPENED
+      - CLICKED
+      - SOFT_BOUNCED
+      - HARD_BOUNCED
+      - COMPLAINED
+      - UNSUBSCRIBED
+      - REPLIED
+    ImapConfig:
+      type: object
+      properties:
+        imap_host:
+          type: string
+        imap_port:
+          type: integer
+        smtp_host:
+          type: string
+        smtp_port:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        use_tls:
+          type: boolean
+      required:
+      - imap_host
+      - smtp_host
+      - username
+    ListExclusion:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        pattern:
+          type: string
+          description: Address or wildcard pattern, e.g. *@competitor.example
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Empty means all lists
+        list_names:
+          type: array
+          items:
+            type: string
+        reason:
+          type: string
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - pattern
+    ListExclusionPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListExclusion'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    ListGrowth:
+      type: object
+      required:
+      - list_id
+      - points
+      properties:
+        list_id:
+          type: string
+          format: uuid
+        points:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            - subscribed
+            - unsubscribed
+            - total
+            properties:
+              date:
+                type: string
+                format: date
+              subscribed:
+                type: integer
+                format: int64
+              unsubscribed:
+                type: integer
+                format: int64
+              total:
+                type: integer
+                format: int64
+    Mailbox:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          description: Owner; shared mailboxes also list `shared_with_user_ids`
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        status:
+          $ref: '#/components/schemas/MailboxStatus'
+        sync_enabled:
+          type: boolean
+          description: Pull inbound/outbound mail into the CRM
+        sync_since:
+          type: string
+          format: date-time
+          description: 'Only messages after this time are synced (default: connection time)'
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+          description: KNOWN_CONTACTS logs only mail whose counterpart is a CRM contact (default)
+        log_to_deals:
+          type: boolean
+          description: Attach synced mail to the contact's open deals
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        last_sync_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - user_id
+      - address
+      - provider
+      - status
+      - sync_enabled
+      description: A connected email account. Tokens and passwords are never returned.
+    MailboxMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        mailbox_id:
+          type: string
+          format: uuid
+        direction:
+          type: string
+          enum:
+          - INBOUND
+          - OUTBOUND
+        external_id:
+          type: string
+        thread_id:
+          type: string
+        from:
+          type: string
+        to:
+          type: array
+          items:
+            type: string
+        cc:
+          type: array
+          items:
+            type: string
+        subject:
+          type: string
+        snippet:
+          type: string
+        body_html:
+          type: string
+        sent_at:
+          type: string
+          format: date-time
+        contact_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        deal_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        opens:
+          type: integer
+        clicks:
+          type: integer
+        replied:
+          type: boolean
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageAttachment'
+      required:
+      - id
+      - mailbox_id
+      - direction
+      - from
+      - to
+      - subject
+      - sent_at
+      description: A synced or sent 1:1 message; also surfaces on contact and deal timelines in crm/engagement.
+    MailboxProvider:
+      type: string
+      enum:
+      - GOOGLE
+      - MICROSOFT
+      - IMAP
+    MailboxStatus:
+      type: string
+      enum:
+      - AUTHORIZING
+      - CONNECTED
+      - SYNCING
+      - DISCONNECTED
+      - ERROR
+    Media:
+      type: object
+      required:
+      - url
+      - kind
+      properties:
+        url:
+          type: string
+          format: uri
+        kind:
+          type: string
+          enum:
+          - IMAGE
+          - VIDEO
+          - GIF
+        alt_text:
+          type: string
+    MergeField:
+      type: object
+      required:
+      - key
+      - label
+      - group
+      properties:
+        key:
+          type: string
+          example: contact.first_name
+        label:
+          type: string
+        group:
+          type: string
+          enum:
+          - contact
+          - custom
+          - list
+          - campaign
+          - links
+          - sender
+        sample:
+          type: string
+    MessageAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        file_name:
+          type: string
+        size_bytes:
+          type: integer
+        content_type:
+          type: string
+        url:
+          type: string
+          format: uri
+      required:
+      - id
+      - file_name
+    MessageEvent:
+      type: object
+      required:
+      - id
+      - send_id
+      - contact_id
+      - type
+      - at
+      properties:
+        id:
+          type: string
+          format: uuid
+        send_id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        type:
+          $ref: '#/components/schemas/EventType'
+        at:
+          type: string
+          format: date-time
+        link_url:
+          type: string
+          format: uri
+          description: CLICKED
+        link_index:
+          type: integer
+          format: int32
+        user_agent:
+          type: string
+        ip:
+          type: string
+        bounce_code:
+          type: string
+        provider_event_id:
+          type: string
+          description: Idempotency key for provider webhooks
+    OutreachOverview:
+      type: object
+      required:
+      - campaigns_sent
+      - messages_sent
+      - open_rate
+      - click_rate
+      - total_contacts
+      properties:
+        campaigns_sent:
+          type: integer
+          format: int64
+        messages_sent:
+          type: integer
+          format: int64
+        open_rate:
+          type: number
+          format: double
+        click_rate:
+          type: number
+          format: double
+        bounce_rate:
+          type: number
+          format: double
+        unsubscribe_rate:
+          type: number
+          format: double
+        total_contacts:
+          type: integer
+          format: int64
+        subscribed_contacts:
+          type: integer
+          format: int64
+        click_to_open_rate:
+          type: number
+          format: double
+        anonymous_open_rate:
+          type: number
+          format: double
+    PaginatedAuditEntry:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedCampaign:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Campaign'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedCampaignPerformanceRow:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignPerformanceRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedCampaignReportContact:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignReportContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedMailbox:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Mailbox'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedMailboxMessage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MailboxMessage'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedMessageEvent:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageEvent'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedSend:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Send'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedSocialPost:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SocialPost'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    PaginatedTemplate:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Template'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
+    Platform:
+      type: string
+      enum:
+      - X
+      - INSTAGRAM
+      - THREADS
+      - LINKEDIN
+      - FACEBOOK
+      - BLUESKY
+      - MASTODON
+    PostStatus:
+      type: string
+      enum:
+      - DRAFT
+      - PENDING_APPROVAL
+      - APPROVED
+      - SCHEDULED
+      - PUBLISHING
+      - PUBLISHED
+      - PARTIAL
+      - FAILED
+      - SKIPPED
+      description: PARTIAL means some platform targets published and others failed
+    PostTarget:
+      type: object
+      required:
+      - account_id
+      properties:
+        account_id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        body_override:
+          type: string
+        status:
+          $ref: '#/components/schemas/PostStatus'
+        platform_post_id:
+          type: string
+          readOnly: true
+        permalink:
+          type: string
+          format: uri
+          readOnly: true
+        error:
+          type: string
+          readOnly: true
+        published_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PostalAddress:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        address:
+          type: string
+          description: The address as printed in footers
+        is_default:
+          type: boolean
+        used_by:
+          type: array
+          items:
+            type: string
+      required:
+      - id
+      - name
+      - address
+    PostalAddressPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostalAddress'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    PostalAddressRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        address:
+          type: string
+        is_default:
+          type: boolean
+      required:
+      - name
+      - address
+    Provider:
+      type: string
+      enum:
+      - SES
+      - POSTMARK
+      - RESEND
+      - TWILIO
+      - META
+      description: Provider adapters the service knows how to drive and whose webhooks it can verify
+    ReadinessProblem:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          enum:
+          - NO_LIST
+          - NO_ADDRESS
+          - NO_SUBJECT
+          - NO_DESIGN
+          - NO_SENDER
+          - SENDER_UNVERIFIED
+          - AB_NEEDS_VARIANTS
+          - AUDIENCE_EMPTY
+          - REMINDER_NO_FIELD
+        message:
+          type: string
+    ReminderConfig:
+      type: object
+      required:
+      - date_field
+      properties:
+        date_field:
+          type: string
+          description: A contact date or datetime field; `subscribed_at` for the subscription anniversary
+        relation:
+          type: string
+          enum:
+          - true
+          - BEFORE
+          - AFTER
+          default: true
+        offset_days:
+          type: integer
+          format: int32
+          default: 0
+        repeat:
+          type: string
+          enum:
+          - YEARLY
+          - ONCE
+          default: YEARLY
+          description: YEARLY matches month and day each year; ONCE matches the full date
+        send_time:
+          type: string
+          description: HH:MM in the workspace timezone (or the contact's with send_in_contact_timezone)
+    RenderRequest:
+      type: object
+      properties:
+        contact_id:
+          type: string
+          format: uuid
+        sample:
+          type: object
+          additionalProperties:
+            type: string
+          description: Merge values to use instead of (or over) the contact's
+    RenderedMessage:
+      type: object
+      required:
+      - html
+      - text
+      properties:
+        subject:
+          type: string
+        preheader:
+          type: string
+        html:
+          type: string
+        text:
+          type: string
+        unresolved:
+          type: array
+          items:
+            type: string
+          description: Merge fields with no value for this contact
+    ScheduleCampaignRequest:
+      type: object
+      properties:
+        send_at:
+          type: string
+          format: date-time
+          description: Omit to send now
+        send_in_contact_timezone:
+          type: boolean
+    Send:
+      type: object
+      required:
+      - id
+      - contact_id
+      - channel
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        contact_id:
+          type: string
+          format: uuid
+        campaign_id:
+          type: string
+          format: uuid
+        variant_key:
+          type: string
+        workflow_id:
+          type: string
+          format: uuid
+          description: Set when sent by an automation step
+        enrolment_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        template_version:
+          type: integer
+          format: int32
+        channel:
+          $ref: '#/components/schemas/Channel'
+        to:
+          type: string
+          description: Address or number as sent
+        subject:
+          type: string
+        status:
+          $ref: '#/components/schemas/SendStatus'
+        provider:
+          $ref: '#/components/schemas/Provider'
+        provider_message_id:
+          type: string
+        error:
+          type: string
+        opened_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: First open
+        clicked_at:
+          type: string
+          format: date-time
+          readOnly: true
+          description: First click
+        events:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/MessageEvent'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      description: One message to one recipient
+    SendMailboxMessageRequest:
+      type: object
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          minItems: 1
+        cc:
+          type: array
+          items:
+            type: string
+            format: email
+        bcc:
+          type: array
+          items:
+            type: string
+            format: email
+        subject:
+          type: string
+        html:
+          type: string
+        text:
+          type: string
+        saved_response_id:
+          type: string
+          format: uuid
+          description: Render a crm/tasks saved response (merge tags resolved against contact/deal) instead of html/text
+        contact_id:
+          type: string
+          format: uuid
+        deal_id:
+          type: string
+          format: uuid
+        in_reply_to:
+          type: string
+          format: uuid
+          description: MailboxMessage to reply to (threads it)
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        attachment_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        send_at:
+          type: string
+          format: date-time
+          description: Schedule; omit to send now
+      required:
+      - to
+      - subject
+      description: 'Send from a connected mailbox as the user (not a campaign: no list consent, no unsubscribe footer; logged
+        to the contact/deal timeline).'
+    SendStatus:
+      type: string
+      enum:
+      - QUEUED
+      - SENT
+      - DELIVERED
+      - BOUNCED
+      - FAILED
+      - SUPPRESSED
+      description: The latest delivery state of a send; engagement (opens, clicks) lives in events, not here
+    Sender:
+      type: object
+      required:
+      - id
+      - from_name
+      - from_address
+      - domain
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        from_name:
+          type: string
+          maxLength: 128
+        from_address:
+          type: string
+          format: email
+        reply_to:
+          type: string
+          format: email
+        domain:
+          type: string
+        provider:
+          $ref: '#/components/schemas/Provider'
+        status:
+          $ref: '#/components/schemas/SenderStatus'
+        dns_records:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/DnsRecord'
+        postal_address:
+          type: string
+          description: Physical address printed in the footer (CAN-SPAM)
+        last_checked_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    SenderStatus:
+      type: string
+      enum:
+      - PENDING
+      - VERIFIED
+      - FAILED
+    SendingProviders:
+      type: object
+      properties:
+        email:
+          type: object
+          properties:
+            adapter:
+              type: string
+            region:
+              type: string
+            credentials:
+              type: string
+              description: How credentials are held; never the secret
+            webhook_status:
+              type: string
+            webhook_last_event_at:
+              type: string
+              format: date-time
+            daily_quota:
+              type: integer
+              format: int64
+            used_today:
+              type: integer
+              format: int64
+            alternatives:
+              type: array
+              items:
+                type: string
+        channels:
+          type: array
+          items:
+            type: object
+            properties:
+              key:
+                type: string
+              label:
+                type: string
+              status:
+                type: string
+                enum:
+                - CONNECTED
+                - NOT_CONNECTED
+                - ERROR
+      description: Configured sending providers. Credentials live in the secrets service and are never returned.
+    SmsSender:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        label:
+          type: string
+        kind:
+          type: string
+          enum:
+          - ALPHANUMERIC
+          - LONG_CODE
+          - SHORT_CODE
+          - TOLL_FREE
+        number:
+          type: string
+          description: E.164, for number senders
+        countries:
+          type: array
+          items:
+            type: string
+            pattern: ^[A-Z]{2}$
+        verified:
+          type: boolean
+      required:
+      - id
+      - label
+      - kind
+    SmsSenderPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SmsSender'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    Snippet:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        key:
+          type: string
+          description: Inserted as {{snippet.key}}
+        value:
+          type: string
+        used_by:
+          type: integer
+          format: int32
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - key
+      - value
+    SnippetPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Snippet'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    SnippetRequest:
+      type: object
+      properties:
+        key:
+          type: string
+          pattern: ^snippet\.[a-z0-9_.-]+$
+        value:
+          type: string
+      required:
+      - key
+      - value
+    SocialAccount:
+      type: object
+      required:
+      - id
+      - platform
+      - handle
+      - status
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        platform:
+          $ref: '#/components/schemas/Platform'
+        handle:
+          type: string
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+          format: uri
+        status:
+          type: string
+          enum:
+          - CONNECTING
+          - CONNECTED
+          - PAUSED
+          - TOKEN_EXPIRED
+          - DISCONNECTED
+        authorization_url:
+          type: string
+          format: uri
+          readOnly: true
+          description: Present while CONNECTING
+        paused_reason:
+          type: string
+        followers:
+          type: integer
+          format: int64
+          readOnly: true
+        token_expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    SocialCalendar:
+      type: object
+      required:
+      - days
+      properties:
+        days:
+          type: array
+          items:
+            type: object
+            required:
+            - date
+            - posts
+            properties:
+              date:
+                type: string
+                format: date
+              posts:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SocialPost'
+    SocialEngagementSummary:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              account_id:
+                type: string
+                format: uuid
+              platform:
+                type: string
+              posts_30d:
+                type: integer
+                format: int32
+              impressions:
+                type: integer
+                format: int64
+              engagements:
+                type: integer
+                format: int64
+        leads_captured_30d:
+          type: integer
+          format: int32
+      required:
+      - items
+    SocialLeadCaptureRequest:
+      type: object
+      required:
+      - platform
+      - handle
+      properties:
+        platform:
+          $ref: '#/components/schemas/Platform'
+        handle:
+          type: string
+        display_name:
+          type: string
+        email:
+          type: string
+          format: email
+        post_id:
+          type: string
+          format: uuid
+          description: The post the interaction came from, when known
+        interaction:
+          type: string
+          enum:
+          - COMMENT
+          - DM
+          - MENTION
+          - FOLLOW
+          - LEAD_FORM
+        text:
+          type: string
+        utm_campaign_id:
+          type: string
+          format: uuid
+    SocialPost:
+      type: object
+      required:
+      - id
+      - status
+      - body
+      - targets
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          $ref: '#/components/schemas/PostStatus'
+        body:
+          type: string
+          description: Default text; a target may override it
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+          description: crm/marketing UTM campaign stamped on the link
+        targets:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+          default: false
+        approved_by:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          readOnly: true
+        skip_reason:
+          type: string
+        source:
+          type: string
+          description: Free text naming what generated the post (a person, an automation, an external worker)
+        created_by:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+    Template:
+      type: object
+      required:
+      - id
+      - name
+      - channel
+      - kind
+      - body_format
+      - body
+      - version
+      - created_at
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          maxLength: 128
+        channel:
+          $ref: '#/components/schemas/Channel'
+        kind:
+          $ref: '#/components/schemas/TemplateKind'
+        subject:
+          type: string
+          maxLength: 255
+          description: EMAIL only; may contain merge fields
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+          description: Source in body_format; merge fields as {{contact.first_name}}, {{list.name}}, {{links.unsubscribe}}
+        text_body:
+          type: string
+          description: Optional explicit plain-text part; derived from body when absent
+        design:
+          type: object
+          description: Editor state for the block editor (opaque to the service); absent for hand-written bodies
+        version:
+          type: integer
+          format: int32
+          readOnly: true
+          description: Incremented on every update; sends record the version they used
+        merge_fields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+          description: Merge fields found in the body at last save
+        is_archived:
+          type: boolean
+          default: false
+        thumbnail_url:
+          type: string
+          format: uri
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+      description: A message template. Campaigns and automation steps reference templates by id.
+    TemplateKind:
+      type: string
+      enum:
+      - CAMPAIGN
+      - AUTOMATION
+      - TRANSACTIONAL
+      description: CAMPAIGN and AUTOMATION templates must carry an unsubscribe link; TRANSACTIONAL may not be used by a campaign
+    TestSendRequest:
+      type: object
+      required:
+      - to
+      properties:
+        to:
+          type: array
+          items:
+            type: string
+            format: email
+          maxItems: 5
+        contact_id:
+          type: string
+          format: uuid
+          description: Contact whose merge values to use
+    TestSendResult:
+      type: object
+      properties:
+        sent_to:
+          type: array
+          items:
+            type: string
+            format: email
+        message_ids:
+          type: array
+          items:
+            type: string
+      required:
+      - sent_to
+    TrackedLink:
+      type: object
+      required:
+      - url
+      properties:
+        url:
+          type: string
+          format: uri
+        tracked:
+          type: boolean
+          default: true
+        report_name:
+          type: string
+          maxLength: 128
+        start_workflow_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: Workflows to start when this link is clicked
+    TrackingDomain:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        domain:
+          type: string
+        status:
+          type: string
+          enum:
+          - PENDING
+          - VERIFIED
+          - FAILED
+        tls:
+          type: boolean
+        last_checked_at:
+          type: string
+          format: date-time
+        records:
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+              name:
+                type: string
+              value:
+                type: string
+              verified:
+                type: boolean
+      required:
+      - id
+      - domain
+      - status
+    TrackingDomainPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingDomain'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    UpdateCampaignRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        sender_id:
+          type: string
+          format: uuid
+        template_id:
+          type: string
+          format: uuid
+        variants:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignVariant'
+        ab_test:
+          $ref: '#/components/schemas/ABTestConfig'
+        list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        exclude_list_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        segment:
+          type: object
+        utm_campaign_id:
+          type: string
+          format: uuid
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        folder:
+          type: string
+    UpdateMailboxRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+        sync_enabled:
+          type: boolean
+        sync_since:
+          type: string
+          format: date-time
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+        log_to_deals:
+          type: boolean
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+    UpdateSocialPostRequest:
+      type: object
+      properties:
+        body:
+          type: string
+        media:
+          type: array
+          items:
+            $ref: '#/components/schemas/Media'
+        link_url:
+          type: string
+          format: uri
+        utm_campaign_id:
+          type: string
+          format: uuid
+        targets:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostTarget'
+        scheduled_at:
+          type: string
+          format: date-time
+        requires_approval:
+          type: boolean
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 128
+        subject:
+          type: string
+          maxLength: 255
+        preheader:
+          type: string
+          maxLength: 255
+        body_format:
+          $ref: '#/components/schemas/BodyFormat'
+        body:
+          type: string
+        text_body:
+          type: string
+        design:
+          type: object
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+    TransactionalSendRequestBody:
+      type: object
+      required:
+      - template_id
+      - to
+      properties:
+        template_id:
+          type: string
+          format: uuid
+        to:
+          type: string
+          description: Email address or E.164 number
+        contact_id:
+          type: string
+          format: uuid
+          description: Links the send to a contact when known
+        merge:
+          type: object
+          additionalProperties:
+            type: string
+        tag:
+          type: string
+          description: Free-text grouping for reporting (welcome, password_reset, alert_digest)
+      description: TransactionalSendRequest (request body; idempotency_key come from the path or headers)
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Search:
+      name: search
+      in: query
+      description: Free-text search
+      schema:
+        type: string
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      description: 'The workspace (brand) the call acts in. Checked against the caller''s memberships: a foreign workspace
+        is 403, a record in another workspace is 404 (ADR 004).'
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    BadRequest:
+      description: Malformed request
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 'Not allowed: the role, or a workspace the caller is not a member of'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Conflict:
+      description: Conflicts with the current state
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

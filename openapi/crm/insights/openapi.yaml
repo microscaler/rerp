@@ -76,7 +76,6 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - name: from
         in: query
         schema:
@@ -573,7 +572,6 @@ paths:
         '429':
           $ref: '#/components/responses/TooManyRequests'
       parameters:
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/WorkspaceId'
       - name: from
         in: query
@@ -3321,7 +3319,7 @@ components:
                 format: int64
               revenue:
                 type: number
-                format: double
+                format: decimal
       required:
       - items
     AutomationContactRow:
@@ -3487,7 +3485,7 @@ components:
           description: 0-100
         revenue:
           type: number
-          format: double
+          format: decimal
       required:
       - step_id
       - name
@@ -3528,7 +3526,7 @@ components:
           description: 0-100
         revenue:
           type: number
-          format: double
+          format: decimal
         series:
           type: array
           items:
@@ -3661,7 +3659,7 @@ components:
           format: float
         total_won_revenue:
           type: number
-          format: double
+          format: decimal
       required:
       - period
       - leads_created
@@ -3856,18 +3854,54 @@ components:
       - owners
       description: 'Deal Owner Overview: one row per owner with created/won/lost/value/avg/time-to-close/tasks completed.'
     DealOwnerRow:
-      allOf:
-      - $ref: '#/components/schemas/OwnerRef'
-      - $ref: '#/components/schemas/DealTotals'
-      - type: object
-        properties:
-          deals_created:
-            type: integer
-          tasks_completed:
-            type: integer
-          last_activity_at:
-            type: string
-            format: date-time
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open_count:
+          type: integer
+        open_value:
+          type: number
+          format: double
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+        lost_value:
+          type: number
+          format: double
+        win_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_deal_value:
+          type: number
+          format: double
+        avg_days_to_close:
+          type: number
+          format: float
+        deals_created:
+          type: integer
+        tasks_completed:
+          type: integer
+        last_activity_at:
+          type: string
+          format: date-time
+      required:
+      - user_id
+      - open_count
+      - open_value
+      - won_count
+      - won_value
+      - lost_count
+      - lost_value
+      - win_rate
       description: One owner's line in the overview / owner-overview tables
     DealStageRow:
       type: object
@@ -4094,7 +4128,7 @@ components:
           format: double
         expected_close_revenue:
           type: number
-          format: double
+          format: decimal
         confidence:
           type: number
           format: float
@@ -4102,7 +4136,7 @@ components:
           maximum: 100
         actual_close_revenue:
           type: number
-          format: double
+          format: decimal
         variance:
           type: number
           format: double
@@ -4162,7 +4196,7 @@ components:
                 format: int32
               revenue:
                 type: number
-                format: double
+                format: decimal
               conversion_from_previous:
                 type: number
                 format: float
@@ -4261,7 +4295,7 @@ components:
           format: int32
         revenue:
           type: number
-          format: double
+          format: decimal
         win_rate:
           type: number
           format: float
@@ -4327,7 +4361,7 @@ components:
           type: integer
         total_revenue:
           type: number
-          format: double
+          format: decimal
         from_campaigns:
           type: number
           format: double
@@ -4480,120 +4514,242 @@ components:
       - by_weekday
       - by_hour
       description: 'When contacts open mail: counts per weekday and per hour of day, in the chosen timezone.'
-    OwnerRef:
+    PaginatedAutomationContactRow:
       type: object
       properties:
-        user_id:
-          type: string
-          format: uuid
-        name:
-          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AutomationContactRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
       required:
-      - user_id
-    PaginatedAutomationContactRow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
-          items:
-            type: array
-            items:
-              $ref: '#/components/schemas/AutomationContactRow'
+      - items
+      - total
+      - page
+      - limit
     PaginatedAutomationListRow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/AutomationListRow'
+            $ref: '#/components/schemas/AutomationListRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedConversionrate:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/ConversionRate'
+            $ref: '#/components/schemas/ConversionRate'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of ConversionRate records
     PaginatedDashboard:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Dashboard'
+            $ref: '#/components/schemas/Dashboard'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedForecastAccuracyEntry:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/ForecastAccuracyEntry'
+            $ref: '#/components/schemas/ForecastAccuracyEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of ForecastAccuracyEntry records
     PaginatedForecastentry:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/ForecastEntry'
+            $ref: '#/components/schemas/ForecastEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of ForecastEntry records
     PaginatedJumpToRow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/JumpToRow'
+            $ref: '#/components/schemas/JumpToRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedLeadSourceReport:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/LeadSourceReport'
+            $ref: '#/components/schemas/LeadSourceReport'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of LeadSourceReport records
     PaginatedLeaderboardEntry:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/LeaderboardEntry'
+            $ref: '#/components/schemas/LeaderboardEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of LeaderboardEntry records
     PaginatedNearbyContact:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/NearbyContact'
+            $ref: '#/components/schemas/NearbyContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedOneToOneEmailRow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/OneToOneEmailRow'
+            $ref: '#/components/schemas/OneToOneEmailRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedPipelinesummary:
       type: object
       required:
@@ -4607,10 +4763,10 @@ components:
           format: int32
         total_revenue:
           type: number
-          format: double
+          format: decimal
         total_weighted_revenue:
           type: number
-          format: double
+          format: decimal
         stages:
           type: array
           items:
@@ -4626,10 +4782,10 @@ components:
                 format: int32
               total_revenue:
                 type: number
-                format: double
+                format: decimal
               weighted_revenue:
                 type: number
-                format: double
+                format: decimal
               avg_days_in_stage:
                 type: number
                 format: float
@@ -4715,10 +4871,10 @@ components:
           format: int32
         revenue_expected:
           type: number
-          format: double
+          format: decimal
         revenue_won:
           type: number
-          format: double
+          format: decimal
         weighted_pipeline:
           type: number
           format: double
@@ -4840,7 +4996,7 @@ components:
           type: string
         revenue:
           type: number
-          format: double
+          format: decimal
         conversions:
           type: integer
       required:
@@ -4872,21 +5028,26 @@ components:
       - owners
       description: 'Sales Performance: deals by stage per owner (matrix), plus won/lost per owner.'
     SalesPerformanceRow:
-      allOf:
-      - $ref: '#/components/schemas/OwnerRef'
-      - type: object
-        properties:
-          stages:
-            type: array
-            items:
-              $ref: '#/components/schemas/DealStageRow'
-          won_count:
-            type: integer
-          won_value:
-            type: number
-            format: double
-          lost_count:
-            type: integer
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        stages:
+          type: array
+          items:
+            $ref: '#/components/schemas/DealStageRow'
+        won_count:
+          type: integer
+        won_value:
+          type: number
+          format: double
+        lost_count:
+          type: integer
+      required:
+      - user_id
     SavedReport:
       type: object
       properties:
@@ -5236,13 +5397,36 @@ components:
       - by_outcome
       description: 'Task Overview: load and completion per rep and per type, outcome sentiment per rep (crm/tasks outcomes).'
     TaskOwnerRow:
-      allOf:
-      - $ref: '#/components/schemas/OwnerRef'
-      - $ref: '#/components/schemas/TaskTotals'
-      - type: object
-        properties:
-          outcomes:
-            $ref: '#/components/schemas/SentimentCounts'
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+        outcomes:
+          $ref: '#/components/schemas/SentimentCounts'
+      required:
+      - user_id
+      - open
+      - overdue
+      - completed
+      - completion_rate
     TaskTotals:
       type: object
       properties:
@@ -5267,18 +5451,35 @@ components:
       - completed
       - completion_rate
     TaskTypeRow:
-      allOf:
-      - type: object
-        properties:
-          task_type_id:
-            type: string
-            format: uuid
-          name:
-            type: string
-        required:
-        - task_type_id
-        - name
-      - $ref: '#/components/schemas/TaskTotals'
+      type: object
+      properties:
+        task_type_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        open:
+          type: integer
+        overdue:
+          type: integer
+        due_today:
+          type: integer
+        completed:
+          type: integer
+        completion_rate:
+          type: number
+          format: float
+          description: 0-100
+        avg_hours_to_complete:
+          type: number
+          format: float
+      required:
+      - task_type_id
+      - name
+      - open
+      - overdue
+      - completed
+      - completion_rate
     TeamPerformance:
       type: object
       properties:
@@ -5295,10 +5496,10 @@ components:
           format: int32
         total_revenue:
           type: number
-          format: double
+          format: decimal
         weighted_revenue:
           type: number
-          format: double
+          format: decimal
         win_rate:
           type: number
           format: float
@@ -5394,7 +5595,7 @@ components:
                 format: int32
               weighted_revenue:
                 type: number
-                format: double
+                format: decimal
         by_user:
           type: array
           items:
@@ -5407,7 +5608,7 @@ components:
                 type: string
               weighted_revenue:
                 type: number
-                format: double
+                format: decimal
       required:
       - by_team
       - by_user
@@ -5525,7 +5726,7 @@ components:
           format: float
         revenue_won:
           type: number
-          format: double
+          format: decimal
         lost_reasons:
           type: array
           items:
@@ -5541,7 +5742,7 @@ components:
                 format: float
               revenue_impact:
                 type: number
-                format: double
+                format: decimal
       required:
       - period
       - total_closed
@@ -5584,28 +5785,6 @@ components:
                 type: string
               message:
                 type: string
-    PaginatedResponse:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: A page of items whose shape the operation describes.
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
   parameters:
     Page:
       name: page

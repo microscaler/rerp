@@ -778,19 +778,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Id'
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -1252,6 +1241,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/MergeField'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1290,19 +1281,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Id'
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -1652,6 +1632,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Sender'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -1856,19 +1838,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Id'
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -2031,6 +2002,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/SocialAccount'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2635,6 +2608,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Engagement'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':
@@ -3032,19 +3007,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Id'
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -3136,7 +3100,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TransactionalSendRequest'
+              $ref: '#/components/schemas/TransactionalSendRequestBody'
       responses:
         '202':
           description: Queued
@@ -3631,7 +3595,7 @@ components:
           format: double
         revenue:
           type: number
-          format: double
+          format: decimal
       required:
       - campaign_id
       - name
@@ -3725,7 +3689,7 @@ components:
             $ref: '#/components/schemas/CampaignVariant'
         revenue:
           type: number
-          format: double
+          format: decimal
           description: Attributed through crm/marketing campaign revenue when a UTM campaign is set
         total_opens:
           type: integer
@@ -3980,14 +3944,75 @@ components:
       - provider
       description: 'IMAP: connects immediately. GOOGLE/MICROSOFT: returns status AUTHORIZING and an `authorize_url` to open.'
     ConnectMailboxResponse:
-      allOf:
-      - $ref: '#/components/schemas/Mailbox'
-      - type: object
-        properties:
-          authorize_url:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+          description: Owner; shared mailboxes also list `shared_with_user_ids`
+        address:
+          type: string
+          format: email
+        display_name:
+          type: string
+        provider:
+          $ref: '#/components/schemas/MailboxProvider'
+        status:
+          $ref: '#/components/schemas/MailboxStatus'
+        sync_enabled:
+          type: boolean
+          description: Pull inbound/outbound mail into the CRM
+        sync_since:
+          type: string
+          format: date-time
+          description: 'Only messages after this time are synced (default: connection time)'
+        sync_scope:
+          type: string
+          enum:
+          - KNOWN_CONTACTS
+          - ALL
+          description: KNOWN_CONTACTS logs only mail whose counterpart is a CRM contact (default)
+        log_to_deals:
+          type: boolean
+          description: Attach synced mail to the contact's open deals
+        track_opens:
+          type: boolean
+        track_clicks:
+          type: boolean
+        signature_html:
+          type: string
+        shared_with_user_ids:
+          type: array
+          items:
             type: string
-            format: uri
-            description: Present when the provider needs OAuth consent
+            format: uuid
+        imap:
+          $ref: '#/components/schemas/ImapConfig'
+        last_sync_at:
+          type: string
+          format: date-time
+        last_error:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        authorize_url:
+          type: string
+          format: uri
+          description: Present when the provider needs OAuth consent
+      required:
+      - id
+      - user_id
+      - address
+      - provider
+      - status
+      - sync_enabled
     ConnectSocialAccountRequest:
       type: object
       required:
@@ -4710,95 +4735,215 @@ components:
           type: number
           format: double
     PaginatedAuditEntry:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/AuditEntry'
+            $ref: '#/components/schemas/AuditEntry'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedCampaign:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Campaign'
+            $ref: '#/components/schemas/Campaign'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedCampaignPerformanceRow:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/CampaignPerformanceRow'
+            $ref: '#/components/schemas/CampaignPerformanceRow'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedCampaignReportContact:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/CampaignReportContact'
+            $ref: '#/components/schemas/CampaignReportContact'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedMailbox:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Mailbox'
+            $ref: '#/components/schemas/Mailbox'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedMailboxMessage:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/MailboxMessage'
+            $ref: '#/components/schemas/MailboxMessage'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedMessageEvent:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/MessageEvent'
+            $ref: '#/components/schemas/MessageEvent'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedSend:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Send'
+            $ref: '#/components/schemas/Send'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedSocialPost:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/SocialPost'
+            $ref: '#/components/schemas/SocialPost'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedTemplate:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Template'
+            $ref: '#/components/schemas/Template'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     Platform:
       type: string
       enum:
@@ -5702,33 +5847,6 @@ components:
         limit:
           type: integer
           format: int32
-    TransactionalSendRequest:
-      type: object
-      required:
-      - template_id
-      - to
-      properties:
-        template_id:
-          type: string
-          format: uuid
-        to:
-          type: string
-          description: Email address or E.164 number
-        contact_id:
-          type: string
-          format: uuid
-          description: Links the send to a contact when known
-        merge:
-          type: object
-          additionalProperties:
-            type: string
-        idempotency_key:
-          type: string
-          maxLength: 128
-          description: Same key within 24h returns the earlier send
-        tag:
-          type: string
-          description: Free-text grouping for reporting (welcome, password_reset, alert_digest)
     UpdateCampaignRequest:
       type: object
       properties:
@@ -5875,28 +5993,30 @@ components:
                 type: string
               message:
                 type: string
-    PaginatedResponse:
+    TransactionalSendRequestBody:
       type: object
       required:
-      - items
-      - total
-      - page
-      - limit
-      description: A page of items whose shape the operation describes.
+      - template_id
+      - to
       properties:
-        items:
-          type: array
-          items:
-            type: object
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
+        template_id:
+          type: string
+          format: uuid
+        to:
+          type: string
+          description: Email address or E.164 number
+        contact_id:
+          type: string
+          format: uuid
+          description: Links the send to a contact when known
+        merge:
+          type: object
+          additionalProperties:
+            type: string
+        tag:
+          type: string
+          description: Free-text grouping for reporting (welcome, password_reset, alert_digest)
+      description: TransactionalSendRequest (request body; idempotency_key come from the path or headers)
   parameters:
     Page:
       name: page

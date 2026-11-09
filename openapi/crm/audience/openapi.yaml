@@ -59,19 +59,8 @@ paths:
           $ref: '#/components/responses/TooManyRequests'
       parameters:
       - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
-      - $ref: '#/components/parameters/WorkspaceId'
       - $ref: '#/components/parameters/Page'
       - $ref: '#/components/parameters/Limit'
-      - $ref: '#/components/parameters/Id'
       x-brrtrouter-impl: true
       security:
       - bearerAuth: []
@@ -976,6 +965,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Subscription'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
@@ -2580,6 +2571,13 @@ components:
           - NOT_WITHIN_DAYS
         value:
           description: String, number, boolean, ISO date or array as the operator requires
+          oneOf:
+          - type: string
+          - type: number
+          - type: boolean
+          - type: array
+            items:
+              type: string
     ConditionGroup:
       type: object
       required:
@@ -2595,9 +2593,26 @@ components:
           type: array
           items:
             oneOf:
-            - $ref: '#/components/schemas/ConditionGroup'
             - $ref: '#/components/schemas/Condition'
-      description: Recursive AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences
+            - $ref: '#/components/schemas/ConditionSubgroup'
+      description: 'AND/OR tree shared by segments, automation IF_ELSE/GOAL steps and campaign audiences: a group holds conditions
+        and sub-groups, a sub-group holds conditions (two levels).'
+    ConditionSubgroup:
+      type: object
+      properties:
+        op:
+          type: string
+          enum:
+          - AND
+          - OR
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Condition'
+      required:
+      - op
+      - items
+      description: A nested AND/OR group of conditions inside a ConditionGroup.
     ConsentEvent:
       type: object
       required:
@@ -2934,7 +2949,7 @@ components:
           format: int32
         annual_revenue:
           type: number
-          format: double
+          format: decimal
         description:
           type: string
         parent_id:
@@ -3173,7 +3188,7 @@ components:
           format: int32
         annual_revenue:
           type: number
-          format: double
+          format: decimal
         description:
           type: string
         parent_id:
@@ -3233,7 +3248,7 @@ components:
           readOnly: true
         total_revenue:
           type: number
-          format: double
+          format: decimal
           readOnly: true
         contact_name:
           type: string
@@ -3309,69 +3324,153 @@ components:
           type: integer
           format: int32
     PaginatedActivity:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Activity'
+            $ref: '#/components/schemas/Activity'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedMailingList:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/MailingList'
+            $ref: '#/components/schemas/MailingList'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedOrganisation:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Organisation'
+            $ref: '#/components/schemas/Organisation'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
       description: Paginated list of Account records
     PaginatedSegment:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Segment'
+            $ref: '#/components/schemas/Segment'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedSubscription:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Subscription'
+            $ref: '#/components/schemas/Subscription'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedSuppression:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Suppression'
+            $ref: '#/components/schemas/Suppression'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     PaginatedTag:
-      allOf:
-      - $ref: '#/components/schemas/PaginatedResponse'
-      - type: object
-        properties:
+      type: object
+      properties:
+        items:
+          type: array
           items:
-            type: array
-            items:
-              $ref: '#/components/schemas/Tag'
+            $ref: '#/components/schemas/Tag'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+      required:
+      - items
+      - total
+      - page
+      - limit
     Segment:
       type: object
       required:
@@ -3669,6 +3768,7 @@ components:
           format: int32
         annual_revenue:
           type: number
+          format: decimal
         description:
           type: string
         parent_id:
@@ -3755,28 +3855,6 @@ components:
                 type: string
               message:
                 type: string
-    PaginatedResponse:
-      type: object
-      required:
-      - items
-      - total
-      - page
-      - limit
-      description: A page of items whose shape the operation describes.
-      properties:
-        items:
-          type: array
-          items:
-            type: object
-        total:
-          type: integer
-          format: int64
-        page:
-          type: integer
-          format: int32
-        limit:
-          type: integer
-          format: int32
   parameters:
     Page:
       name: page

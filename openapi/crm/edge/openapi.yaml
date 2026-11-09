@@ -133,6 +133,8 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/AdConversion'
+                required:
+                - items
         '401':
           $ref: '#/components/responses/Unauthorized'
         '404':

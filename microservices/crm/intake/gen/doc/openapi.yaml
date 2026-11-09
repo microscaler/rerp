@@ -1,0 +1,382 @@
+openapi: 3.1.0
+# Handler coroutine stack (BRRTRouter src/handler_stack.rs): the default for every operation; an operation's own
+# x-brrtrouter-stack-size overrides it. Measured handlers peak at 24-48 KiB (pp, 24 Oct 2026).
+x-brrtrouter-stack-size: 128KiB
+info:
+  title: CRM Intake
+  version: v1.0.0
+  description: The quarantine for anonymous submissions (ADR 004). A worker keeps pending submissions in its own database
+    until they are confirmed (subscriptions) or validated (enquiries), sends the confirmation email, and publishes intake.admitted
+    for crm/audience. This API is the staff view of what is pending; nothing here is on the internet.
+  x-api-docs:
+    service: intake
+    openapi_version: 3.1.0
+    brrtrouter_version: latest
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+- url: http://localhost:10352/api/v1/crm/intake
+  description: Local development (port from port-registry)
+- url: /api/v1/crm/intake
+  description: CRM Intake API
+tags:
+- name: submissions
+  description: Submissions
+paths:
+  /submissions:
+    get:
+      operationId: list_submissions
+      summary: Pending and recent submissions
+      tags:
+      - submissions
+      responses:
+        '200':
+          description: Page of submissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeSubmissionPage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Limit'
+      - name: status
+        in: query
+        schema:
+          type: string
+      - name: form_id
+        in: query
+        schema:
+          type: string
+          format: uuid
+      x-brrtrouter-impl: true
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+  /submissions/{id}:
+    get:
+      operationId: get_submission
+      summary: A submission
+      tags:
+      - submissions
+      responses:
+        '200':
+          description: Submission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeSubmission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+      - sales
+      - read-only
+    delete:
+      operationId: discard_submission
+      summary: Discard a submission
+      tags:
+      - submissions
+      responses:
+        '204':
+          description: Discarded; nothing reaches the CRM store
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+  /submissions/{id}/resend:
+    post:
+      operationId: resend_confirmation
+      summary: Send the confirmation email again
+      tags:
+      - submissions
+      responses:
+        '200':
+          description: Sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IntakeSubmission'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/Unprocessable'
+      description: 409 unless PENDING; at most 3 sends per submission.
+      x-brrtrouter-impl: true
+      parameters:
+      - $ref: '#/components/parameters/WorkspaceId'
+      - $ref: '#/components/parameters/Id'
+      - $ref: '#/components/parameters/IdempotencyKey'
+      security:
+      - bearerAuth: []
+      x-required-role:
+      - owner
+      - admin
+      - marketer
+components:
+  schemas:
+    IntakeSubmission:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        form_id:
+          type: string
+          format: uuid
+        form_name:
+          type: string
+        kind:
+          type: string
+          enum:
+          - SUBSCRIPTION
+          - ENQUIRY
+        email_masked:
+          type: string
+          description: e.g. pr***@northwind.example; the full address is never returned
+        status:
+          type: string
+          enum:
+          - PENDING
+          - CONFIRMED
+          - ADMITTED
+          - REJECTED
+          - EXPIRED
+        reject_reason:
+          type: string
+          enum:
+          - HONEYPOT
+          - RATE_LIMIT
+          - INVALID_ADDRESS
+          - DISPOSABLE_DOMAIN
+          - DISCARDED_BY_STAFF
+        submitted_at:
+          type: string
+          format: date-time
+        confirmation_sent_at:
+          type: string
+          format: date-time
+        confirmation_count:
+          type: integer
+          format: int32
+        confirmed_at:
+          type: string
+          format: date-time
+        decided_at:
+          type: string
+          format: date-time
+        expires_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - kind
+      - status
+      - submitted_at
+    IntakeSubmissionPage:
+      type: object
+      required:
+      - items
+      - total
+      - page
+      - limit
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntakeSubmission'
+        total:
+          type: integer
+          format: int64
+        page:
+          type: integer
+          format: int32
+        limit:
+          type: integer
+          format: int32
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      description: Every error, from every CRM service.
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: HTTP status code
+        message:
+          type: string
+          description: Human-readable message, safe to show
+        details:
+          type: string
+          description: Additional detail
+        request_id:
+          type: string
+          description: Same value as the X-Request-Id header
+        fields:
+          type: array
+          description: Per-field validation errors (422)
+          items:
+            type: object
+            required:
+            - field
+            - message
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+  parameters:
+    Page:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+    Limit:
+      name: limit
+      in: query
+      description: Items per page
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 20
+    Id:
+      name: id
+      in: path
+      required: true
+      description: Resource id
+      schema:
+        type: string
+        format: uuid
+    WorkspaceId:
+      name: X-Workspace-Id
+      in: header
+      required: true
+      description: 'The workspace (brand) the call acts in. Checked against the caller''s memberships: a foreign workspace
+        is 403, a record in another workspace is 404 (ADR 004).'
+      schema:
+        type: string
+        format: uuid
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: Makes a retried request return the first response without repeating the side effect (kept 24 hours).
+      schema:
+        type: string
+        maxLength: 128
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Forbidden:
+      description: 'Not allowed: the role, or a workspace the caller is not a member of'
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: Not found (or in another workspace)
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    Unprocessable:
+      description: Validation failed; see fields
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    TooManyRequests:
+      description: Rate limited
+      headers:
+        X-Request-Id:
+          $ref: '#/components/headers/RequestId'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  headers:
+    RequestId:
+      description: Correlates the request across the gateway, the service and its logs and traces.
+      schema:
+        type: string
+    RetryAfter:
+      description: Seconds to wait before retrying.
+      schema:
+        type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

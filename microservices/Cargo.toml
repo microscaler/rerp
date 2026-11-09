@@ -53,6 +53,17 @@ members = [
     # CRM accounts: the customer record; created only from conversions (ADR 003)
     "crm/accounts/gen",
     "crm/accounts/impl",
+    # CRM services from the 2026-11 decomposition (doc 08, ADR 004): generated crates only, serving the
+    # spec's examples until each service gets an impl crate.
+    "crm/audience/gen",
+    "crm/messaging/gen",
+    "crm/automation/gen",
+    "crm/sales/gen",
+    "crm/acquisition/gen",
+    "crm/insights/gen",
+    "crm/workspace/gen",
+    "crm/edge/gen",
+    "crm/intake/gen",
 
     # Centralized migration generation
     "migrator",
