@@ -46,3 +46,24 @@
     CRM-RT-02 lands the consumer that calls `invalidate_workspace`.
   - CRM-RT-02 (outbox/relay/consumer) and CRM-RT-03 will fill `events.rs`/`audit.rs`/`idempotency.rs`; the
     guard SQL for their transactions is `context::workspace_guard_sql()`.
+
+## Review
+
+CodeRabbit round 1 (commit 29454f5), findings and resolutions — fix commit **a6375808**:
+
+1. **Major (Security):** an in-flight membership fetch could re-cache a role after `invalidate_workspace`.
+   ✅ Fixed: per-lookup generation stamp; a fetch that overlaps any invalidation drops its result
+   (`insert_if_not_invalidated`, double-checked under the lock). Test `a_fetch_overlapping_an_invalidation_is_not_cached`.
+2. **Major (Stability):** unbounded cache growth from repeated distinct workspace ids (negative entries were
+   never removed). ✅ Fixed: `MEMBERSHIP_CACHE_MAX_ENTRIES` (10 000) with expired-sweep-then-evict on insert.
+   Test `the_cache_is_bounded_and_evicts`.
+3. **Minor:** `forbidden`/`conflict` passed caller-supplied reasons through unvalidated, so a malformed reason
+   could violate the `ErrorResponse` pattern. ✅ Fixed: pattern-checked in the constructors; malformed →
+   `invalid_state` with the intended value kept in `details`. Test `malformed_reasons_cannot_reach_the_response`.
+4. **Nitpick:** the TTL test proved nothing about hits and depended on wall-clock scheduling. ✅ Fixed:
+   hit/refetch proven by source call count with 1 h and zero TTLs; no clock waiting.
+5. **Nitpick:** the schema-validation test hardcoded `required:` keys, so it could not catch a contract that
+   makes e.g. `details` required. ✅ Fixed: required keys are read from the spec's schema text; the validator
+   checks them per body.
+6. **Docstring coverage warning (pre-merge check, not a required CI check):** ✅ added `///` docs to the public
+   helpers that lacked them (`Role::as_str`, `ActorKind::as_str`, `FieldError::new`, `StaticMemberships::new/role`).
