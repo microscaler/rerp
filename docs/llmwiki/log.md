@@ -1085,3 +1085,21 @@ ref-rewritten) the whole accounting suite — including
 - Legacy `openapi/crm/{accounts,pipeline,...}` specs keep the old
   `{code, message}` error body — the AC-3 contract test is scoped to
   the nine story services by design.
+
+## [2026-11-09] contribute | CRM story slice 2: CRM-DB-01 local databases and migration pipeline
+
+- `microservices/crm/scripts/crm-db.sh` (with `test-crm-db.sh` and a
+  `tooling/tests/test_crm_db.py` wrapper) creates the three CRM databases
+  (`crm`, `crm_insights`, `crm_intake`) and one login role per service —
+  non-superuser, non-BYPASSRLS, `CONNECT` scoped to its own database,
+  schema-scoped table grants plus default privileges, audit INSERT for all
+  services and audit SELECT only for `crm_workspace`. No role for
+  `crm/edge` (ADR 004). `apply` walks
+  `microservices/crm/migrations/apply_order.txt` (migrator format) with a
+  sorted-glob fallback while the migrator has no CRM LifeModels.
+- `audit.audit_log` and `crm_current_workspace_id()` are provisioned by
+  `up`, not by a service migration, because no single service owns them;
+  apply runs as the admin with pre-granted default privileges so templates'
+  RLS policies apply from the first migration.
+- AC-3 Mac compatibility is by construction (bash-3.2-safe, plain
+  psql/sed/grep) — one real Mac run is still outstanding.
