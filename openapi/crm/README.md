@@ -6,6 +6,10 @@ RERP CRM is an **OpenAPI-first, Rust-native, self-hosted** customer relationship
 
 **Architecture:** 13 services, 5 databases, event-driven communication.
 
+> **Proposed restructuring (2026-11-09):** [docs/08-service-decomposition.md](docs/08-service-decomposition.md) regroups these
+> folders into seven services and a public edge, from the operations the platform portal actually calls. It is the
+> input for the next round of specs; until it is accepted, the folders below remain the specs of record.
+
 ## Architecture
 
 ```
