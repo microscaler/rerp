@@ -12,6 +12,7 @@ pub struct FieldError {
 }
 
 impl FieldError {
+    /// A named field and what is wrong with it.
     #[must_use]
     pub fn new(field: impl Into<String>, message: impl Into<String>) -> Self {
         Self {
@@ -34,6 +35,32 @@ pub struct ApiError {
 }
 
 impl ApiError {
+    /// The `ErrorResponse` pattern `^[a-z][a-z0-9_.]*$` on `reason`.
+    fn is_reason_shape(reason: &str) -> bool {
+        let mut chars = reason.chars();
+        let Some(first) = chars.next() else {
+            return false;
+        };
+        first.is_ascii_lowercase()
+            && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '.')
+    }
+
+    /// Keep a caller-supplied reason inside the contract pattern (#152 review): a malformed reason degrades to
+    /// `invalid_state` and the intended value is kept in `details` for debugging, so no response can violate the
+    /// `ErrorResponse` schema.
+    fn contract_safe(reason: &str) -> (String, Option<String>) {
+        if Self::is_reason_shape(reason) {
+            (reason.to_owned(), None)
+        } else {
+            (
+                "invalid_state".to_owned(),
+                Some(format!(
+                    "constructor passed an unrecognized reason: {reason}"
+                )),
+            )
+        }
+    }
+
     /// A record the caller may see does not exist (404). A record in another workspace also answers this, never 403,
     /// so ids leak nothing (`09-api-conventions.md` §3).
     #[must_use]
@@ -47,7 +74,8 @@ impl ApiError {
         }
     }
 
-    /// 403 with a stable reason (`workspace_forbidden`, `role_forbidden`, `owner_required`, ...).
+    /// 403 with a stable reason (`workspace_forbidden`, `role_forbidden`, `owner_required`, ...). A reason that
+    /// breaks the contract pattern answers `invalid_state` instead (see `contract_safe`).
     #[must_use]
     pub fn forbidden(reason: &str) -> Self {
         let message = match reason {
@@ -55,11 +83,12 @@ impl ApiError {
             "role_forbidden" => "The caller's role does not allow this operation.",
             _ => "The caller is not allowed to perform this operation.",
         };
+        let (reason, details) = Self::contract_safe(reason);
         Self {
             status: 403,
-            reason: reason.to_owned(),
+            reason,
             message: message.to_owned(),
-            details: None,
+            details,
             fields: Vec::new(),
         }
     }
@@ -77,14 +106,16 @@ impl ApiError {
         }
     }
 
-    /// 409 with the domain reason the contract names (`in_use`, `invalid_state`, `duplicate`, ...).
+    /// 409 with the domain reason the contract names (`in_use`, `invalid_state`, `duplicate`, ...). A reason that
+    /// breaks the contract pattern answers `invalid_state` instead (see `contract_safe`).
     #[must_use]
     pub fn conflict(reason: &str, message: &str) -> Self {
+        let (reason, details) = Self::contract_safe(reason);
         Self {
             status: 409,
-            reason: reason.to_owned(),
+            reason,
             message: message.to_owned(),
-            details: None,
+            details,
             fields: Vec::new(),
         }
     }
@@ -178,21 +209,42 @@ impl std::error::Error for ApiError {}
 mod tests {
     use super::*;
 
-    /// The contract pattern `^[a-z][a-z0-9_.]*$` on `ErrorResponse.reason`.
+    /// The contract pattern `^[a-z][a-z0-9_.]*$` on `ErrorResponse.reason` (the production gate).
     fn is_contract_reason(reason: &str) -> bool {
-        let mut chars = reason.chars();
-        let Some(first) = chars.next() else {
-            return false;
-        };
-        first.is_ascii_lowercase()
-            && chars.all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '_' || c == '.')
+        ApiError::is_reason_shape(reason)
     }
 
-    /// Validate a rendered body against the `ErrorResponse` constraints of the CRM specs: required `code` (integer),
-    /// `reason` (contract pattern) and `message` (string); optional `details` and `request_id` (strings) and
-    /// `fields` (objects carrying exactly `field` and `message`, both required strings).
-    fn assert_valid_error_response(body: &serde_json::Value) {
+    /// The top-level `required:` keys of an extracted schema block, read from the schema text itself (#152
+    /// nitpick): if a contract ever makes `details` required, this list grows and the constructor tests fail.
+    fn schema_required_keys(block: &str) -> Vec<String> {
+        let mut keys = Vec::new();
+        let mut in_required = false;
+        for line in block.lines() {
+            if line == "      required:" {
+                in_required = true;
+                continue;
+            }
+            if in_required {
+                match line.strip_prefix("      - ") {
+                    Some(key) => keys.push(key.trim().to_owned()),
+                    None => break,
+                }
+            }
+        }
+        keys
+    }
+
+    /// Validate a rendered body against the `ErrorResponse` constraints of the CRM specs: the `required:` keys
+    /// read from the schema text, `reason` matching the schema pattern, optional `details` and `request_id`
+    /// (strings) and `fields` (objects carrying exactly `field` and `message`, both required strings).
+    fn assert_valid_error_response(body: &serde_json::Value, required: &[String]) {
         let object = body.as_object().expect("body is an object");
+        for key in required {
+            assert!(
+                object.contains_key(key),
+                "schema-required ErrorResponse key `{key}` missing: {body}"
+            );
+        }
         assert!(
             object
                 .get("code")
@@ -439,10 +491,45 @@ mod tests {
 
     #[test]
     fn every_constructor_json_validates_against_the_error_response_schema() {
+        let paths = crm_spec_paths();
+        let text = std::fs::read_to_string(&paths[0]).expect("spec is readable");
+        let block = error_response_schema(&text).expect("audience declares ErrorResponse");
+        let required = schema_required_keys(&block);
+        assert_eq!(
+            required,
+            ["code", "reason", "message"],
+            "the test's expectations must follow the schema, not lead it"
+        );
         for (_name, error) in all_constructors() {
-            assert_valid_error_response(&error.to_json(None));
-            assert_valid_error_response(&error.to_json(Some("req-1")));
+            assert_valid_error_response(&error.to_json(None), &required);
+            assert_valid_error_response(&error.to_json(Some("req-1")), &required);
         }
+    }
+
+    #[test]
+    fn malformed_reasons_cannot_reach_the_response() {
+        // #152 minor: forbidden/conflict take caller-supplied reasons; none may break the schema pattern.
+        let error = ApiError::forbidden("OWNER_REQUIRED");
+        assert_eq!(error.status, 403);
+        assert_eq!(error.reason, "invalid_state");
+        assert!(error
+            .details
+            .as_deref()
+            .is_some_and(|details| details.contains("OWNER_REQUIRED")));
+
+        let conflict = ApiError::conflict("In Use", "This snippet is used by 3 templates.");
+        assert_eq!(conflict.reason, "invalid_state");
+        assert_eq!(conflict.message, "This snippet is used by 3 templates.");
+        assert!(conflict
+            .details
+            .as_deref()
+            .is_some_and(|details| details.contains("In Use")));
+
+        // Schema-valid reasons pass through untouched.
+        let owner = ApiError::forbidden("owner_required");
+        assert_eq!(owner.reason, "owner_required");
+        assert_eq!(owner.details, None);
+        assert_eq!(ApiError::conflict("in_use", "m").details, None);
     }
 
     #[test]

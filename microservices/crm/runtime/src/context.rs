@@ -27,6 +27,7 @@ pub enum Role {
 }
 
 impl Role {
+    /// The wire name used in `x-required-role` and the memberships API.
     #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
@@ -81,6 +82,7 @@ pub enum ActorKind {
 }
 
 impl ActorKind {
+    /// The wire name, for audit rows and logs.
     #[must_use]
     pub fn as_str(self) -> &'static str {
         match self {
@@ -187,6 +189,7 @@ pub struct StaticMemberships {
 }
 
 impl StaticMemberships {
+    /// Build a fixed membership map from `(workspace_id, user_id, role)` entries.
     #[must_use]
     pub fn new(entries: impl IntoIterator<Item = (Uuid, String, Role)>) -> Self {
         Self {
@@ -197,6 +200,7 @@ impl StaticMemberships {
         }
     }
 
+    /// The role of `user_id` in `workspace_id`, or `None` when they are not a member.
     #[must_use]
     pub fn role(&self, workspace_id: Uuid, user_id: &str) -> Option<Role> {
         self.roles.get(&(workspace_id, user_id.to_owned())).copied()
@@ -212,13 +216,23 @@ impl MembershipSource for StaticMemberships {
 /// Wraps any `MembershipSource` with a per-workspace-and-user cache (default 60 s, dropped wholesale or per
 /// workspace on `member.changed` — consumers call `invalidate_workspace` when CRM-RT-02 delivers the event).
 /// Non-membership is cached too, so a flood of foreign-workspace calls does not re-hit the source.
+///
+/// Two bounds hold it in shape (#152 review):
+/// - an in-flight fetch never lands in the cache across an invalidation: each lookup takes a generation stamp
+///   before calling the source and skips its insert if any `invalidate`/`invalidate_workspace` happened meanwhile
+///   (a revoked role must not survive another TTL);
+/// - at most [`MEMBERSHIP_CACHE_MAX_ENTRIES`] entries: expired entries are swept on insert, and one arbitrary
+///   entry is evicted when the cache is still full, so repeated lookups of distinct workspace ids cannot grow
+///   memory without limit.
 pub struct CachedMemberships<S> {
     source: S,
     ttl: Duration,
+    max_entries: usize,
+    generation: std::sync::atomic::AtomicU64,
     entries: Mutex<HashMap<MembershipKey, CacheEntry>>,
 }
 
-#[derive(Eq, Hash, PartialEq)]
+#[derive(Clone, Eq, Hash, PartialEq)]
 struct MembershipKey {
     workspace_id: Uuid,
     user_id: String,
@@ -232,36 +246,96 @@ struct CacheEntry {
 /// The story's 60 s membership cache TTL.
 pub const MEMBERSHIP_CACHE_TTL: Duration = Duration::from_secs(60);
 
+/// The largest number of (workspace, user) memberships one service caches before eviction (an active workspace
+/// has tens of members; this only ever binds hostile distinct-workspace traffic).
+pub const MEMBERSHIP_CACHE_MAX_ENTRIES: usize = 10_000;
+
 impl<S: MembershipSource> CachedMemberships<S> {
+    /// The production cache: the story's 60 s TTL and the default capacity bound.
     #[must_use]
     pub fn new(source: S) -> Self {
-        Self::with_ttl(source, MEMBERSHIP_CACHE_TTL)
+        Self::with_limits(source, MEMBERSHIP_CACHE_TTL, MEMBERSHIP_CACHE_MAX_ENTRIES)
     }
 
-    /// A non-default TTL (tests; nothing in production should change it).
+    /// A non-default TTL and capacity (tests; nothing in production should change them).
     #[must_use]
     pub fn with_ttl(source: S, ttl: Duration) -> Self {
+        Self::with_limits(source, ttl, MEMBERSHIP_CACHE_MAX_ENTRIES)
+    }
+
+    #[must_use]
+    fn with_limits(source: S, ttl: Duration, max_entries: usize) -> Self {
         Self {
             source,
             ttl,
+            max_entries,
+            generation: std::sync::atomic::AtomicU64::new(0),
             entries: Mutex::new(HashMap::new()),
         }
     }
 
     /// Drop every cached membership (the cache is global on `member.changed`).
     pub fn invalidate(&self) {
+        self.bump_generation();
         self.locked().clear();
     }
 
-    /// Drop one workspace's cached memberships (`member.changed` for that workspace).
+    /// Drop one workspace's cached memberships (`member.changed` for that workspace). The generation is bumped
+    /// globally: an in-flight fetch for any workspace is discarded rather than re-added after its invalidation.
     pub fn invalidate_workspace(&self, workspace_id: Uuid) {
+        self.bump_generation();
         self.locked()
             .retain(|key, _| key.workspace_id != workspace_id);
     }
 
+    /// The number of cached (workspace, user) entries right now.
     #[must_use]
     pub fn cached_len(&self) -> usize {
         self.locked().len()
+    }
+
+    fn bump_generation(&self) {
+        self.generation
+            .fetch_add(1, std::sync::atomic::Ordering::AcqRel);
+    }
+
+    fn generation_stamp(&self) -> u64 {
+        self.generation.load(std::sync::atomic::Ordering::Acquire)
+    }
+
+    /// Insert only if no invalidation ran since `stamp` (taken before the source call). Returns whether it
+    /// stored the entry.
+    fn insert_if_not_invalidated(
+        &self,
+        stamp: u64,
+        key: MembershipKey,
+        role: Option<Role>,
+    ) -> bool {
+        if self.generation_stamp() != stamp {
+            return false;
+        }
+        let mut entries = self.locked();
+        // Re-check under the lock: an invalidation may have run between the stamp check and the lock.
+        if self.generation_stamp() != stamp {
+            return false;
+        }
+        if entries.len() >= self.max_entries && !entries.contains_key(&key) {
+            entries.retain(|_, entry| entry.fetched_at.elapsed() < self.ttl);
+            if entries.len() >= self.max_entries {
+                let victim = entries.keys().next().cloned();
+                if let Some(victim) = victim {
+                    entries.remove(&victim);
+                }
+            }
+        }
+        entries.insert(
+            key,
+            CacheEntry {
+                fetched_at: std::time::Instant::now(),
+                role,
+            },
+        );
+        true
     }
 
     fn locked(&self) -> MutexGuard<'_, HashMap<MembershipKey, CacheEntry>> {
@@ -287,17 +361,9 @@ impl<S: MembershipSource> MembershipSource for CachedMemberships<S> {
                 }
             }
         }
+        let stamp = self.generation_stamp();
         let role = self.source.role_of(workspace_id, user_id);
-        self.locked().insert(
-            MembershipKey {
-                workspace_id,
-                user_id: user_id.to_owned(),
-            },
-            CacheEntry {
-                fetched_at: std::time::Instant::now(),
-                role,
-            },
-        );
+        self.insert_if_not_invalidated(stamp, key, role);
         role
     }
 }
@@ -480,27 +546,104 @@ mod tests {
     }
 
     #[test]
-    fn the_cache_serves_hits_then_refetches_after_the_ttl() {
-        let counting = CountingMemberships {
+    fn the_cache_serves_a_hit_then_refetches_after_the_ttl() {
+        // Deterministic hit/refetch by call count — no wall-clock waiting (#152 nitpick).
+        let hit_source = CountingMemberships {
             inner: memberships(),
             calls: Cell::new(0),
         };
-        let cache = CachedMemberships::with_ttl(counting, Duration::from_millis(20));
-        assert_eq!(cache.role_of(workspace(), USER), Some(Role::Sales));
-        assert_eq!(cache.role_of(workspace(), USER), Some(Role::Sales));
-        assert_eq!(cache.cached_len(), 1, "the second lookup must not refetch");
-
-        // Wait out the TTL without blocking a may worker (this is a test on its own thread anyway).
-        let deadline = std::time::Instant::now() + Duration::from_millis(30);
-        while std::time::Instant::now() < deadline {
-            std::hint::spin_loop();
-        }
-        assert_eq!(cache.role_of(workspace(), USER), Some(Role::Sales));
+        let hits = CachedMemberships::with_ttl(hit_source, Duration::from_secs(3600));
+        assert_eq!(hits.role_of(workspace(), USER), Some(Role::Sales));
+        assert_eq!(hits.role_of(workspace(), USER), Some(Role::Sales));
         assert_eq!(
-            cache.cached_len(),
+            hits.source.calls.get(),
             1,
-            "the entry was replaced, not duplicated"
+            "the second lookup is a cache hit"
         );
+
+        let stale_source = CountingMemberships {
+            inner: memberships(),
+            calls: Cell::new(0),
+        };
+        // A zero TTL expires every entry at once: no scheduling can make these lookups hits.
+        let stale = CachedMemberships::with_ttl(stale_source, Duration::ZERO);
+        assert_eq!(stale.role_of(workspace(), USER), Some(Role::Sales));
+        assert_eq!(stale.role_of(workspace(), USER), Some(Role::Sales));
+        assert_eq!(
+            stale.source.calls.get(),
+            2,
+            "an expired entry must trigger a refetch"
+        );
+    }
+
+    #[test]
+    fn a_fetch_overlapping_an_invalidation_is_not_cached() {
+        // The generation guard behind `role_of`: a result fetched before an invalidation must not re-enter
+        // the cache after it, or a revoked role would survive another TTL (#152 major).
+        let source = CountingMemberships {
+            inner: memberships(),
+            calls: Cell::new(0),
+        };
+        let cache = CachedMemberships::new(source);
+        let stamp = cache.generation_stamp();
+        let fresh_key = MembershipKey {
+            workspace_id: workspace(),
+            user_id: "member-a".to_owned(),
+        };
+        assert!(
+            cache.insert_if_not_invalidated(stamp, fresh_key.clone(), Some(Role::Sales)),
+            "an uncontested fetch is cached"
+        );
+
+        // member.changed lands while the fetch for `revoked_key` is still in flight.
+        let revoked_key = MembershipKey {
+            workspace_id: workspace(),
+            user_id: USER.to_owned(),
+        };
+        cache.invalidate_workspace(workspace());
+        assert!(
+            !cache.insert_if_not_invalidated(stamp, revoked_key, Some(Role::Sales)),
+            "the pre-invalidation result must be dropped"
+        );
+        assert_eq!(cache.cached_len(), 0);
+
+        // The guard is deliberately global: invalidation of any workspace discards in-flight fetches.
+        let stamp = cache.generation_stamp();
+        cache.invalidate_workspace(other_workspace());
+        assert!(!cache.insert_if_not_invalidated(
+            stamp,
+            MembershipKey {
+                workspace_id: workspace(),
+                user_id: "member-b".to_owned(),
+            },
+            Some(Role::Admin),
+        ));
+    }
+
+    #[test]
+    fn the_cache_is_bounded_and_evicts() {
+        // Hostile distinct-workspace traffic cannot grow memory without limit (#152 major).
+        let entries: Vec<(Uuid, String, Role)> = (0..10)
+            .map(|i| (workspace(), format!("user-{i}"), Role::Sales))
+            .collect();
+        let cache = CachedMemberships::with_limits(
+            StaticMemberships::new(entries),
+            Duration::from_secs(3600),
+            4,
+        );
+        for i in 0..10 {
+            assert_eq!(
+                cache.role_of(workspace(), &format!("user-{i}")),
+                Some(Role::Sales)
+            );
+        }
+        assert!(
+            cache.cached_len() <= 4,
+            "the cache must not grow past its capacity: {}",
+            cache.cached_len()
+        );
+        // Eviction cost nothing: the sources still answer for evicted users.
+        assert_eq!(cache.role_of(workspace(), "user-0"), Some(Role::Sales));
     }
 
     #[test]
