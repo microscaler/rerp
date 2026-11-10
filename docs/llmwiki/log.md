@@ -1103,3 +1103,30 @@ ref-rewritten) the whole accounting suite — including
   RLS policies apply from the first migration.
 - AC-3 Mac compatibility is by construction (bash-3.2-safe, plain
   psql/sed/grep) — one real Mac run is still outstanding.
+
+## [2026-11-10] contribute | CRM story slice 3: CRM-RT-02 event machinery (PR #154)
+
+- `microservices/crm/runtime/src/events.rs`: `Envelope` (UUID v7
+  `event_id`, field names asserted against each service's generated
+  asyncapi payload contracts), `append` (outbox row inside the caller's
+  transaction), `relay_batch`/`run_relay` to `crm.<service>.v1` with
+  `event_type`/`workspace_id`/`schema_version` attributes and
+  `entity_id` ordering key, `consume_batch`/`run_consumer` (handler +
+  `processed_events` marker in one workspace-guarded transaction, ack
+  after commit, duplicates acked, poison bodies acked away).
+- All table access goes through the service's own Lifeguard entity via
+  the `OutboxTable`/`ProcessedTable` traits — no raw SQL except the
+  shared transaction-scoped `crm.workspace_id` guard from `context`.
+  Per-service entity impls ship with each service's data-model story.
+- A failed publish holds that entity's later rows for the rest of the
+  round (per-entity ordering; retry next round oldest-first) —
+  CodeRabbit-found ordering hazard, fixed pre-merge.
+- Pub/Sub REST client moved `crm/conversion` → shared `crm/runtime`;
+  publish body carries `orderingKey` (PubsubMessage proto field, not
+  `messageOrderingKey`).
+- Template gains the documented permissive relay SELECT policy on
+  `<schema>.outbox` (the service schema is the isolation boundary; the
+  relay reads every workspace).
+- Six `#[ignore]`d tests in `tests/events_db.rs` run the full cycle
+  over real entities when `CRM_TEST_DATABASE_URL` points at a migrated
+  CRM database.
