@@ -4716,6 +4716,7 @@ dependencies = [
  "ed25519-dalek 3.0.0",
  "http 0.2.12",
  "may_minihttp",
+ "rerp_crm_runtime",
  "serde",
  "serde_json",
  "uuid",
@@ -4937,10 +4938,18 @@ dependencies = [
 name = "rerp_crm_runtime"
 version = "0.1.0"
 dependencies = [
+ "base64 0.23.1",
  "brrtrouter",
  "chrono",
+ "http 0.2.12",
+ "lifeguard",
+ "lifeguard-derive",
+ "may",
+ "may_minihttp",
+ "sea-query",
  "serde",
  "serde_json",
+ "serde_yaml",
  "uuid",
 ]
 

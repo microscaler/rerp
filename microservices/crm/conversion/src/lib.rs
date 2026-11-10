@@ -13,7 +13,10 @@
 //! conversions only. Everything here is pure: screening needs nothing but the bytes and the public keys.
 
 pub mod provision;
-pub mod pubsub;
+
+// The shared Pub/Sub REST client lives in `rerp_crm_runtime::pubsub` (CRM-RT-02 moved it there so the event
+// relay and consumer can drive the same client); this re-export keeps `rerp_crm_conversion::pubsub` stable.
+pub use rerp_crm_runtime::pubsub;
 
 use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
