@@ -530,6 +530,25 @@ fn preflight_migration_history(migrations_root: &Path, rows: &[Row]) -> Result<(
     Ok(())
 }
 
+/// `templates/` holds authored inputs every service copies FROM (with `{{placeholder}}` bodies);
+/// Lifeguard's apply-order writer globs every `*.sql`, so drop those entries — they are inputs,
+/// never deliverables, and executing one would paste literal `{{schema}}` into the database.
+fn strip_templates_from_apply_order(migrations_root: &Path) -> Result<(), String> {
+    let path = migrations_root.join("apply_order.txt");
+    let text = std::fs::read_to_string(&path)
+        .map_err(|error| format!("could not read {}: {error}", path.display()))?;
+    let kept: Vec<&str> = text
+        .lines()
+        .filter(|line| !line.trim_start().starts_with("templates/"))
+        .collect();
+    let mut cleaned = kept.join("\n");
+    if text.ends_with('\n') {
+        cleaned.push('\n');
+    }
+    std::fs::write(&path, cleaned)
+        .map_err(|error| format!("could not write {}: {error}", path.display()))
+}
+
 fn write_service_migrations(
     migrations_root: &Path,
     service_name: &str,
@@ -616,6 +635,7 @@ fn generate_suite(suite: Suite, manifest_dir: &Path) -> Result<(), String> {
             layout.migrations_root.join("apply_order.txt").display()
         )
     })?;
+    strip_templates_from_apply_order(&layout.migrations_root)?;
 
     let seed_files = discover_seed_files(&layout.suite_root)?;
     if !seed_files.is_empty() {

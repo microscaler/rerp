@@ -1,0 +1,19 @@
+# Auto-generated FK-safe apply order. Regenerate with: cargo run -p hauliage_migrator
+audience/20261110131017_import_jobs.sql
+audience/20261110131017_lists.sql
+audience/20261110131017_organisations.sql
+audience/20261110131017_contacts.sql
+audience/20261110131017_contact_facts.sql
+audience/20261110131017_contact_notes.sql
+audience/20261110131017_segments.sql
+audience/20261110131017_bulk_jobs.sql
+audience/20261110131017_bulk_job_changes.sql
+audience/20261110131017_subscriptions.sql
+audience/20261110131017_consent_events.sql
+audience/20261110131017_suppressions.sql
+audience/20261110131017_tags.sql
+audience/20261110131017_contact_tags.sql
+audience/20261110131017_timeline_items.sql
+0001_accounts.sql
+0002_accounts_phone.sql
+audience/0002_rls_and_infrastructure.sql
