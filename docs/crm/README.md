@@ -37,7 +37,7 @@ Order: build step, then the table order. A story may start when everything in **
 | 0 | [CRM-RT-02](stories/CRM-RT-02-events.md) | events: envelope, outbox, relay, consumer | CRM-RT-01, CRM-DB-01 | 8 | — | ✅ |
 | 0 | [CRM-RT-03](stories/CRM-RT-03-audit-and-idempotency.md) | audit and idempotency | CRM-RT-01, CRM-WSP-00 | 5 | — | ⬜ |
 | 1 | [CRM-RT-05](stories/CRM-RT-05-conditions.md) | the condition tree | CRM-AUD-00 | 8 | — | ⬜ |
-| 1 | [CRM-AUD-00](stories/CRM-AUD-00-audience-data-model.md) | LifeModels and migrations | CRM-DB-01 | 5 | — | ⬜ |
+| 1 | [CRM-AUD-00](stories/CRM-AUD-00-audience-data-model.md) | LifeModels and migrations | CRM-DB-01 | 5 | — | ✅ |
 | 1 | [CRM-AUD-01](stories/CRM-AUD-01-audience-contacts.md) | Contacts, organisations and notes | CRM-AUD-00, CRM-RT-01, CRM-RT-02, CRM-RT-03 | 9 | US_55_03, US_55_04, US_55_05, US_55_11, US_55_18, US_55_19, US_55_22, US_55_23, US_55_35 | ⬜ |
 | 1 | [CRM-AUD-02](stories/CRM-AUD-02-audience-lists.md) | Lists, subscriptions, consent and suppressions | CRM-AUD-00, CRM-RT-01, CRM-RT-02, CRM-RT-03 | 6 | US_55_03, US_55_04, US_55_06, US_55_08, US_55_14, US_55_29, US_55_32 | ⬜ |
 | 1 | [CRM-AUD-03](stories/CRM-AUD-03-audience-segments.md) | Tags, segments and bulk jobs | CRM-AUD-00, CRM-RT-01, CRM-RT-02, CRM-RT-03 | 7 | US_55_03, US_55_04, US_55_07, US_55_08, US_55_29, US_55_32 | ⬜ |

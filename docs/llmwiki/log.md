@@ -1130,3 +1130,28 @@ ref-rewritten) the whole accounting suite — including
 - Six `#[ignore]`d tests in `tests/events_db.rs` run the full cycle
   over real entities when `CRM_TEST_DATABASE_URL` points at a migrated
   CRM database.
+
+## [2026-11-10] contribute | CRM story slice 4: CRM-AUD-00 audience data model (PR #155)
+
+- 15 LifeModels in `microservices/crm/audience/impl/src/models/` from
+  `openapi/crm/docs/data-model/audience.yaml`, design order and types exact;
+  generated `migrations/audience/20261110131017_*.sql` + authored
+  `0002_rls_and_infrastructure.sql` (no audience RLS exceptions).
+- Foreign keys carry the `audience.` schema prefix in `#[foreign_key]` — the
+  generated CREATE must apply without a service search_path; future services
+  follow the same rule.
+- Expression uniques (`workspace_id, lower(email)`) arrive as
+  `#[index = "UNIQUE idx_…(workspace_id, lower(email) | email)"]`; the right
+  side of `|` lists coverage columns (lifeguard expression-index grammar).
+- Composite primary keys needed lifeguard#242 (merged): more than one
+  `#[primary_key]` now emits one table-level `PRIMARY KEY (a, b)` clause and
+  no generated defaults on members. rerp's pinned lifeguard rev must bump to
+  the merged commit before the next service regenerates.
+- The suite migrator strips `templates/` from `apply_order.txt` (authored
+  `{{placeholder}}` inputs are never deliverables); `apply_order.txt` is fully
+  tool-produced — the glob FK-orders the authored 0002 last, so story step 5's
+  manual append is no longer needed.
+- Verified on throwaway Postgres 15 via `scripts/crm-db.sh` (reset/up/apply ×2)
+  as the non-superuser `crm_audience` role: A/B/unset visibility 1/0/0,
+  cross-workspace insert and the status CHECK rejected, untagged outbox insert
+  refused, 18 tables, 13 FKs, all 15 CHECKs and both composite pkeys present.
