@@ -2,6 +2,9 @@
 //!
 //! Credentials are the pod's Workload Identity, read from the GKE metadata server. With `PUBSUB_EMULATOR_HOST` set
 //! (local development), it talks plain HTTP to the emulator without credentials.
+//!
+//! This is the shared client: `crm/conversion` re-exports it (`rerp_crm_conversion::pubsub`), and the CRM event
+//! relay and consumer drive it through `crate::events::{Publisher, Subscriber}` (CRM-RT-02, `10-events.md`).
 
 use base64::engine::general_purpose::STANDARD as B64;
 use base64::Engine;
@@ -127,15 +130,27 @@ impl PubSub {
         data: &[u8],
         attributes: &[(&str, &str)],
     ) -> Result<String, String> {
+        self.publish_ordered(topic, data, attributes, "")
+    }
+
+    /// Publish with `orderingKey` set (the CRM envelope's is `entity_id`, `10-events.md`);
+    /// an empty key publishes unordered, exactly like [`Self::publish`].
+    pub fn publish_ordered(
+        &mut self,
+        topic: &str,
+        data: &[u8],
+        attributes: &[(&str, &str)],
+        ordering_key: &str,
+    ) -> Result<String, String> {
         let attrs: serde_json::Map<String, Value> = attributes
             .iter()
             .map(|(k, v)| (k.to_string(), Value::String(v.to_string())))
             .collect();
-        let v = self.call(
-            topic,
-            "publish",
-            json!({ "messages": [{ "data": B64.encode(data), "attributes": attrs }] }),
-        )?;
+        let mut message = json!({ "data": B64.encode(data), "attributes": attrs });
+        if !ordering_key.is_empty() {
+            message["orderingKey"] = Value::String(ordering_key.to_string());
+        }
+        let v = self.call(topic, "publish", json!({ "messages": [message] }))?;
         v.get("messageIds")
             .and_then(|ids| ids.get(0))
             .and_then(Value::as_str)

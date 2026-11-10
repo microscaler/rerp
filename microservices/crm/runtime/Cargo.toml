@@ -9,7 +9,17 @@ brrtrouter = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 chrono = { workspace = true }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
+lifeguard = { workspace = true }
+may_minihttp = { workspace = true }
+http_legacy = { workspace = true }
+may = { workspace = true }
+base64 = "0.23"
+
+[dev-dependencies]
+lifeguard-derive = { workspace = true }
+sea-query = { version = "1.0.2", features = ["thread-safe", "with-json", "with-chrono", "with-uuid", "with-rust_decimal"] }
+serde_yaml = "0.9"
 
 [lints]
 workspace = true

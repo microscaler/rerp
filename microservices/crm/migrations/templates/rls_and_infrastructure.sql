@@ -47,6 +47,18 @@ CREATE TABLE IF NOT EXISTS {{schema}}.idempotency_keys (
 
 -- Row-level security on every table that has workspace_id (the infrastructure tables too: the relay and the
 -- consumer set the workspace before they touch them).
+-- Exception (CRM-RT-02): the relay reads unpublished rows for EVERY workspace at once, which no single
+-- workspace GUC can satisfy. The outbox is append-only event intent inside the service's OWN schema — the
+-- schema is its isolation boundary — so its policy is permissive for reads and still forces every row to
+-- carry a workspace tag. processed_events keeps the blanket workspace-isolation policy (the consumer sets
+-- the guard before it touches the table).
+ALTER TABLE {{schema}}.outbox ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS outbox_relay_access ON {{schema}}.outbox;
+CREATE POLICY outbox_relay_access ON {{schema}}.outbox
+    AS PERMISSIVE FOR ALL
+    USING (true)
+    WITH CHECK (workspace_id IS NOT NULL);
+
 DO $$
 DECLARE
     t text;
@@ -54,6 +66,7 @@ BEGIN
     FOR t IN
         SELECT c.table_name FROM information_schema.columns c
         WHERE c.table_schema = '{{schema}}' AND c.column_name = 'workspace_id'
+          AND c.table_name <> 'outbox'
     LOOP
         EXECUTE format('ALTER TABLE {{schema}}.%I ENABLE ROW LEVEL SECURITY', t);
         EXECUTE format('ALTER TABLE {{schema}}.%I FORCE ROW LEVEL SECURITY', t);
