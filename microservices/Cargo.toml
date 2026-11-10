@@ -180,9 +180,9 @@ may_http = { git = "https://github.com/rust-may/may_http.git" }
 http_legacy = { package = "http", version = "0.2" }
 
 # Lifeguard ORM
-lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "44a2412232597d8b44c3b9f3d98689e7c9fa9547" }
-lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "44a2412232597d8b44c3b9f3d98689e7c9fa9547" }
-lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "44a2412232597d8b44c3b9f3d98689e7c9fa9547" }
+lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
+lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
+lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
 rerp_entities = { package = "rerp-entities", path = "accounting/entities" }
 
 # Standard dependencies
