@@ -10,7 +10,7 @@
 //!
 //! Story: CRM-RT-02 (docs/crm/stories/).
 
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
@@ -351,7 +351,13 @@ pub fn relay_batch<O: OutboxTable, E: LifeExecutor, P: Publisher + ?Sized>(
     let topic = topic_for(project, service);
     let rows = O::unpublished(exec, u64::from(EVENT_BATCH_SIZE))?;
     let mut report = RelayReport::default();
+    // One failed publish stops the entity for the rest of the round: the ordering key promises per-entity
+    // order, so a newer row for the same entity must wait for the retry (next round, oldest-first).
+    let mut held: HashSet<String> = HashSet::new();
     for row in rows {
+        if held.contains(&row.entity_id) {
+            continue;
+        }
         let body = serde_json::to_vec(&row.payload).map_err(event_db_error)?;
         let workspace_id = row.workspace_id.to_string();
         let attributes: Vec<(&str, &str)> = vec![
@@ -365,6 +371,7 @@ pub fn relay_batch<O: OutboxTable, E: LifeExecutor, P: Publisher + ?Sized>(
                 report.published += 1;
             }
             Err(error) => {
+                held.insert(row.entity_id.clone());
                 let reason = format!("publish to {topic}: {error}");
                 O::record_failure(exec, row.id, &reason)?;
                 report.failed += 1;
@@ -660,14 +667,15 @@ mod tests {
         }
 
         fn unpublished<E: LifeExecutor>(_exec: &E, limit: u64) -> Result<Vec<OutboxRow>, ApiError> {
-            let mut rows = shared(&OUTBOX_ROWS);
-            rows.sort_by_key(|row| row.occurred_at);
-            let taken: Vec<OutboxRow> = rows
+            // Mirrors the real partial-index read: unpublished rows only, oldest first.
+            let mut rows: Vec<OutboxRow> = shared(&OUTBOX_ROWS)
                 .iter()
-                .take(usize::try_from(limit).unwrap_or(usize::MAX))
+                .filter(|row| row.published_at.is_none())
                 .cloned()
                 .collect();
-            Ok(taken)
+            rows.sort_by_key(|row| row.occurred_at);
+            rows.truncate(usize::try_from(limit).unwrap_or(usize::MAX));
+            Ok(rows)
         }
 
         fn mark_published<E: LifeExecutor>(
@@ -842,10 +850,14 @@ mod tests {
     }
 
     fn seed_row(event_type: &str) -> OutboxRow {
+        seed_row_entity(event_type, "entity-1")
+    }
+
+    fn seed_row_entity(event_type: &str, entity_id: &str) -> OutboxRow {
         let envelope = build_envelope::<FakeOutbox, _>(
             &ctx(),
             event_type,
-            "entity-1",
+            entity_id,
             &serde_json::json!({"k": 1}),
         )
         .expect("build envelope");
@@ -898,27 +910,27 @@ mod tests {
         let body: Value = serde_json::from_slice(&message.body).expect("body is JSON");
         assert_eq!(body["event_id"].as_str(), Some(row.id.to_string().as_str()));
 
-        // The row is marked published; a second round has nothing left (AC-1 ordering half).
+        // The row is marked published; a second round finds nothing and republishes nothing (AC-1).
         assert_eq!(shared(&OUTBOX_MARKS).as_slice(), &[row.id]);
         let again = relay_batch::<FakeOutbox, NoopExec, MemoryPublisher>(
             &NoopExec, "p", "audience", &publisher,
         )
         .expect("second relay round");
-        // The fake read ignores published_at like nothing else would; verify the mark, not a re-read.
         assert_eq!(
             again.published + again.failed,
-            publisher.messages().len() - 1
+            0,
+            "published rows are never republished"
         );
-        assert!(shared(&OUTBOX_ROWS)
-            .iter()
-            .all(|r| r.published_at.is_some()));
+        assert_eq!(publisher.messages().len(), 1);
     }
 
     #[test]
     fn relay_records_failures_and_retries_next_round() {
         let _serial = shared(&FAKE_LOCK);
         reset_fakes();
-        let row = seed_row("contact.updated");
+        // Two events for the same entity: the newer one must not overtake the failed older one.
+        let older = seed_row_entity("contact.created", "entity-9");
+        let row = seed_row_entity("contact.updated", "entity-9");
         let publisher = MemoryPublisher::default();
         publisher.set_failing(true);
 
@@ -931,25 +943,40 @@ mod tests {
 
         let failures = shared(&OUTBOX_FAILURES).clone();
         assert_eq!(failures.len(), 1);
-        assert_eq!(failures[0].0, row.id);
+        assert_eq!(failures[0].0, older.id);
         assert!(failures[0]
             .1
             .contains("publish to projects/p/topics/crm.audience.v1"));
-        let (published_at, attempts) = {
-            let rows = shared(&OUTBOX_ROWS);
-            (rows[0].published_at, rows[0].attempts)
-        };
-        assert!(published_at.is_none());
-        assert_eq!(attempts, 1);
+        let attempts: Vec<i32> = shared(&OUTBOX_ROWS)
+            .iter()
+            .map(|r| (r.occurred_at, r.attempts, r.published_at))
+            .map(|(_, attempts, published_at)| {
+                assert!(published_at.is_none());
+                attempts
+            })
+            .collect();
+        // The failed row is counted; the newer same-entity row is held untouched for the retry.
+        assert_eq!(attempts, vec![1, 0]);
 
-        // Next round retries the same row (at-least-once).
+        // Next round retries oldest-first and preserves the entity's order (at-least-once, ordered).
         publisher.set_failing(false);
         let retry = relay_batch::<FakeOutbox, NoopExec, MemoryPublisher>(
             &NoopExec, "p", "audience", &publisher,
         )
         .expect("retry round");
-        assert_eq!(retry.published, 1);
-        assert_eq!(publisher.messages().len(), 1);
+        assert_eq!(retry.published, 2);
+        let messages = publisher.messages();
+        assert_eq!(messages.len(), 2);
+        let first: Value = serde_json::from_slice(&messages[0].body).expect("body JSON");
+        let second: Value = serde_json::from_slice(&messages[1].body).expect("body JSON");
+        assert_eq!(
+            first["event_id"].as_str(),
+            Some(older.id.to_string().as_str())
+        );
+        assert_eq!(
+            second["event_id"].as_str(),
+            Some(row.id.to_string().as_str())
+        );
     }
 
     #[test]

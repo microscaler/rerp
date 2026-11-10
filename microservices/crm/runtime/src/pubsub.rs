@@ -133,7 +133,7 @@ impl PubSub {
         self.publish_ordered(topic, data, attributes, "")
     }
 
-    /// Publish with `messageOrderingKey` set (the CRM envelope's is `entity_id`, `10-events.md`);
+    /// Publish with `orderingKey` set (the CRM envelope's is `entity_id`, `10-events.md`);
     /// an empty key publishes unordered, exactly like [`Self::publish`].
     pub fn publish_ordered(
         &mut self,
@@ -148,7 +148,7 @@ impl PubSub {
             .collect();
         let mut message = json!({ "data": B64.encode(data), "attributes": attrs });
         if !ordering_key.is_empty() {
-            message["messageOrderingKey"] = Value::String(ordering_key.to_string());
+            message["orderingKey"] = Value::String(ordering_key.to_string());
         }
         let v = self.call(topic, "publish", json!({ "messages": [message] }))?;
         v.get("messageIds")
