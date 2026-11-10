@@ -9,3 +9,19 @@
 pub mod entity_registry {
     include!(concat!(env!("OUT_DIR"), "/entity_registry.rs"));
 }
+
+pub mod bulk_job_changes;
+pub mod bulk_jobs;
+pub mod consent_events;
+pub mod contact_facts;
+pub mod contact_notes;
+pub mod contact_tags;
+pub mod contacts;
+pub mod import_jobs;
+pub mod lists;
+pub mod organisations;
+pub mod segments;
+pub mod subscriptions;
+pub mod suppressions;
+pub mod tags;
+pub mod timeline_items;
