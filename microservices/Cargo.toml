@@ -173,16 +173,16 @@ tracing = "0.1"
 # BRRTRouter: default-features = false so arm7 cross build does not pull in jemalloc (__ffsdi2 link error)
 brrtrouter = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "cb10df40d46c83811aa5a3016388e5b92af8df6a", default-features = false }
 brrtrouter_macros = { git = "https://github.com/microscaler/BRRTRouter.git", rev = "cb10df40d46c83811aa5a3016388e5b92af8df6a" }
-sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", rev = "02ceb2bff70edb33fd5a98690aa7899fc0031f4e" }
+sesame-idam-client = { git = "https://github.com/microscaler/sesame-idam-client.git", tag = "v0.1.0" }
 # Gen crate dependencies (from brrtrouter-gen Phase 1)
 arc-swap = "1.7"
 may_http = { git = "https://github.com/rust-may/may_http.git" }
 http_legacy = { package = "http", version = "0.2" }
 
 # Lifeguard ORM
-lifeguard = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
-lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
-lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", rev = "9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5" }
+lifeguard = { git = "https://github.com/microscaler/lifeguard.git", tag = "v0.1.1" }
+lifeguard-derive = { git = "https://github.com/microscaler/lifeguard.git", tag = "v0.1.1" }
+lifeguard-migrate = { git = "https://github.com/microscaler/lifeguard.git", tag = "v0.1.1" }
 rerp_entities = { package = "rerp-entities", path = "accounting/entities" }
 
 # Standard dependencies

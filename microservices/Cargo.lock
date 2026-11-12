@@ -2346,7 +2346,7 @@ checksum = "2e126dda6f34391ab7b444f9922055facc83c07a910da3eb16f1e4d9c45dc777"
 [[package]]
 name = "lifeguard"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
+source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "bytes",
  "chrono",
@@ -2384,7 +2384,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-derive"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
+source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2394,7 +2394,7 @@ dependencies = [
 [[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
+source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "anyhow",
  "chrono",
@@ -5508,7 +5508,7 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=02ceb2bff70edb33fd5a98690aa7899fc0031f4e#02ceb2bff70edb33fd5a98690aa7899fc0031f4e"
+source = "git+https://github.com/microscaler/sesame-idam-client.git?tag=v0.1.0#02ceb2bff70edb33fd5a98690aa7899fc0031f4e"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",
