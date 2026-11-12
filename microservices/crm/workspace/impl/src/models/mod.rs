@@ -9,3 +9,21 @@
 pub mod entity_registry {
     include!(concat!(env!("OUT_DIR"), "/entity_registry.rs"));
 }
+
+pub mod api_keys;
+pub mod audit_entries;
+pub mod brand_kits;
+pub mod compliance_settings;
+pub mod custom_fields;
+pub mod data_request_steps;
+pub mod data_requests;
+pub mod field_groups;
+pub mod integrations;
+pub mod invitations;
+pub mod job_errors;
+pub mod jobs;
+pub mod memberships;
+pub mod notification_rules;
+pub mod webhook_delivery_logs;
+pub mod webhooks;
+pub mod workspaces;

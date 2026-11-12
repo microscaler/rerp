@@ -444,7 +444,6 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a#cb10df40d46c83811aa5a3016388e5b92af8df6a"
 dependencies = [
  "anyhow",
  "arc-swap",
@@ -500,7 +499,6 @@ dependencies = [
 [[package]]
 name = "brrtrouter_macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a#cb10df40d46c83811aa5a3016388e5b92af8df6a"
 dependencies = [
  "heck 0.5.0",
  "proc-macro2",
@@ -2346,7 +2344,6 @@ checksum = "2e126dda6f34391ab7b444f9922055facc83c07a910da3eb16f1e4d9c45dc777"
 [[package]]
 name = "lifeguard"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "bytes",
  "chrono",
@@ -2359,7 +2356,7 @@ dependencies = [
  "log",
  "may",
  "may_minihttp",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
+ "may_postgres",
  "may_tracing",
  "microscaler-timing",
  "once_cell",
@@ -2384,7 +2381,6 @@ dependencies = [
 [[package]]
 name = "lifeguard-derive"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2394,7 +2390,6 @@ dependencies = [
 [[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/lifeguard.git?rev=9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
 dependencies = [
  "anyhow",
  "chrono",
@@ -2405,7 +2400,7 @@ dependencies = [
  "lifeguard",
  "lifeguard-derive",
  "log",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
+ "may_postgres",
  "pathdiff",
  "regex",
  "rust_decimal",
@@ -2534,7 +2529,6 @@ dependencies = [
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork#0f9df0e6ad7d8aa1ade256c2c4e85b6132027a59"
 dependencies = [
  "byteorder",
  "bytes",
@@ -2548,25 +2542,6 @@ dependencies = [
  "postgres-types",
  "rustls",
  "rustls-pemfile",
- "smallvec",
- "spin 0.9.9",
-]
-
-[[package]]
-name = "may_postgres"
-version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?branch=master#0f93c04ae2a372e7a909093255e967d370d2cfb2"
-dependencies = [
- "byteorder",
- "bytes",
- "crossbeam",
- "fallible-iterator",
- "log",
- "may",
- "percent-encoding",
- "phf",
- "postgres-protocol",
- "postgres-types",
  "smallvec",
  "spin 0.9.9",
 ]
@@ -2646,10 +2621,9 @@ checksum = "c2a86d3146ed3995b5913c414f6664344b9617457320782e64f0bb44afd49d74"
 [[package]]
 name = "microscaler-observability"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?rev=2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f#2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f"
 dependencies = [
  "backtrace",
- "base64 0.22.1",
+ "base64 0.23.1",
  "flate2",
  "jemalloc_pprof",
  "opentelemetry",
@@ -2659,7 +2633,7 @@ dependencies = [
  "opentelemetry_sdk",
  "pprof",
  "serde_json",
- "thiserror 1.0.69",
+ "thiserror 2.0.21",
  "tikv-jemalloc-sys",
  "tokio",
  "tracing",
@@ -4590,7 +4564,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_acquisition_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4633,7 +4607,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_audience_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4676,7 +4650,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_automation_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4772,7 +4746,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_insights_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4815,7 +4789,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_intake_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4858,7 +4832,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_messaging_gen",
  "rerp_crm_runtime",
  "rust_decimal",
@@ -4965,7 +4939,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_runtime",
  "rerp_crm_sales_gen",
  "rust_decimal",
@@ -5008,7 +4982,7 @@ dependencies = [
  "lifeguard-derive",
  "lifeguard-migrate",
  "may",
- "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
+ "may_postgres",
  "rerp_crm_runtime",
  "rerp_crm_workspace_gen",
  "rust_decimal",
@@ -5508,7 +5482,6 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?rev=02ceb2bff70edb33fd5a98690aa7899fc0031f4e#02ceb2bff70edb33fd5a98690aa7899fc0031f4e"
 dependencies = [
  "base64 0.22.1",
  "brrtrouter",
