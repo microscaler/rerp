@@ -5,6 +5,8 @@ pub mod ar_aging;
 pub mod ar_payment;
 pub mod ar_payment_application;
 pub mod ar_payment_application_event;
+pub mod ar_statement_job;
+pub mod ar_statement_render_instruction;
 pub mod customer_invoice;
 
 pub mod entity_registry {
