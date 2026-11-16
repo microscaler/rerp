@@ -100,7 +100,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -111,7 +111,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -637,7 +637,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1386,7 +1386,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -1896,7 +1896,7 @@ dependencies = [
  "hyper",
  "libc",
  "pin-project-lite",
- "socket2",
+ "socket2 0.6.5",
  "tokio",
  "tower-service",
  "tracing",
@@ -2355,7 +2355,7 @@ dependencies = [
  "csv",
  "fake",
  "libc",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1)",
  "log",
  "may",
  "may_minihttp",
@@ -2392,6 +2392,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "lifeguard-derive"
+version = "0.1.0"
+source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3#23fa43cf98aaa18ac213a671bccca380e98ddebf"
+dependencies = [
+ "lifeguard-typemap",
+ "proc-macro2",
+ "quote",
+ "syn 3.0.9",
+]
+
+[[package]]
 name = "lifeguard-migrate"
 version = "0.1.0"
 source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1#9c2a0c19ce4ec03bf2cafe12a8da776b188cd0a5"
@@ -2403,7 +2414,7 @@ dependencies = [
  "dotenv",
  "env_logger",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.1)",
  "log",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork)",
  "pathdiff",
@@ -2417,6 +2428,11 @@ dependencies = [
  "toml",
  "uuid",
 ]
+
+[[package]]
+name = "lifeguard-typemap"
+version = "0.1.0"
+source = "git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3#23fa43cf98aaa18ac213a671bccca380e98ddebf"
 
 [[package]]
 name = "linux-raw-sys"
@@ -2505,14 +2521,14 @@ dependencies = [
  "parking_lot",
  "rustversion",
  "smallvec",
- "socket2",
+ "socket2 0.6.5",
  "windows-sys 0.61.2",
 ]
 
 [[package]]
 name = "may_minihttp"
 version = "0.1.11"
-source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#e3967b89bc1d5d3a2db863c6248c9dd004e94a3c"
+source = "git+https://github.com/microscaler/may_minihttp.git?branch=integration%2Fmicroscaler-fork#8c47df186c9cff7edc0a693c718ff3fb9f89651a"
 dependencies = [
  "bytes",
  "generator",
@@ -2534,7 +2550,7 @@ dependencies = [
 [[package]]
 name = "may_postgres"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork#0f9df0e6ad7d8aa1ade256c2c4e85b6132027a59"
+source = "git+https://github.com/microscaler/may_postgres.git?branch=integration%2Fmicroscaler-fork#8c7fecf401ecc75fae88dcf07509930c094e7c40"
 dependencies = [
  "byteorder",
  "bytes",
@@ -2549,6 +2565,7 @@ dependencies = [
  "rustls",
  "rustls-pemfile",
  "smallvec",
+ "socket2 0.5.10",
  "spin 0.9.9",
 ]
 
@@ -2671,7 +2688,7 @@ dependencies = [
 [[package]]
 name = "microscaler-timing"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?branch=main#4bcc9333668b15af88b09ce6ec3e215b5261a06a"
+source = "git+https://github.com/microscaler/microscaler-observability.git?branch=main#412b7342ac3c423a6cb539bf21873eb86960abfa"
 dependencies = [
  "microscaler-timing-macros",
 ]
@@ -2679,11 +2696,11 @@ dependencies = [
 [[package]]
 name = "microscaler-timing-macros"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/microscaler-observability.git?branch=main#4bcc9333668b15af88b09ce6ec3e215b5261a06a"
+source = "git+https://github.com/microscaler/microscaler-observability.git?branch=main#412b7342ac3c423a6cb539bf21873eb86960abfa"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.119",
+ "syn 3.0.9",
 ]
 
 [[package]]
@@ -2808,7 +2825,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3452,7 +3469,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
 dependencies = [
  "bytes",
- "heck 0.4.1",
+ "heck 0.5.0",
  "itertools 0.12.1",
  "log",
  "multimap",
@@ -3656,7 +3673,7 @@ dependencies = [
  "percent-encoding",
  "ryu",
  "sha1_smol",
- "socket2",
+ "socket2 0.6.5",
  "url",
  "xxhash-rust",
 ]
@@ -3755,7 +3772,7 @@ version = "0.1.23"
 dependencies = [
  "chrono",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "rust_decimal",
  "sea-query",
@@ -3777,7 +3794,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -3824,7 +3841,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -3875,7 +3892,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -3962,7 +3979,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4051,7 +4068,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4178,7 +4195,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4226,7 +4243,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4273,7 +4290,7 @@ dependencies = [
  "config",
  "http 1.5.0",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4328,7 +4345,7 @@ dependencies = [
  "http 1.5.0",
  "jsonwebtoken",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_minihttp",
@@ -4587,7 +4604,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4630,7 +4647,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4673,7 +4690,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4769,7 +4786,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4812,7 +4829,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4855,7 +4872,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -4943,7 +4960,7 @@ dependencies = [
  "chrono",
  "http 0.2.12",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "may",
  "may_minihttp",
  "sea-query",
@@ -4962,7 +4979,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -5005,7 +5022,7 @@ dependencies = [
  "chrono",
  "clap",
  "lifeguard",
- "lifeguard-derive",
+ "lifeguard-derive 0.1.0 (git+https://github.com/microscaler/lifeguard.git?tag=v0.1.3)",
  "lifeguard-migrate",
  "may",
  "may_postgres 0.1.0 (git+https://github.com/microscaler/may_postgres.git?branch=master)",
@@ -5237,7 +5254,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5303,7 +5320,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5658,12 +5675,22 @@ dependencies = [
 
 [[package]]
 name = "socket2"
+version = "0.5.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e22376abed350d73dd1cd119b57ffccad95b4e585a7cda43e286245ce23c0678"
+dependencies = [
+ "libc",
+ "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "socket2"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5830,10 +5857,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd"
 dependencies = [
  "fastrand",
- "getrandom 0.3.4",
+ "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -5981,7 +6008,7 @@ dependencies = [
  "libc",
  "mio",
  "pin-project-lite",
- "socket2",
+ "socket2 0.6.5",
  "tokio-macros",
  "windows-sys 0.61.2",
 ]
@@ -6092,7 +6119,7 @@ dependencies = [
  "hyper-util",
  "percent-encoding",
  "pin-project",
- "socket2",
+ "socket2 0.6.5",
  "sync_wrapper",
  "tokio",
  "tokio-stream",
@@ -6583,7 +6610,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.61.2",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
