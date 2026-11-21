@@ -69,7 +69,7 @@ pub struct ItemFacts<'a> {
     pub today: NaiveDate,
 }
 
-fn money(value: Decimal) -> String {
+pub(crate) fn money(value: Decimal) -> String {
     value.round_dp(6).normalize().to_string()
 }
 
@@ -641,7 +641,7 @@ impl BucketTotals {
 
 /// Same shape as `chargeback_documents` plus the as-of cutoff and
 /// currency/customer narrowing — keep the two in lockstep by intent.
-fn as_of_chargeback_documents<E: LifeExecutor>(
+pub(crate) fn as_of_chargeback_documents<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entities: &[Uuid],
@@ -672,7 +672,7 @@ fn as_of_chargeback_documents<E: LifeExecutor>(
 }
 
 /// `credit_note_totals` with the same as-of cutoff on the NOTE's posting.
-fn as_of_credit_note_totals<E: LifeExecutor>(
+pub(crate) fn as_of_credit_note_totals<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entities: &[Uuid],
@@ -708,7 +708,7 @@ fn as_of_credit_note_totals<E: LifeExecutor>(
 
 /// Overlay rows for the write-off facts ONLY (keys and `write_off_amount`);
 /// the cache columns on these rows are deliberately never read here.
-fn aging_overlays<E: LifeExecutor>(
+pub(crate) fn aging_overlays<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     legal_entities: &[Uuid],
@@ -725,17 +725,28 @@ fn aging_overlays<E: LifeExecutor>(
         .map_err(|error| ArError::Database(error.to_string()))
 }
 
-/// Net applied per posted document, replayed from the immutable event
-/// journal: +APPLIED, -REVERSED, `occurred_at` before the cutoff. Rows
-/// cannot answer history — reversal zeroes `applied_amount` in place.
-fn as_of_applied_totals<E: LifeExecutor>(
+/// One application's net position as of the cutoff, replayed from the
+/// immutable event journal: +APPLIED, -REVERSED, `occurred_at` before the
+/// cutoff. Rows cannot answer history — reversal zeroes `applied_amount`
+/// in place. `invoice_id` is the POSTED DOCUMENT id (resolved through the
+/// overlay row the application targets).
+pub(crate) struct ApplicationAsOf {
+    pub invoice_id: Uuid,
+    pub application_id: Uuid,
+    pub net_amount: Decimal,
+    pub applied_at: chrono::NaiveDateTime,
+}
+
+/// The journal replay every as-of consumer shares (aging totals and the
+/// frozen statement render model), in deterministic applied order.
+pub(crate) fn as_of_application_details<E: LifeExecutor>(
     executor: &E,
     session: &SessionContext,
     overlays: &[CustomerInvoiceModel],
     occurred_before: NaiveDateTime,
-) -> Result<HashMap<Uuid, Decimal>, ArError> {
+) -> Result<Vec<ApplicationAsOf>, ArError> {
     if overlays.is_empty() {
-        return Ok(HashMap::new());
+        return Ok(Vec::new());
     }
     let overlay_to_document: HashMap<Uuid, Uuid> = overlays
         .iter()
@@ -743,7 +754,7 @@ fn as_of_applied_totals<E: LifeExecutor>(
         .collect();
     // Chunked IN lists: every statement stays far below the driver's 16-bit
     // bind-parameter limit regardless of how many overlays the scope holds.
-    let mut application_to_document: HashMap<Uuid, Uuid> = HashMap::new();
+    let mut application_meta: HashMap<Uuid, (Uuid, chrono::NaiveDateTime)> = HashMap::new();
     let overlay_ids: Vec<Uuid> = overlay_to_document.keys().copied().collect();
     for chunk in overlay_ids.chunks(ID_CHUNK) {
         let applications = ApplicationEntity::find()
@@ -754,21 +765,21 @@ fn as_of_applied_totals<E: LifeExecutor>(
             .map_err(|error| ArError::Database(error.to_string()))?;
         for row in applications {
             if let Some(document_id) = overlay_to_document.get(&row.invoice_id) {
-                application_to_document.insert(row.id, *document_id);
+                application_meta.insert(row.id, (*document_id, row.applied_at));
             }
         }
-        if application_to_document.len() as i64 > MAX_AGE_APPLICATIONS {
+        if application_meta.len() as i64 > MAX_AGE_APPLICATIONS {
             return Err(ArError::Validation(format!(
                 "application rows exceed the {MAX_AGE_APPLICATIONS}-row read bound; narrow the scope"
             )));
         }
     }
-    if application_to_document.is_empty() {
-        return Ok(HashMap::new());
+    if application_meta.is_empty() {
+        return Ok(Vec::new());
     }
-    let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
+    let mut nets: HashMap<Uuid, Decimal> = HashMap::new();
     let mut seen_events: i64 = 0;
-    let application_ids: Vec<Uuid> = application_to_document.keys().copied().collect();
+    let application_ids: Vec<Uuid> = application_meta.keys().copied().collect();
     for chunk in application_ids.chunks(ID_CHUNK) {
         // Fetch at most the REMAINING event budget: the database stops scanning
         // at the LIMIT, so an over-budget history is rejected without ever
@@ -789,15 +800,41 @@ fn as_of_applied_totals<E: LifeExecutor>(
         }
         seen_events += events.len() as i64;
         for event in &events {
-            let Some(document_id) = application_to_document.get(&event.application_id) else {
+            if !application_meta.contains_key(&event.application_id) {
                 continue;
-            };
+            }
             let delta = match event.kind.as_str() {
                 "APPLIED" => event.amount,
                 _ => -event.amount,
             };
-            *totals.entry(*document_id).or_insert(Decimal::ZERO) += delta;
+            *nets.entry(event.application_id).or_insert(Decimal::ZERO) += delta;
         }
+    }
+    let mut details: Vec<ApplicationAsOf> = application_meta
+        .iter()
+        .map(|(application_id, (invoice_id, applied_at))| ApplicationAsOf {
+            invoice_id: *invoice_id,
+            application_id: *application_id,
+            net_amount: nets.get(application_id).copied().unwrap_or(Decimal::ZERO),
+            applied_at: *applied_at,
+        })
+        .collect();
+    details.sort_by(|left, right| {
+        (left.applied_at, left.application_id).cmp(&(right.applied_at, right.application_id))
+    });
+    Ok(details)
+}
+
+/// Net applied per posted document, folded from the shared replay.
+fn as_of_applied_totals<E: LifeExecutor>(
+    executor: &E,
+    session: &SessionContext,
+    overlays: &[CustomerInvoiceModel],
+    occurred_before: NaiveDateTime,
+) -> Result<HashMap<Uuid, Decimal>, ArError> {
+    let mut totals: HashMap<Uuid, Decimal> = HashMap::new();
+    for detail in as_of_application_details(executor, session, overlays, occurred_before)? {
+        *totals.entry(detail.invoice_id).or_insert(Decimal::ZERO) += detail.net_amount;
     }
     Ok(totals)
 }

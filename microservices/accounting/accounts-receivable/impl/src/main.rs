@@ -19,6 +19,7 @@ mod impl_registry;
 mod ledger;
 mod payments;
 mod projection;
+mod statements;
 use brrtrouter::dispatcher::Dispatcher;
 use brrtrouter::middleware::MetricsMiddleware;
 use brrtrouter::router::Router;
