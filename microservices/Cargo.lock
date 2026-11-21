@@ -100,7 +100,7 @@ version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "40c48f72fd53cd289104fc64099abca73db4166ad86ea0b4341abe65af83dadc"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -111,7 +111,7 @@ checksum = "291e6a250ff86cd4a820112fb8898808a366d8f9f58ce16d1f538353ad55747d"
 dependencies = [
  "anstyle",
  "once_cell_polyfill",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -444,6 +444,62 @@ dependencies = [
 [[package]]
 name = "brrtrouter"
 version = "0.1.0-alpha.1"
+source = "git+https://github.com/microscaler/BRRTRouter.git?tag=v0.1.1#ebf727e0007989569600b48b93af40ff15353acf"
+dependencies = [
+ "anyhow",
+ "arc-swap",
+ "askama",
+ "base64 0.23.1",
+ "clap",
+ "dashmap",
+ "flate2",
+ "hmac 0.13.0",
+ "http 0.2.12",
+ "http 1.5.0",
+ "jsonschema",
+ "jsonwebtoken",
+ "libc",
+ "lru",
+ "may",
+ "may_minihttp",
+ "may_tracing 0.1.1 (git+https://github.com/microscaler/may_tracing.git?tag=v0.1.2)",
+ "memory-stats",
+ "microscaler-observability 0.1.0 (git+https://github.com/microscaler/microscaler-observability.git?rev=e85aaad340a7cd4380c3ec417240dd3aa521cbb8)",
+ "microscaler-timing 0.1.0 (git+https://github.com/microscaler/microscaler-observability.git?branch=main)",
+ "minijinja",
+ "notify",
+ "oas3 0.22.0",
+ "once_cell",
+ "opentelemetry 0.33.1",
+ "opentelemetry-semantic-conventions 0.33.1",
+ "opentelemetry_sdk 0.33.1",
+ "prost 0.14.4",
+ "regex",
+ "rustls",
+ "rustls-native-certs",
+ "rustls-pemfile",
+ "rustls-platform-verifier",
+ "serde",
+ "serde_json",
+ "serde_yaml",
+ "sha2 0.11.1",
+ "signal-hook",
+ "smallvec",
+ "tokio",
+ "toml",
+ "tonic",
+ "tracing",
+ "tracing-appender",
+ "tracing-opentelemetry 0.34.0",
+ "tracing-subscriber",
+ "ulid 3.0.0",
+ "url",
+ "urlencoding",
+]
+
+[[package]]
+name = "brrtrouter"
+version = "0.1.0-alpha.1"
 source = "git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a#cb10df40d46c83811aa5a3016388e5b92af8df6a"
 dependencies = [
  "anyhow",
@@ -464,14 +520,14 @@ dependencies = [
  "may_minihttp",
  "may_tracing 0.1.1 (git+https://github.com/microscaler/may_tracing.git?tag=v0.1.1)",
  "memory-stats",
- "microscaler-observability",
+ "microscaler-observability 0.1.0 (git+https://github.com/microscaler/microscaler-observability.git?rev=2b7e35c7a64e5a70e035d1b4fc6527bd1ea2751f)",
  "microscaler-timing 0.1.0 (git+https://github.com/microscaler/microscaler-observability.git?branch=main)",
  "minijinja",
  "notify",
- "oas3",
+ "oas3 0.21.0",
  "once_cell",
  "opentelemetry 0.31.0",
- "opentelemetry-semantic-conventions",
+ "opentelemetry-semantic-conventions 0.31.0",
  "opentelemetry_sdk 0.31.0",
  "prost 0.14.4",
  "regex",
@@ -490,9 +546,9 @@ dependencies = [
  "tonic",
  "tracing",
  "tracing-appender",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.32.1",
  "tracing-subscriber",
- "ulid",
+ "ulid 1.2.1",
  "url",
  "urlencoding",
 ]
@@ -637,7 +693,7 @@ version = "3.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "faf9468729b8cbcea668e36183cb69d317348c2e08e994829fb56ebfdfbaac34"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -1386,7 +1442,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2588,7 +2644,7 @@ dependencies = [
  "opentelemetry 0.31.0",
  "opentelemetry_sdk 0.31.0",
  "tracing",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.32.1",
 ]
 
 [[package]]
@@ -2597,7 +2653,10 @@ version = "0.1.1"
 source = "git+https://github.com/microscaler/may_tracing.git?tag=v0.1.2#5f3ab984c15aa09d867561d8a5ff7232a45ace2e"
 dependencies = [
  "may",
+ "opentelemetry 0.33.1",
+ "opentelemetry_sdk 0.33.1",
  "tracing",
+ "tracing-opentelemetry 0.34.0",
 ]
 
 [[package]]
@@ -2660,9 +2719,9 @@ dependencies = [
  "flate2",
  "jemalloc_pprof",
  "opentelemetry 0.31.0",
- "opentelemetry-appender-tracing",
- "opentelemetry-otlp",
- "opentelemetry-semantic-conventions",
+ "opentelemetry-appender-tracing 0.31.1",
+ "opentelemetry-otlp 0.31.0",
+ "opentelemetry-semantic-conventions 0.31.0",
  "opentelemetry_sdk 0.31.0",
  "pprof",
  "serde_json",
@@ -2670,7 +2729,32 @@ dependencies = [
  "tikv-jemalloc-sys",
  "tokio",
  "tracing",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.32.1",
+ "tracing-subscriber",
+ "ureq",
+]
+
+[[package]]
+name = "microscaler-observability"
+version = "0.1.0"
+source = "git+https://github.com/microscaler/microscaler-observability.git?rev=e85aaad340a7cd4380c3ec417240dd3aa521cbb8#e85aaad340a7cd4380c3ec417240dd3aa521cbb8"
+dependencies = [
+ "backtrace",
+ "base64 0.23.1",
+ "flate2",
+ "jemalloc_pprof",
+ "opentelemetry 0.33.1",
+ "opentelemetry-appender-tracing 0.33.1",
+ "opentelemetry-otlp 0.33.1",
+ "opentelemetry-semantic-conventions 0.33.1",
+ "opentelemetry_sdk 0.33.1",
+ "pprof",
+ "serde_json",
+ "thiserror 2.0.21",
+ "tikv-jemalloc-sys",
+ "tokio",
+ "tracing",
+ "tracing-opentelemetry 0.34.0",
  "tracing-subscriber",
  "ureq",
 ]
@@ -2833,7 +2917,7 @@ version = "0.50.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7957b9740744892f114936ab4a57b3f487491bbeafaf8083688b16841a4240e5"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -2976,6 +3060,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "oas3"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da5a5aa72eddcc53edfd06f287a2c10f872d88e8b72c650234cd8a227572424a"
+dependencies = [
+ "derive_more",
+ "http 1.5.0",
+ "indexmap",
+ "log",
+ "once_cell",
+ "regex",
+ "semver",
+ "serde",
+ "serde_json",
+ "url",
+ "yaml_serde",
+]
+
+[[package]]
 name = "object"
 version = "0.40.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3048,7 +3151,19 @@ dependencies = [
  "opentelemetry 0.31.0",
  "tracing",
  "tracing-core",
- "tracing-opentelemetry",
+ "tracing-opentelemetry 0.32.1",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "opentelemetry-appender-tracing"
+version = "0.33.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1f01f1c53c46ce80e5fd8cb7a646f13766fd8f315a8a5b75b9bad59a08d2c5c7"
+dependencies = [
+ "opentelemetry 0.33.1",
+ "tracing",
+ "tracing-core",
  "tracing-subscriber",
 ]
 
@@ -3060,12 +3175,29 @@ checksum = "7a2366db2dca4d2ad033cad11e6ee42844fd727007af5ad04a1730f4cb8163bf"
 dependencies = [
  "http 1.5.0",
  "opentelemetry 0.31.0",
- "opentelemetry-proto",
+ "opentelemetry-proto 0.31.0",
  "opentelemetry_sdk 0.31.0",
  "prost 0.14.4",
  "thiserror 2.0.21",
  "tokio",
  "tonic",
+]
+
+[[package]]
+name = "opentelemetry-otlp"
+version = "0.33.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0756af24841e367128ef31c831999937b8b5c5197d47914590d8f4e2e88c2e1a"
+dependencies = [
+ "http 1.5.0",
+ "opentelemetry 0.33.1",
+ "opentelemetry-proto 0.33.1",
+ "opentelemetry_sdk 0.33.1",
+ "prost 0.14.4",
+ "thiserror 2.0.21",
+ "tokio",
+ "tonic",
+ "tonic-types",
 ]
 
 [[package]]
@@ -3095,10 +3227,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "opentelemetry-proto"
+version = "0.33.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d576f5dddc3299341bcd85a04be17b2564844c0c9563214f02d85f2524d1afae"
+dependencies = [
+ "opentelemetry 0.33.1",
+ "opentelemetry_sdk 0.33.1",
+ "prost 0.14.4",
+ "tonic",
+ "tonic-prost",
+]
+
+[[package]]
 name = "opentelemetry-semantic-conventions"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e62e29dfe041afb8ed2a6c9737ab57db4907285d999ef8ad3a59092a36bdc846"
+
+[[package]]
+name = "opentelemetry-semantic-conventions"
+version = "0.33.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a3cf639fefd3e852869114f9925b578da6dd8e99281a2089bb0e773ead46962"
 
 [[package]]
 name = "opentelemetry_sdk"
@@ -3127,8 +3278,12 @@ dependencies = [
  "futures-executor",
  "futures-util",
  "opentelemetry 0.33.1",
+ "percent-encoding",
  "portable-atomic",
+ "rand 0.9.5",
  "thiserror 2.0.21",
+ "tokio",
+ "tokio-stream",
 ]
 
 [[package]]
@@ -3527,7 +3682,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "22505a5c94da8e3b7c2996394d1c933236c4d743e81a410bcca4e6989fc066a4"
 dependencies = [
  "bytes",
- "heck 0.5.0",
+ "heck 0.4.1",
  "itertools 0.12.1",
  "log",
  "multimap",
@@ -3535,7 +3690,7 @@ dependencies = [
  "petgraph",
  "prettyplease",
  "prost 0.12.6",
- "prost-types",
+ "prost-types 0.12.6",
  "regex",
  "syn 2.0.119",
  "tempfile",
@@ -3574,6 +3729,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9091c90b0a32608e984ff2fa4091273cbdd755d54935c51d520887f4a1dbd5b0"
 dependencies = [
  "prost 0.12.6",
+]
+
+[[package]]
+name = "prost-types"
+version = "0.14.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f94967dc7688f3054c7fac87473ffae4cc4c3904800e2d9f5b857246d8963b0a"
+dependencies = [
+ "prost 0.14.4",
 ]
 
 [[package]]
@@ -3854,7 +4018,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -3881,7 +4045,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -3901,7 +4065,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -3932,7 +4096,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -3952,7 +4116,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -3979,7 +4143,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -3999,7 +4163,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4019,7 +4183,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4039,7 +4203,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4066,7 +4230,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4086,7 +4250,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4107,7 +4271,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4128,7 +4292,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4155,7 +4319,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4175,7 +4339,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4195,7 +4359,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4215,7 +4379,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4235,7 +4399,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4255,7 +4419,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4282,7 +4446,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4303,7 +4467,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4330,7 +4494,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4350,7 +4514,7 @@ version = "0.1.23"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4381,7 +4545,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4402,7 +4566,7 @@ dependencies = [
  "anyhow",
  "arc-swap",
  "base64 0.22.1",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4440,7 +4604,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4460,7 +4624,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4480,7 +4644,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4500,7 +4664,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4520,7 +4684,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4540,7 +4704,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4560,7 +4724,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4580,7 +4744,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4600,7 +4764,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4620,7 +4784,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4648,7 +4812,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4666,7 +4830,7 @@ dependencies = [
 name = "rerp_crm_acquisition"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4691,7 +4855,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4709,7 +4873,7 @@ dependencies = [
 name = "rerp_crm_audience"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4734,7 +4898,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4752,7 +4916,7 @@ dependencies = [
 name = "rerp_crm_automation"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4777,7 +4941,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4810,7 +4974,7 @@ dependencies = [
 name = "rerp_crm_edge"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4830,7 +4994,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4848,7 +5012,7 @@ dependencies = [
 name = "rerp_crm_insights"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4873,7 +5037,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4891,7 +5055,7 @@ dependencies = [
 name = "rerp_crm_intake"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4916,7 +5080,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4934,7 +5098,7 @@ dependencies = [
 name = "rerp_crm_messaging"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -4959,7 +5123,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -4979,7 +5143,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -5004,7 +5168,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -5023,7 +5187,7 @@ name = "rerp_crm_runtime"
 version = "0.1.0"
 dependencies = [
  "base64 0.23.1",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "chrono",
  "http 0.2.12",
  "lifeguard",
@@ -5041,7 +5205,7 @@ dependencies = [
 name = "rerp_crm_sales"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -5066,7 +5230,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -5084,7 +5248,7 @@ dependencies = [
 name = "rerp_crm_workspace"
 version = "0.1.0"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "chrono",
  "clap",
@@ -5109,7 +5273,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -5127,7 +5291,7 @@ dependencies = [
 name = "rerp_documents_render"
 version = "0.1.23"
 dependencies = [
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "lifeguard-migrate",
@@ -5144,7 +5308,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "arc-swap",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?rev=cb10df40d46c83811aa5a3016388e5b92af8df6a)",
  "brrtrouter_macros",
  "clap",
  "config",
@@ -5321,7 +5485,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5387,7 +5551,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5592,10 +5756,10 @@ dependencies = [
 [[package]]
 name = "sesame-idam-client"
 version = "0.1.0"
-source = "git+https://github.com/microscaler/sesame-idam-client.git?tag=v0.1.0#02ceb2bff70edb33fd5a98690aa7899fc0031f4e"
+source = "git+https://github.com/microscaler/sesame-idam-client.git?tag=v0.1.2#70c0c83544d7be3faa0193f02e2fdbbb7436e6ee"
 dependencies = [
  "base64 0.22.1",
- "brrtrouter",
+ "brrtrouter 0.1.0-alpha.1 (git+https://github.com/microscaler/BRRTRouter.git?tag=v0.1.1)",
  "getrandom 0.2.17",
  "may",
  "microscaler-timing 0.1.0 (git+https://github.com/microscaler/microscaler-observability.git?branch=main)",
@@ -5757,7 +5921,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3d1e2c7f27f8d4cb10542a02c49005dbd6e93095799d6f3be745fae9f8fedd4"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -5927,7 +6091,7 @@ dependencies = [
  "getrandom 0.4.3",
  "once_cell",
  "rustix",
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -6208,6 +6372,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tonic-types"
+version = "0.14.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "73ab1b02061f83d519bba3caa167f88f261ef05720ab8ebc954ade70de3348e8"
+dependencies = [
+ "prost 0.14.4",
+ "prost-types 0.14.4",
+ "tonic",
+]
+
+[[package]]
 name = "tower"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6311,6 +6486,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "tracing-opentelemetry"
+version = "0.34.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a904802a1b902f43638b677ff2a650847e3b4404101b6c586d648e8c1e3e8fe"
+dependencies = [
+ "js-sys",
+ "opentelemetry 0.33.1",
+ "smallvec",
+ "tracing",
+ "tracing-core",
+ "tracing-log",
+ "tracing-subscriber",
+ "web-time",
+]
+
+[[package]]
 name = "tracing-serde"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6372,6 +6563,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "470dbf6591da1b39d43c14523b2b469c86879a53e8b758c8e090a470fe7b1fbe"
 dependencies = [
  "rand 0.9.5",
+ "web-time",
+]
+
+[[package]]
+name = "ulid"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "947dde63b6d514cc5e044edad4e0ca7261afd1099d16c83d942cb2b2f348689c"
+dependencies = [
+ "rand 0.10.3",
  "web-time",
 ]
 
@@ -6677,7 +6878,7 @@ version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2a7b1c03c876122aa43f3020e6c3c3ee5c05081c9a00739faf7503aeba10d22"
 dependencies = [
- "windows-sys 0.60.2",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
